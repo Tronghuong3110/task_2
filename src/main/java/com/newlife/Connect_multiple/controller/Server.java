@@ -68,8 +68,8 @@ public class Server {
                 Integer count = 0;
                 do {
                     MqttMessage message = new MqttMessage(content.getBytes());
-                    message.setQos(qos);
-                    client.publish(pubTopic, message);
+//                  message.setQos(qos);
+//                  client.publish(pubTopic, message);
 //                  set thời gian chờ sau mỗi lần gửi lại
                 }
                 while (count++ <= 2 && checkResponse == false);
