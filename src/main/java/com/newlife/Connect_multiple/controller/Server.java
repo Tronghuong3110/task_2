@@ -1,7 +1,8 @@
 package com.newlife.Connect_multiple.controller;
 
-import com.newlife.Connect_multiple.service.OnMessageCallback;
+import com.google.gson.JsonObject;
 import org.eclipse.paho.client.mqttv3.*;
+import org.json.simple.JSONObject;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import java.util.Scanner;
@@ -21,9 +22,9 @@ public class Server {
                 String content = sc.nextLine();
 
                 String pubTopic = "test/test_1";
-//                String broker = "tcp://192.168.100.12:1883";
+                String broker = "tcp://192.168.100.17:1883";
 //                String broker = "tcp://192.168.0.101:1883";
-                String broker = "tcp://192.168.27.101:1883";
+//                String broker = "tcp://192.168.27.101:1883";
 //                String broker = "tcp://192.168.113.122:1883";
                 String clientId = "Server_Id";
                 MemoryPersistence persistence = new MemoryPersistence();
@@ -68,8 +69,8 @@ public class Server {
                 Integer count = 0;
                 do {
                     MqttMessage message = new MqttMessage(content.getBytes());
-//                  message.setQos(qos);
-//                  client.publish(pubTopic, message);
+                    message.setQos(qos);
+                    client.publish(pubTopic, message);
 //                  set thời gian chờ sau mỗi lần gửi lại
                 }
                 while (count++ <= 2 && checkResponse == false);
@@ -83,6 +84,17 @@ public class Server {
                 me.printStackTrace();
             }
         }
+    }
+
+    private String createJson() {
+        String message = "";
+        JSONObject jsonObject = new JSONObject();
+        Long milisecond = System.currentTimeMillis();
+        String id = milisecond + "clientId_2";
+        String command = "ping -t 1.1.1.1";
+        jsonObject.put("id", id);
+        jsonObject.put("command", command);
+        return jsonObject.toJSONString();
     }
 }
 
