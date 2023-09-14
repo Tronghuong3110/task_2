@@ -22,7 +22,7 @@ public class Server {
                 String content = sc.nextLine();
 
                 String pubTopic = "test/test_1";
-                String broker = "tcp://192.168.100.17:1883";
+                String broker = "tcp://192.168.100.8:1883";
 //                String broker = "tcp://192.168.0.101:1883";
 //                String broker = "tcp://192.168.27.101:1883";
 //                String broker = "tcp://192.168.113.122:1883";

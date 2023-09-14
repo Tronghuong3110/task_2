@@ -20,20 +20,19 @@ public class TestModuleInWindown {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split("\\s+");
-                if (parts.length >= 3) {
+//                if (parts.length >= 3) {
                     String caption = parts[0];
                     String processId = parts[parts.length-1];
                     String commandLine = solveCommandLine(parts);
-                    String commandLineFromDb = "ping -t 1."; // lấy từ database
-                    if(commandLine.contains(commandLineFromDb)) { // kiểm tra module với command line có còn chạy không
+                    String commandLineFromDb = "wininit"; // lấy từ database
+                    if(caption.contains(commandLineFromDb)) { // kiểm tra module với command line có còn chạy không
                         System.out.println("Caption: " + caption);
                         System.out.println("Processid: " + processId);
                         System.out.println("CommandLine: " + commandLine);
                         System.out.println("====================================================");
                     }
-                }
+//                }
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }

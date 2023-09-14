@@ -1,6 +1,5 @@
 package com.newlife.Connect_multiple.controller;
 
-import com.newlife.Connect_multiple.entity.Test;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 

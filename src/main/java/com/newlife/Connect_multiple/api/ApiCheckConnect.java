@@ -1,7 +1,6 @@
 package com.newlife.Connect_multiple.api;
 import com.google.gson.JsonArray;
 import com.newlife.Connect_multiple.converter.DataConverter;
-import com.newlife.Connect_multiple.entity.DataEntity;
 import com.squareup.okhttp.Credentials;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
