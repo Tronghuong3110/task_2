@@ -20,16 +20,16 @@ public class Client2 {
             MqttConnectOptions connOpts = new MqttConnectOptions();
             int qos = 2;
             String subTopic = "test/test_1";
-            String pubTopic = "test/test_1_client_2";
-            String broker = "tcp://192.168.100.8:1883";
+            String pubTopic = "Probe_3/800137002640200_Probe_3";
+            String broker = "tcp://192.168.27.106:1883";
 //          String broker = "tcp://192.168.0.101:1883";
-//          String broker = "tcp://192.168.27.101:1883";
+//          String broker = "tcp://192.168.27.106:1883";
 //          String broker = "tcp://192.168.113.122:1883";
 
-            String clientId = "Client_2_Id";
+            String clientId = "800137002640200_Probe_3";
             MemoryPersistence persistence = new MemoryPersistence();
             MqttClient client = new MqttClient(broker, clientId, persistence);
-            connOpts.setUserName("client 2");
+            connOpts.setUserName("probe4");
             connOpts.setPassword("1234".toCharArray());
 //            connOpts.setKeepAliveInterval(15);
             connOpts.setConnectionTimeout(50);

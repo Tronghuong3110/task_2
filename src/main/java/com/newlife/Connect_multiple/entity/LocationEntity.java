@@ -20,4 +20,36 @@ public class LocationEntity {
 
     @OneToMany(mappedBy = "locationEntity")
     List<AreaEntity> areaEntityList;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getLocationCode() {
+        return locationCode;
+    }
+
+    public void setLocationCode(String locationCode) {
+        this.locationCode = locationCode;
+    }
+
+    public List<AreaEntity> getAreaEntityList() {
+        return areaEntityList;
+    }
+
+    public void setAreaEntityList(List<AreaEntity> areaEntityList) {
+        this.areaEntityList = areaEntityList;
+    }
 }

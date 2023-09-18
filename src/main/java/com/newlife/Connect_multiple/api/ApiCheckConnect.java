@@ -1,6 +1,5 @@
 package com.newlife.Connect_multiple.api;
 import com.google.gson.JsonArray;
-import com.newlife.Connect_multiple.converter.DataConverter;
 import com.squareup.okhttp.Credentials;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -32,8 +31,8 @@ public class ApiCheckConnect {
                 JsonArray data = jsonObject.getAsJsonArray("data");
                 for(int i = 0; i < data.size(); i++) {
 //                    Những client còn connect tới
-                    DataEntity dataEntity = DataConverter.toEntity(data.get(i));
-                    System.out.println(dataEntity.getClientid());
+//                    DataEntity dataEntity = DataConverter.toEntity(data.get(i));
+//                    System.out.println(dataEntity.getClientid());
                 }
                 int count = meta.get("count").getAsInt();
                 return count+"";

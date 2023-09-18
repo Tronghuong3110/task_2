@@ -8,7 +8,6 @@ import java.sql.Date;
 public class CmdHistoryEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_cmd_history")
     private String id;
 

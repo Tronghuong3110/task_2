@@ -42,8 +42,8 @@ public class Client1 {
                     public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
                         String responseFromServer = new String(mqttMessage.getPayload());
                         if(!responseFromServer.equals("") || responseFromServer != null) {
-                            Test test = solveRequest(responseFromServer);
-                            MqttMessage message = new MqttMessage(serializeObject(test));
+//                            Test test = solveRequest(responseFromServer);
+                            MqttMessage message = new MqttMessage();
                             message.setQos(qos);
                             client.publish(pubTopic, message);
                         }
@@ -74,20 +74,6 @@ public class Client1 {
             }
 //        }
 
-    }
-
-    private static Test solveRequest(String request) {
-        Test test = new Test();
-        if(request.equals("")) {
-            test.setId("1");
-            test.setContent("Client 1 đã nhận được lệnh");
-            return test;
-        }
-        else {
-            test.setId("1");
-            test.setContent("Module thứ i vẫn hoạt động bình thường");
-        }
-        return null;
     }
 
     private static byte[] serializeObject(Test object) {

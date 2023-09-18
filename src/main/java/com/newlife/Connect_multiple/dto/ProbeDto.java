@@ -1,80 +1,27 @@
-package com.newlife.Connect_multiple.entity;
+package com.newlife.Connect_multiple.dto;
 
 import lombok.Data;
 
-import java.util.*;
-
-import javax.persistence.*;
 import java.sql.Date;
 
-@Entity
 @Data
-@Table(name = "probe")
-public class ProbeEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_probe")
+public class ProbeDto {
     private Integer id;
-
-    @Column(name = "location")
     private String location;
-
-    @Column(name = "area")
-    private String area;
-
-    @Column(name = "name")
+    private String area; //
     private String name;
-
-    @Column(name = "pub_topic", columnDefinition = "text")
-    private String pubTopic;
-
-    @Column(name = "status")
-    private String status;
-
-    @Column(name = "ip_address")
+    private String status; // đại diện cho probe còn kết nối tới broker không
     private String ipAddress;
-
-    @Column(name = "connect_at")
     private Date connectAt;
-
-    @Column(name = "number_stoped_module")
     private Integer numberStopedModule;
-
-    @Column(name = "number_running_module")
     private Integer numberRunningModule;
-
-    @Column(name = "number_pending_module")
     private Integer numberPendingModule;
-
-    @Column(name = "number_failed_module")
     private Integer numberFailedModule;
-
-    @Column(name = "olt")
     private String olt;
-
-    @Column(name = "vlan")
     private Integer vlan;
-
-    @Column(name = "description", columnDefinition = "text")
     private String description;
-
-
-    @Column(name = "client_id")
-    private String clientId;
-
-    @Column(name = "total_module")
     private Integer totalModule;
-
-    @Column(name = "create_at")
-    private Date createAt;
-
-    @OneToOne
-    @JoinColumn(name = "id_probe_option")
-    private ProbeOptionEntity probeOptionEntity;
-
-    @OneToMany(mappedBy = "probeEntity")
-    List<ProbeHistoryEntity> probeHistoryEntityList;
+    private String message;
 
     public Integer getId() {
         return id;
@@ -106,14 +53,6 @@ public class ProbeEntity {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getPubTopic() {
-        return pubTopic;
-    }
-
-    public void setPubTopic(String pubTopic) {
-        this.pubTopic = pubTopic;
     }
 
     public String getStatus() {
@@ -196,22 +135,6 @@ public class ProbeEntity {
         this.description = description;
     }
 
-    public ProbeOptionEntity getProbeOptionEntity() {
-        return probeOptionEntity;
-    }
-
-    public void setProbeOptionEntity(ProbeOptionEntity probeOptionEntity) {
-        this.probeOptionEntity = probeOptionEntity;
-    }
-
-    public String getClientId() {
-        return clientId;
-    }
-
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
-    }
-
     public Integer getTotalModule() {
         return totalModule;
     }
@@ -220,11 +143,11 @@ public class ProbeEntity {
         this.totalModule = totalModule;
     }
 
-    public Date getCreateAt() {
-        return createAt;
+    public String getMessage() {
+        return message;
     }
 
-    public void setCreateAt(Date createAt) {
-        this.createAt = createAt;
+    public void setMessage(String message) {
+        this.message = message;
     }
 }
