@@ -21,11 +21,12 @@ public class ProbeHistoryEntity {
     @Column(name = "at_time")
     private Date atTime;
 
-    @Column(name = "probe_name")
+    @Column(name = "probe_name", columnDefinition = "nvarchar(255)")
     private String probeName;
 
-    @Column(name = "id_probe")
-    private Integer idProbe;
+    @ManyToOne
+    @JoinColumn(name = "id_probe")
+    private ProbeEntity probeEntity;
 
     public Integer getId() {
         return id;
@@ -59,11 +60,11 @@ public class ProbeHistoryEntity {
         this.probeName = probeName;
     }
 
-    public Integer getIdProbe() {
-        return idProbe;
+    public ProbeEntity getProbeEntity() {
+        return probeEntity;
     }
 
-    public void setIdProbe(Integer idProbe) {
-        this.idProbe = idProbe;
+    public void setProbeEntity(ProbeEntity probeEntity) {
+        this.probeEntity = probeEntity;
     }
 }

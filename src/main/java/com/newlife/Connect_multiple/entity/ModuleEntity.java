@@ -12,7 +12,7 @@ public class ModuleEntity {
     @Column(name = "id_module")
     private Integer id;
 
-    @Column(name = "name")
+    @Column(name = "name", columnDefinition = "nvarchar(255)")
     private String name;
 
     @Column(name = "caption")
@@ -30,7 +30,7 @@ public class ModuleEntity {
     @Column(name = "path_log_default")
     private String pathLogDefault;
 
-    @Column(name = "note", columnDefinition = "text")
+    @Column(name = "note", columnDefinition = "ntext")
     private String note;
 
     public Integer getId() {

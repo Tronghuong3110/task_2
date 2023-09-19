@@ -12,7 +12,7 @@ public class AreaEntity {
     @Column(name = "id_area")
     private Integer id;
 
-    @Column(name = "name")
+    @Column(name = "name", columnDefinition = "nvarchar(255)")
     private String name;
 
     @Column(name = "area_code")

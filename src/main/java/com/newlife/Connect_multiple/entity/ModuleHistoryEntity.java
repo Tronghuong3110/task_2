@@ -14,10 +14,10 @@ public class ModuleHistoryEntity {
     @Column(name = "id_probe")
     private Integer idProbe;
 
-    @Column(name = "content")
+    @Column(name = "content", columnDefinition = "ntext")
     private String content;
 
-    @Column(name = "title")
+    @Column(name = "title", columnDefinition = "ntext")
     private String title;
 
     @Column(name = "caption")
@@ -32,10 +32,10 @@ public class ModuleHistoryEntity {
     @Column(name = "at_time")
     private Date atTime;
 
-    @Column(name = "module_name")
+    @Column(name = "module_name", columnDefinition = "nvarchar(255)")
     private String moduleName;
 
-    @Column(name = "note", columnDefinition = "text")
+    @Column(name = "note", columnDefinition = "ntext")
     private String note;
 
     @ManyToOne

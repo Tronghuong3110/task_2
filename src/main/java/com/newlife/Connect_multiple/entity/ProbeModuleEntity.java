@@ -42,7 +42,7 @@ public class ProbeModuleEntity {
     @Column(name = "process_id")
     private String processId;
 
-    @Column(name = "note", columnDefinition = "text")
+    @Column(name = "note", columnDefinition = "ntext")
     private String note;
 
     @OneToMany(mappedBy = "probeModuleEntity")

@@ -17,20 +17,20 @@ public class ProbeEntity {
     @Column(name = "id_probe")
     private Integer id;
 
-    @Column(name = "location")
+    @Column(name = "location", columnDefinition = "nvarchar(255)")
     private String location;
 
-    @Column(name = "area")
+    @Column(name = "area", columnDefinition = "nvarchar(255)")
     private String area;
 
-    @Column(name = "name")
+    @Column(name = "name", columnDefinition = "nvarchar(255)")
     private String name;
 
     @Column(name = "pub_topic", columnDefinition = "text")
     private String pubTopic;
 
     @Column(name = "status")
-    private String status;
+    private String status; // connected broker
 
     @Column(name = "ip_address")
     private String ipAddress;
@@ -56,7 +56,7 @@ public class ProbeEntity {
     @Column(name = "vlan")
     private Integer vlan;
 
-    @Column(name = "description", columnDefinition = "text")
+    @Column(name = "description", columnDefinition = "ntext")
     private String description;
 
 
@@ -68,6 +68,9 @@ public class ProbeEntity {
 
     @Column(name = "create_at")
     private Date createAt;
+
+    @Column(name = "deleted")
+    private Integer deleted;
 
     @OneToOne
     @JoinColumn(name = "id_probe_option")
@@ -226,5 +229,13 @@ public class ProbeEntity {
 
     public void setCreateAt(Date createAt) {
         this.createAt = createAt;
+    }
+
+    public Integer getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Integer deleted) {
+        this.deleted = deleted;
     }
 }

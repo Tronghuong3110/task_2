@@ -16,7 +16,8 @@ public interface ProbeRepository extends JpaRepository<ProbeEntity, Integer> {
     @Query(value = "select * from probe where (name COLLATE Latin1_General_CI_AI like %:name%) " +
                     "and (location COLLATE Latin1_General_CI_AI like %:location%) " +
                     "and (area COLLATE Latin1_General_CI_AI like %:area%) " +
-                    "and (vlan like %:vlan%)", nativeQuery = true)
+                    "and (vlan like %:vlan%) " +
+                    "and deleted = 0", nativeQuery = true)
     Page<ProbeEntity> findByNameOrLocationOrAreaOrVlan(@Param("name") String name,
                                                        @Param("location") String location,
                                                        @Param("area") String area,

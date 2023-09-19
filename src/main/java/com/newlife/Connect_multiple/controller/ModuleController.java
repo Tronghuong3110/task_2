@@ -18,6 +18,7 @@ public class ModuleController {
 
     @GetMapping("/modules")
     public List<ModuleDto> findAllModule(@RequestParam("name")Optional<String> name) {
-        return null;
+        List<ModuleDto> listModules = moduleService.findAllModule(name.orElse(""));
+        return listModules;
     }
 }

@@ -11,7 +11,7 @@ public class ServerEntity {
     @Column(name = "id_server")
     private Integer id;
 
-    @Column(name = "name")
+    @Column(name = "name", columnDefinition = "nvarchar(255)")
     private String name;
 
     @Column(name = "ip_address")

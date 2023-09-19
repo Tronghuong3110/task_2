@@ -32,7 +32,7 @@ public class CmdHistoryEntity {
     @Column(name = "status")
     private Integer status;
 
-    @Column(name = "message")
+    @Column(name = "message", columnDefinition = "ntext")
     private String message;
 
     @Column(name = "retry_times")

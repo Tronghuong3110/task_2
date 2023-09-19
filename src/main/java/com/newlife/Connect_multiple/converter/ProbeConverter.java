@@ -37,5 +37,29 @@ public class ProbeConverter {
         }
     }
 
-
+    public static ProbeEntity toEntity(ProbeEntity entity, ProbeDto dto) {
+        try {
+            if(!dto.getName().equals(entity.getName())) {
+                entity.setName(dto.getName());
+            }
+            if(!dto.getIpAddress().equals(entity.getIpAddress())) {
+                entity.setIpAddress(dto.getIpAddress());
+            }
+            if(!dto.getLocation().equals(entity.getLocation())) {
+                entity.setLocation(dto.getLocation());
+            }
+            if(!dto.getArea().equals(entity.getArea())) {
+                entity.setArea(dto.getArea());
+            }
+            if(!dto.getDescription().equals(entity.getDescription())) {
+                entity.setDescription(dto.getDescription());
+            }
+            return entity;
+        }
+        catch (NullPointerException e) {
+            System.out.println("Convert from probe dto to probe entity error (Update probe)");
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

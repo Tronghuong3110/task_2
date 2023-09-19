@@ -12,7 +12,7 @@ public class LocationEntity {
     @Column(name = "id_location")
     private Integer id;
 
-    @Column(name = "name")
+    @Column(name = "name", columnDefinition = "nvarchar(255)")
     private String name;
 
     @Column(name = "location_code")

@@ -76,6 +76,7 @@ public class ProbeService implements IProbeService {
 
                 // addd probe to database
                 probeEntity.setStatus("disconnect");
+                probeEntity.setDeleted(0);
                 probeEntity = probeRepository.save(probeEntity);
                 responseProbe = ProbeConverter.toDto(probeEntity);
                 responseProbe.setMessage("Create probe success");
@@ -85,7 +86,7 @@ public class ProbeService implements IProbeService {
                 probeHistoryEntity.setAction("Create");
                 probeHistoryEntity.setAtTime(new Date(System.currentTimeMillis()));
                 probeHistoryEntity.setProbeName(probeEntity.getName());
-                probeHistoryEntity.setIdProbe(probeEntity.getId());
+                probeHistoryEntity.setProbeEntity(probeEntity);
                 probeHistoryRepository.save(probeHistoryEntity);
             }
             return responseProbe;
@@ -111,13 +112,66 @@ public class ProbeService implements IProbeService {
     }
 
     @Override
-    public void delete(Integer id) {
-
+    public String delete(Integer id) {
+        try {
+            ProbeEntity probeEntity = probeRepository.findById(id)
+                    .orElse(null);
+            if(probeEntity == null) {
+                return "Can not found probe with id = " + id;
+            }
+            probeEntity.setDeleted(1);
+            probeEntity = probeRepository.save(probeEntity);
+            return "Delete probe with id " + id + " success";
+        }
+        catch (Exception e) {
+            System.out.println("Delete probe error");
+            e.printStackTrace();
+            return "Can not delete probe with " + id;
+        }
     }
 
     @Override
     public String updateProbe(ProbeDto probeDto) {
-        return null;
+        try {
+            ProbeEntity probeEntity = probeRepository.findById(probeDto.getId())
+                    .orElse(null);
+            probeEntity = ProbeConverter.toEntity(probeEntity, probeDto);
+            if(probeEntity == null) {
+                return "Can not update probe";
+            }
+            if(checkValidateIpAddress(probeEntity.getIpAddress())) {
+                return "Ip address invalidate";
+            }
+            if(checkProbeName(probeEntity.getName())) {
+                return "Name probe exists";
+            }
+            probeEntity = probeRepository.save(probeEntity);
+            return "Update probe success";
+        }
+        catch (Exception e) {
+            System.out.println("Update probe error");
+            e.printStackTrace();
+            return "Can not update probe";
+        }
+    }
+
+    @Override
+    public String backUpProbe(Integer id) {
+        try {
+            ProbeEntity probeEntity = probeRepository.findById(id)
+                    .orElse(null);
+            if(probeEntity == null) {
+                return "Can not found probe with id = " + id;
+            }
+            probeEntity.setDeleted(0);
+            probeEntity = probeRepository.save(probeEntity);
+            return "Back up probe with id = " + id + " success";
+        }
+        catch (Exception e) {
+            System.out.println("Back up probe error");
+            e.printStackTrace();
+            return "Can not back up probe with id = " + id;
+        }
     }
 
     private Boolean checkUsername(String username) {
