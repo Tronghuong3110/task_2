@@ -35,7 +35,8 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<scope>provided</scope>
+			<version>1.16.22</version>
+			<optional>true</optional>
 		</dependency>
 
 		<!--<dependency>-->
@@ -55,11 +56,6 @@
 			<artifactId>org.eclipse.paho.client.mqttv3</artifactId>
 			<version>1.2.5</version>
 		</dependency>
-		<!--<dependency>-->
-			<!--<groupId>com.squareup.okhttp3</groupId>-->
-			<!--<artifactId>okhttp</artifactId>-->
-			<!--<version>5.0.0-alpha.11</version>-->
-		<!--</dependency>-->
 		<dependency>
 			<groupId>com.squareup.okhttp</groupId>
 			<artifactId>okhttp</artifactId>
@@ -70,11 +66,6 @@
 			<artifactId>gson</artifactId>
 			<version>2.10.1</version>
 		</dependency>
-		<!--<dependency>-->
-			<!--<groupId>com.fasterxml.jackson.core</groupId>-->
-			<!--<artifactId>jackson-databind</artifactId>-->
-			<!--<version>2.9.8</version>-->
-		<!--</dependency>-->
 		<dependency>
 			<groupId>org.modelmapper</groupId>
 			<artifactId>modelmapper</artifactId>
@@ -94,19 +85,6 @@
 			<artifactId>json-simple</artifactId>
 			<version>1.1.1</version>
 		</dependency>
-
-		<!-- https://mvnrepository.com/artifact/com.sun.jna/jna -->
-		<dependency>
-			<groupId>com.sun.jna</groupId>
-			<artifactId>jna</artifactId>
-			<version>3.0.9</version>
-		</dependency>
-
-		<!--<dependency>-->
-			<!--<groupId>jdk.management</groupId>-->
-			<!--<artifactId>jdk.management.jfr</artifactId>-->
-			<!--<version>17.0.2</version>-->
-		<!--</dependency>-->
 
 	</dependencies>
 

@@ -17,7 +17,6 @@ public class ModuleService implements IModuleService {
     @Autowired
     private ModuleRepository moduleRepository;
 
-
     @Override
     public List<ModuleDto> findAllModule(String name) {
         List<ModuleEntity> listModules = moduleRepository.findAllByName(name);

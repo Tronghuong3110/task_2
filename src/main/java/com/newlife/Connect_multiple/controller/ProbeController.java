@@ -2,7 +2,6 @@ package com.newlife.Connect_multiple.controller;
 
 import com.newlife.Connect_multiple.dto.LocationDto;
 import com.newlife.Connect_multiple.dto.ProbeDto;
-import com.newlife.Connect_multiple.dto.ProbeOptionDto;
 import com.newlife.Connect_multiple.dto.RequestData;
 import com.newlife.Connect_multiple.service.ILocationService;
 import com.newlife.Connect_multiple.service.IProbeService;

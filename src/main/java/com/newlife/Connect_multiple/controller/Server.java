@@ -1,6 +1,5 @@
 package com.newlife.Connect_multiple.controller;
 
-import com.google.gson.JsonObject;
 import org.eclipse.paho.client.mqttv3.*;
 import org.json.simple.JSONObject;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;

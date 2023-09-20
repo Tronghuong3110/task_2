@@ -1,7 +1,5 @@
 package com.newlife.Connect_multiple.entity;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-
 import javax.persistence.*;
 
 @Entity

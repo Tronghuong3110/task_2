@@ -2,10 +2,6 @@ package com.newlife.Connect_multiple.controller;
 
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.Scanner;
 
 public class Client1 {
@@ -76,17 +72,4 @@ public class Client1 {
 
     }
 
-    private static byte[] serializeObject(Test object) {
-        try {
-            ByteArrayOutputStream by = new ByteArrayOutputStream();
-            ObjectOutputStream out = new ObjectOutputStream(by);
-            out.writeObject(object);
-            out.flush();
-            return by.toByteArray();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 }
