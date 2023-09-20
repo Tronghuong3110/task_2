@@ -38,5 +38,3 @@ public class ModuleController {
         return listProbeModules;
     }
 }
-
-// localhost:8081/api/v1/probe/modules?sortBy=error_per_week&name=Kiểm tra&status&page

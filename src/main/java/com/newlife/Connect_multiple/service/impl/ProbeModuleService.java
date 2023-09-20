@@ -3,6 +3,8 @@ package com.newlife.Connect_multiple.service.impl;
 import com.newlife.Connect_multiple.converter.ProbeModuleConverter;
 import com.newlife.Connect_multiple.dto.ProbeModuleDto;
 import com.newlife.Connect_multiple.entity.ProbeModuleEntity;
+import com.newlife.Connect_multiple.repository.CmdHistoryRepository;
+import com.newlife.Connect_multiple.repository.ModuleHistoryRepository;
 import com.newlife.Connect_multiple.repository.ModuleProbeRepository;
 import com.newlife.Connect_multiple.service.IProbeModuleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,11 @@ public class ProbeModuleService implements IProbeModuleService {
 
     @Autowired
     private ModuleProbeRepository moduleProbeRepository;
+    @Autowired
+    private ModuleHistoryRepository moduleHistoryRepository;
+    @Autowired
+    private CmdHistoryRepository cmdHistoryRepository;
+
     @Override
     public List<ProbeModuleDto> findAllProbeModule(String moduleName, String status, Integer page, String sortBy) {
         try {
@@ -37,5 +44,11 @@ public class ProbeModuleService implements IProbeModuleService {
             e.printStackTrace();
             return new ArrayList<>();
         }
+    }
+
+    @Override
+    public String runModule(Integer idProbeModule) {
+
+        return null;
     }
 }
