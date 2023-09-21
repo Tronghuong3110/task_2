@@ -1,9 +1,12 @@
 package com.newlife.Connect_multiple.entity;
 
+import lombok.Data;
+
 import javax.persistence.*;
 import java.sql.Date;
 
 @Entity
+@Data
 @Table(name = "server")
 public class ServerEntity {
     @Id
@@ -22,6 +25,9 @@ public class ServerEntity {
 
     @Column(name = "connect_at")
     private Date connectAt;
+
+    @Column(name = "server_id_connect")
+    private String serverIdConnect;
 
     @OneToOne
     @JoinColumn(name = "id_probe_option")

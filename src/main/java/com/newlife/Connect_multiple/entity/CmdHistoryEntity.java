@@ -1,9 +1,12 @@
 package com.newlife.Connect_multiple.entity;
 
+import lombok.Data;
+
 import javax.persistence.*;
 import java.sql.Date;
 
 @Entity
+@Data
 @Table(name = "cmd_history")
 public class CmdHistoryEntity {
 
@@ -40,5 +43,8 @@ public class CmdHistoryEntity {
 
     @Column(name = "at_time")
     private Date atTime;
+
+    @Column(name = "modifiledate")
+    private Date modifiledate;
 
 }

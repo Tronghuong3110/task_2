@@ -1,9 +1,12 @@
 package com.newlife.Connect_multiple.entity;
 
+import lombok.Data;
+
 import javax.persistence.*;
 import java.sql.Date;
 
 @Entity
+@Data
 @Table(name = "module_history")
 public class ModuleHistoryEntity {
 
