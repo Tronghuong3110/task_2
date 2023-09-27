@@ -12,8 +12,7 @@ import java.io.IOException;
 public class ApiCheckConnect {
     private static final String username = "2aee9b12c90aabd6";
     private static final String password = "iyOKvKD2t7uw2LUM7dOMcIYDYN4Bg9AuX8ZahoKRBwvM";
-
-    public static String checkExistClient(String clientId) {
+    public static Boolean checkExistClient(String clientId) {
         try {
             OkHttpClient client = new OkHttpClient();
             Request request = new Request.Builder()
@@ -29,19 +28,20 @@ public class ApiCheckConnect {
             try{
                 JsonObject meta = jsonObject.getAsJsonObject("meta");
                 JsonArray data = jsonObject.getAsJsonArray("data");
-                for(int i = 0; i < data.size(); i++) {
-//                    Những client còn connect tới
-//                    DataEntity dataEntity = DataConverter.toEntity(data.get(i));
-//                    System.out.println(dataEntity.getClientid());
-                }
+//                for(int i = 0; i < data.size(); i++) {
+////                    Những client còn connect tới
+////                    DataEntity dataEntity = DataConverter.toEntity(data.get(i));
+////                    System.out.println(dataEntity.getClientid());
+//                }
                 int count = meta.get("count").getAsInt();
-                return count+"";
+                return true;
             }
             catch (Exception e){
                 String messageCode = jsonObject.get("code").getAsString();
-                return messageCode;
+                if(messageCode.equals("CLIENTID_NOT_FOUND")) {
+                    return false;
+                }
             }
-//            return response.body().toString();
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -50,9 +50,9 @@ public class ApiCheckConnect {
     }
 
 
-    public static void main(String[] args) {
-        System.out.println(checkExistClient(""));
-    }
+//    public static void main(String[] args) {
+//        System.out.println(checkExistClient(""));
+//    }
 }
 
 //            OkHttpClient client = new OkHttpClient();

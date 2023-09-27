@@ -12,7 +12,7 @@ import java.sql.Date;
 @Table(name = "probe")
 public class ProbeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id_probe")
     private Integer id;
     @Column(name = "location", columnDefinition = "nvarchar(255)")
@@ -41,7 +41,7 @@ public class ProbeEntity {
     private String olt;
     @Column(name = "vlan")
     private Integer vlan;
-    @Column(name = "description", columnDefinition = "ntext")
+    @Column(name = "description", columnDefinition = "text")
     private String description;
     @Column(name = "client_id")
     private String clientId;

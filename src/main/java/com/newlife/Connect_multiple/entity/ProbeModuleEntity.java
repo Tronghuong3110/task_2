@@ -11,7 +11,7 @@ import java.util.*;
 public class ProbeModuleEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id_probe_module")
     private Integer id;
 
@@ -45,7 +45,7 @@ public class ProbeModuleEntity {
     @Column(name = "process_id")
     private String processId;
 
-    @Column(name = "note", columnDefinition = "ntext")
+    @Column(name = "note", columnDefinition = "text")
     private String note;
 
     @Column(name = "module_name", columnDefinition = "nvarchar(255)")

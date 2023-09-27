@@ -11,7 +11,7 @@ import java.sql.Date;
 public class ProbeHistoryEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id_probe_history")
     private Integer id;
 
@@ -28,43 +28,4 @@ public class ProbeHistoryEntity {
     @JoinColumn(name = "id_probe")
     private ProbeEntity probeEntity;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getAction() {
-        return action;
-    }
-
-    public void setAction(String action) {
-        this.action = action;
-    }
-
-    public Date getAtTime() {
-        return atTime;
-    }
-
-    public void setAtTime(Date atTime) {
-        this.atTime = atTime;
-    }
-
-    public String getProbeName() {
-        return probeName;
-    }
-
-    public void setProbeName(String probeName) {
-        this.probeName = probeName;
-    }
-
-    public ProbeEntity getProbeEntity() {
-        return probeEntity;
-    }
-
-    public void setProbeEntity(ProbeEntity probeEntity) {
-        this.probeEntity = probeEntity;
-    }
 }

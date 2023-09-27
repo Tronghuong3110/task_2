@@ -5,71 +5,50 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import java.util.Scanner;
 
 public class Client1 {
-    private  static String content = "Xin chào tao là client 1";
     public static void main(String[] args) {
-        boolean check = true;
+        try {
+            String broker = "tcp://192.168.100.5:1883";
+            String clientId = "Client_Id";
+            MemoryPersistence persistence = new MemoryPersistence();
+            MqttClient client = new MqttClient(broker, clientId, persistence);
 
-        Scanner sc = new Scanner(System.in);
-//        while (check) {
-            try {
-                MqttConnectOptions connOpts = new MqttConnectOptions();
-                int qos = 2;
-                String subTopic = "test/test_1"; // đăng kí nhận thông điệp từ server
-                String pubTopic = "test/client_1_test"; // đăng kí để gửi thông điệp
-//                String broker = "tcp://192.168.100.12:1883";
-//                String broker = "tcp://192.168.0.101:1883";
-                String broker = "tcp://192.168.27.101:1883";
-                String clientId = "Client_1_Id";
-                MemoryPersistence persistence = new MemoryPersistence();
-                MqttClient client = new MqttClient(broker, clientId, persistence);
-                connOpts.setUserName("client 1");
-                connOpts.setPassword("1234".toCharArray());
-                connOpts.setKeepAliveInterval(3);
-//                connOpts.setAutomaticReconnect(true);
+            // MQTT connection option
+            MqttConnectOptions connOpts = new MqttConnectOptions();
+            connOpts.setUserName("client");
+            connOpts.setPassword("1234".toCharArray());
+            connOpts.setKeepAliveInterval(3);
+            connOpts.setCleanSession(true);
 
-                connOpts.setCleanSession(true);
-                client.setCallback(new MqttCallback() {
-                    @Override
-                    public void connectionLost(Throwable throwable) {
+            // set callback
+            client.setCallback(new MqttCallback() {
+                @Override
+                public void connectionLost(Throwable throwable) {
+                }
 
-                    }
+                @Override
+                public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
+                    String messageContent = new String(mqttMessage.getPayload());
+                    System.out.println("Received message: " + messageContent);
+                }
 
-                    @Override
-                    public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
-                        String responseFromServer = new String(mqttMessage.getPayload());
-                        if(!responseFromServer.equals("") || responseFromServer != null) {
-//                            Test test = solveRequest(responseFromServer);
-                            MqttMessage message = new MqttMessage();
-                            message.setQos(qos);
-                            client.publish(pubTopic, message);
-                        }
-                        System.out.println(responseFromServer);
-                    }
+                @Override
+                public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
+                }
+            });
 
-                    @Override
-                    public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
+            client.connect(connOpts);
 
-                    }
-                });
+            // Nhập tên chủ đề bạn muốn subscribe (ví dụ: "client/client1")
+            String subTopic = "Probe_1/800137002640200_Probe_1";
 
-                System.out.println("Connecting to broker: " + broker);
-                client.connect(connOpts);
+            // Subscribe vào chủ đề
+            client.subscribe(subTopic);
 
-                System.out.println("Connected");
-                System.out.println("Publishing message: " + content);
+            System.out.println("Client is subscribed to: " + subTopic);
 
-                // Subscribe
-                client.subscribe(subTopic);
-            }
-            catch (MqttException  e) {
-                System.out.println("msg " + e.getMessage());
-                System.out.println("loc " + e.getLocalizedMessage());
-                System.out.println("cause " + e.getCause());
-                System.out.println("excep " + e);
-                e.printStackTrace();
-            }
-//        }
-
+        } catch (MqttException me) {
+            me.printStackTrace();
+        }
     }
 
 }

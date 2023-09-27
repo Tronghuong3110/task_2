@@ -17,10 +17,10 @@ public class ModuleHistoryEntity {
     @Column(name = "id_probe")
     private Integer idProbe;
 
-    @Column(name = "content", columnDefinition = "ntext")
+    @Column(name = "content", columnDefinition = "text")
     private String content;
 
-    @Column(name = "title", columnDefinition = "ntext")
+    @Column(name = "title", columnDefinition = "text")
     private String title;
 
     @Column(name = "caption")
@@ -38,7 +38,7 @@ public class ModuleHistoryEntity {
     @Column(name = "module_name", columnDefinition = "nvarchar(255)")
     private String moduleName;
 
-    @Column(name = "note", columnDefinition = "ntext")
+    @Column(name = "note", columnDefinition = "text")
     private String note;
 
     @ManyToOne

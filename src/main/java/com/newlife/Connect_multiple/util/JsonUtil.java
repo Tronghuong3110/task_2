@@ -42,4 +42,18 @@ public class JsonUtil {
             return null;
         }
     }
+
+    public static JSONObject createJsonResponse(String message, String status) {
+        try{
+            JSONObject res = new JSONObject();
+            res.put("message", message);
+            res.put("status", status);
+            return res;
+        }
+        catch (Exception e) {
+            System.out.println("Create response to front error");
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
