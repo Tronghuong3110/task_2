@@ -8,11 +8,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface ProbeRepository extends JpaRepository<ProbeEntity, Integer> {
     Boolean existsByIpAddress(String ipAddress);
     Boolean existsByName(String probeName);
-
     @Query(value = "select * from probe where (name COLLATE Latin1_General_CI_AI like %:name%) " +
                     "and (location COLLATE Latin1_General_CI_AI like %:location%) " +
                     "and (area COLLATE Latin1_General_CI_AI like %:area%) " +
@@ -23,6 +24,9 @@ public interface ProbeRepository extends JpaRepository<ProbeEntity, Integer> {
                                                        @Param("area") String area,
                                                        @Param("vlan") String vlan,
                                                        Pageable pageable);
+
+    @Query(value = "select * from probe where id_probe = :id", nativeQuery = true)
+    Optional<ProbeEntity> findProbe(@Param("id") Integer id);
 }
 
 
