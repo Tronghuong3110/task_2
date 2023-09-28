@@ -11,9 +11,9 @@ public class JsonUtil {
     public static String createJson(ProbeModuleEntity probeModuleEntity, String idCmdHistory, Optional<String> cmdWin, Optional<String> cmdLinux) {
         try {
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("idProbeModule", probeModuleEntity.getId());
+            jsonObject.put("idProbeModule", probeModuleEntity.getId().toString());
             jsonObject.put("idCmdHistory", idCmdHistory);
-            jsonObject.put("id_probe", probeModuleEntity.getIdProbe());
+            jsonObject.put("id_probe", probeModuleEntity.getIdProbe().toString());
             jsonObject.put("path", probeModuleEntity.getPath());
             jsonObject.put("caption", probeModuleEntity.getCaption());
             jsonObject.put("arg", probeModuleEntity.getArg());

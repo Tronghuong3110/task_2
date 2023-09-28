@@ -18,9 +18,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
 
 @Service
 public class ProbeModuleService implements IProbeModuleService {
@@ -41,6 +40,8 @@ public class ProbeModuleService implements IProbeModuleService {
     private ServerRepository serverRepository;
     private boolean checkResponse = false;
     private JSONObject responseMessage;
+    private Integer retry;
+    private Integer count;
 
     @Override
     public List<ProbeModuleDto> findAllProbeModule(String moduleName, String status, Integer page, String sortBy) {
@@ -64,6 +65,8 @@ public class ProbeModuleService implements IProbeModuleService {
     @Override
     public JSONObject runModule(Integer idProbeModule) {
         try {
+            retry = 0;
+            count = -2;
             checkResponse = false;
             responseMessage = new JSONObject();
             ServerEntity server = serverRepository.findAll().get(0); // lấy thông tin server
@@ -80,86 +83,123 @@ public class ProbeModuleService implements IProbeModuleService {
             ProbeEntity probe = probeRepository.findById(probeModuleEntity.getIdProbe()).orElse(null);
             // create message json
             String jsonObject = JsonUtil.createJson(probeModuleEntity, idCmd, Optional.ofNullable(null), Optional.ofNullable(null));
-            MqttConnectOptions connectOptions = createConnection(probeOption);
+            MqttConnectOptions connectOptions = createOption(probeOption);
             // kết nối server voi broker
-            MqttClient client = connectToClient(probeModuleEntity, probeOption, clientID, idCmd, connectOptions, subTopic.getSubTopic());
-            // set callback nhận response từ client
-            client.setCallback(new MqttCallback() {
-                @Override
-                public void connectionLost(Throwable throwable) {
-                    while (!client.isConnected()) {
-                        try {
-                            System.out.println("Đang kết nối lại...");
-                            Thread.sleep(5000);
-                            connectOptions.setUserName(probeOption.getUserName());
-                            connectOptions.setPassword(probeOption.getPassword().toCharArray());
-                            client.connect(connectOptions);
-                            client.subscribe(subTopic.getSubTopic());
-                            System.out.println("Kết nối lại thành công!!");
+            List<BrokerEntity> broker = brokerRepository.findAll();
+            String brokerURL = broker.get(0).getUrl();
+            // connect to broker
+            try {
+                MemoryPersistence persistence = new MemoryPersistence();
+                MqttClient client = new MqttClient(brokerURL, clientID, persistence);
+                if(!client.isConnected()) {
+                    client.connect(connectOptions);
+                    client.subscribe(subTopic.getSubTopic());
+                }
+                System.out.println("Json object " + jsonObject);
+                client.setCallback(new MqttCallback() {
+                    @Override
+                    public void connectionLost(Throwable throwable) {
+                        while (!client.isConnected()) {
+                            try {
+                                System.out.println("Đang kết nối lại...");
+                                Thread.sleep(5000);
+                                client.reconnect();
+                                client.subscribe(subTopic.getSubTopic());
+                                System.out.println("Kết nối lại thành công!!");
+                            }
+                            catch(InterruptedException | MqttException e) {
+                                e.printStackTrace();
+                            }
                         }
-                        catch(InterruptedException | MqttException e) {
-                            e.printStackTrace();
+                    }
+                    @Override
+                    public void messageArrived(String s, MqttMessage mqttMessage) {
+                        String message = new String(mqttMessage.getPayload());
+                        JSONObject json = JsonUtil.parseJson(message);
+                        if(json.containsKey("check")) {
+                            checkResponse = true; // đánh dấu cliet đã nhận được lệnh ==> không gửi lại lệnh nữa
+                            System.out.println("Response " + message);
+                            responseMessage = JsonUtil.parseJson(message);
+                            String status = (String) responseMessage.get("statusModule");
+                            System.out.println("Phản hồi từ client: " + responseMessage.get("statusCmd"));
+                            // client phản hồi đã nhận được lệnh
+                            if (responseMessage.containsKey("statusCmd") && (responseMessage.get("statusCmd").equals("OK") || responseMessage.get("statusCmd").equals("restart"))) {
+                                System.out.println("Message " + responseMessage.get("message"));
+                                // update status cmd history
+                                updateCmdHistory(idCmd, -1, 1);
+                            }
+                            // client phản hổi đã thực hiện lệnh thành công hoặc thất bại
+                            else if(status.equals("1") ||  status.equals("3")) {
+                                System.out.println("Status cmd " + json.get("message"));
+                                saveModuleHistory(status, 1, probeModuleEntity);
+                            }
                         }
                     }
-                }
-
-                @Override
-                public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
-                    String message = new String(mqttMessage.getPayload());
-                    responseMessage = JsonUtil.parseJson(message);
-                    Object status = responseMessage.get("statusModule");
-                    System.out.println("Phản hồi từ client: ");
-                    // client phản hồi đã nhận được lệnh
-                    if (responseMessage.containsKey("statusCmd") && (responseMessage.get("statusCmd").equals("OK") || responseMessage.get("statusCmd").equals("restart"))) {
-                        checkResponse = true; // đánh dấu cliet đã nhận được lệnh ==> không gửi lại lệnh nữa
-                        System.out.println(responseMessage.get("message"));
-                        // update status cmd history
-                        updateCmdHistory(idCmd, -1, 1);
+                    @Override
+                    public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
                     }
-                    // client phản hổi đã thực hiện lệnh thành công hoặc thất bại
-                    else if(status.equals("1") ||  status.equals("3")) {
-                        saveModuleHistory((String) status, 1, probeModuleEntity);
+                });
+                // send message
+                MqttMessage message = new MqttMessage(jsonObject.getBytes());
+                message.setQos(2);
+                client.publish(subTopic.getSubTopic(), message);
+                // gửi lại lệnh khi chưa nhận được phản hồi từ client
+                while (true) {
+                    Thread.sleep(5000);
+                    if (retry <= 2 && !checkResponse) {
+                        retry++;
+                        // Gửi lại tin nhắn
+                        client.publish(subTopic.getSubTopic(), message);
+                    } else if (!checkResponse && retry > 2) {
+                        if (retry > 2) {
+                            updateCmdHistory(idCmd, 3, 4);
+                            Boolean clientIsDisconnect = checkClientIsDisconnect(clientID);
+                            if (!clientIsDisconnect) {
+                                // Thông báo cho FE client đã mất kết nối
+                                System.out.println("Send to front end " + "đã mất kết nối tới broker");
+                                client.disconnect();
+                                return responseMessageToFE("Probe " + probe.getName() + "đã mất kết nối tới broker", probeModuleEntity);
+                            } else {
+                                // Thông báo gửi lệnh thất bại
+                                System.out.println("Send to front end " + "không nhận được yêu cầu thực hiện");
+                                client.disconnect();
+                                return responseMessageToFE("Probe " + probe.getName() + "không nhận được yêu cầu thực hiện", probeModuleEntity);
+                            }
+                        }
+                    } else if(checkResponse) {
+                        break;
                     }
                 }
-
-                @Override
-                public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
-
-                }
-            });
-            // gửi lệnh tới client
-            client.connect(connectOptions);
-            client.subscribe(subTopic.getSubTopic());
-            sendMessage(client, jsonObject, subTopic.getSubTopic(), 0, idCmd, 0);
-            // gửi lại lệnh khi chưa nhận được phản hồi từ client
-            int retry = 0;
-            while (checkResponse == false && retry <= 2) {
-                retry++;
-                sendMessage(client, jsonObject, subTopic.getSubTopic(), retry, idCmd, 0);
-                Thread.sleep(5);
-            }
-            // TH gửi lệnh không thành công
-            if(checkResponse == false) {
-                // gửi lệnh thất bại
-                updateCmdHistory(idCmd, 3, 4);
-                Boolean clientIsDisconnect = checkClientIsDisconnect(clientID);
-                if(!clientIsDisconnect) { // TH client mất kết noois tới broker
-                    // thông báo cho FE client đã mất kết nối
-                    return responseMessageToFE("Probe " + probe.getName() + " đã mất kết nối tới broker", probeModuleEntity);
-                }
-                else {
-                    // thông báo gửi lệnh thất bại
-                    return responseMessageToFE("Probe " + probe.getName() + " không nhận được yêu cầu thực hiện", probeModuleEntity);
+                // client đã nhận được lệnh, kiểm tra xem lệnh chạy thành công hay thất bại
+                while(true) {
+                    Thread.sleep(2000);
+                    String statusModule = (String) responseMessage.get("statusModule");
+                    System.out.println("Status module " + statusModule);
+                    // TH nhận được phản hồi về trạng thái module
+                    if (statusModule != null && (statusModule.equals("1") || statusModule.equals("3"))) {
+                        System.out.println("Module thành công hoặc thất bại" + responseMessage.toJSONString());
+                        client.disconnect();
+                        return responseMessageToFE("", probeModuleEntity);
+                    }
+                    // TH không nhận được phản hồi
+                    else if (count >= 3) {
+                        System.out.println("Client không có phản hồi " + responseMessage.toJSONString());
+                        client.disconnect();
+                        return responseMessageToFE("Không nhận được phản hồi từ client", probeModuleEntity);
+                    } else {
+                        count++;
+                    }
                 }
             }
-            // TH client nhận được lệnh và chạy lệnh nhưng không có phản hổi chạy thành công hay thất bại
-            String statusModule = (String) responseMessage.get("statusModule");
-            Thread.sleep(5);
-            if(statusModule != null) { // TH nhận được phản hồi về trạng thái module
-                return responseMessageToFE("", probeModuleEntity);
+            catch (MqttException me) {
+                System.out.println("reason " + me.getReasonCode());
+                System.out.println("msg " + me.getMessage());
+                System.out.println("loc " + me.getLocalizedMessage());
+                System.out.println("cause " + me.getCause());
+                System.out.println("excep " + me);
+                me.printStackTrace();
+                return new JSONObject();
             }
-            // Có nên gửi lại lệnh không???
-            return responseMessageToFE("Không nhận được phản hồi từ client", probeModuleEntity);
         }
         catch (Exception e) {
             System.out.println("Chạy module lỗi rồi!");
@@ -169,28 +209,11 @@ public class ProbeModuleService implements IProbeModuleService {
     }
 
     //Kết nối server với broker
-    private MqttClient connectToClient(ProbeModuleEntity probeModuleEntity, ProbeOptionEntity probeOption, String clientID, String idCmd, MqttConnectOptions connectOptions, String subTopic) {
+    private MqttClient connectToClient(String clientID, String subTopic) {
         try {
             // get subtopic to server subscribe send message to client
             // chi co 1 Broker duy nhat
-            List<BrokerEntity> broker = brokerRepository.findAll();
-            String brokerURL = broker.get(0).getUrl();
-            // connect to broker
-            try {
-                MemoryPersistence persistence = new MemoryPersistence();
-                MqttClient client = new MqttClient(brokerURL, clientID, persistence);
 
-                // set callback
-                System.out.println("Subscribe = " + subTopic);
-                return client;
-            } catch (MqttException me) {
-                System.out.println("reason " + me.getReasonCode());
-                System.out.println("msg " + me.getMessage());
-                System.out.println("loc " + me.getLocalizedMessage());
-                System.out.println("cause " + me.getCause());
-                System.out.println("excep " + me);
-                me.printStackTrace();
-            }
         }
         catch (Exception e) {
             System.out.println("Connect to broker fail");
@@ -202,21 +225,18 @@ public class ProbeModuleService implements IProbeModuleService {
 
     private void sendMessage(MqttClient client, String jsonObject, String pubTopic, Integer retry, String idCmd, Integer status) {
         // cập nhật bảng cmd history // từ lần gửi lại đầu tiên
-        if(retry >= 1) {
-            updateCmdHistory(idCmd, retry, status);
-        }
-        int qos = 0;
-//        System.out.println(jsonObject + " " + pubTopic);
-
-        try {
-            MqttMessage message = new MqttMessage(jsonObject.getBytes());
-            message.setQos(qos);
-            client.publish(pubTopic, message);
-        }
-        catch (MqttException e) {
-            System.out.print("Send message error");
-            e.printStackTrace();
-        }
+//        if(retry >= 1) {
+//            updateCmdHistory(idCmd, retry, status);
+//        }
+//        int qos = 0;
+//
+//        try {
+//
+//        }
+//        catch (MqttException e) {
+//            System.out.print("Send message error");
+//            e.printStackTrace();
+//        }
     }
 
     private String saveCmd(ProbeModuleEntity probeModuleEntity) {
@@ -338,7 +358,7 @@ public class ProbeModuleService implements IProbeModuleService {
         }
     }
 
-    private MqttConnectOptions createConnection(ProbeOptionEntity probeOption) {
+    private MqttConnectOptions createOption(ProbeOptionEntity probeOption) {
         try {
             MqttConnectOptions connectOptions = new MqttConnectOptions();
             connectOptions.setUserName(probeOption.getUserName());

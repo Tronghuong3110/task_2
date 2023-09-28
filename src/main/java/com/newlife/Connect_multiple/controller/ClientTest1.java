@@ -29,7 +29,7 @@ public class ClientTest1 {
                 String responseMessage1 = "Client 1 nhận được tin nhắn";
                 if(!response.equals(responseMessage1)) {
                     MqttMessage responseMessage = new MqttMessage(responseMessage1.getBytes());
-                    responseMessage.setQos(2);
+                    responseMessage.setQos(1);
                     client.publish(topic, responseMessage);
                     Thread.sleep(10000);
                     System.out.println("Hoàn thành");

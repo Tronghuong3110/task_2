@@ -42,7 +42,7 @@ public class ModuleController {
 
     @PostMapping("/probeModule")
     public ResponseEntity<?> runModule(@RequestParam("idProbeModule") Optional<Integer> idProbeModule) {
-        JSONObject jsonObject = probeModuleService.runModule(idProbeModule.orElse(0));
+        Object jsonObject = probeModuleService.runModule(idProbeModule.orElse(0));
         return ResponseEntity.ok(jsonObject);
     }
 }

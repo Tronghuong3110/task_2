@@ -16,7 +16,7 @@ public class TestModuleInWindown {
 //            ProcessBuilder processBuilder = new ProcessBuilder("powershell.exe",
 //                                "Get-WmiObject -Class Win32_Process | Select-Object ProcessId,Name,Status");
             ProcessBuilder processBuilder = new ProcessBuilder("powershell.exe",
-                    "wmic process get Caption,Processid,Commandline");
+                    "WMIC path win32_process get Caption,Processid,Commandline");
 //            ProcessBuilder processBuilder = new ProcessBuilder("powershell.exe",
 //                    "Get-WmiObject -Query 'SELECT * FROM Win32_Process ' ");
             Process process = processBuilder.start();
@@ -30,29 +30,10 @@ public class TestModuleInWindown {
                     String caption = parts[0];
                     String processId = parts[parts.length-1];
                     String commandLine = solveCommandLine(parts);
-//                    String commandLineFromDb = "wininit"; // lấy từ database
-//                    if(caption.contains(commandLineFromDb)) { // kiểm tra module với command line có còn chạy không
-                    List<String> strs = new ArrayList<>();
-                    String tmp = "";
-                    for(int i = 0; i < parts.length; i++) {
-                        if(parts[i].equals("18920")) {
-//                            System.out.print(" ++ Status ++ ");
-//                            System.out.print(parts[i] + "+");
-                        }
-                        tmp += parts[i] + " ";
-                    }
-                    strs.add(tmp);
-//                    System.out.println("====================================================");
-//                    }
-//                }
-                for(String str : strs) {
-//                    if(str.contains("18920")) {
-                        System.out.println(str.toLowerCase().contains("running"));
-                        System.out.println("================================ status ===============");
-                        System.out.println(str);
-                        System.out.println("================================ status ===============");
-//                    }
-                }
+                    System.out.println("caption " + caption);
+                    System.out.println("CommandLine " + commandLine);
+                    System.out.println("PID " + processId);
+                    System.out.println("==================================================");
             }
         } catch (IOException e) {
             e.printStackTrace();
