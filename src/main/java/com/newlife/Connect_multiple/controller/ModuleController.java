@@ -40,9 +40,26 @@ public class ModuleController {
         return listProbeModules;
     }
 
-    @PostMapping("/probeModule")
+    @PostMapping("/probeModule/run")
     public ResponseEntity<?> runModule(@RequestParam("idProbeModule") Optional<Integer> idProbeModule) {
         Object jsonObject = probeModuleService.runModule(idProbeModule.orElse(0));
         return ResponseEntity.ok(jsonObject);
+    }
+
+    @PostMapping("/probeModule/stop")
+    public ResponseEntity<?> stopModule(@RequestParam("idProbeModule") Optional<Integer> idProbeModule) {
+        Object jsonObject = probeModuleService.stopModule(idProbeModule.orElse(0));
+        return ResponseEntity.ok(jsonObject);
+    }
+
+    @GetMapping("/test")
+    public String test(){
+        try {
+            Thread.sleep(2000);
+            return "hello";
+        }
+        catch (InterruptedException e) {
+            return null;
+        }
     }
 }
