@@ -156,11 +156,11 @@ public class ProbeModuleService implements IProbeModuleService {
                         if (!clientIsDisconnect) {
                             // Thông báo cho FE client đã mất kết nối
                             System.out.println("Send to front end " + "đã mất kết nối tới broker");
-                            return responseMessageToFE("Probe " + probe.getName() + " đã mất kết nối tới broker", probeModuleEntity, "4", 1);
+                            return responseMessageToFE("Probe " + probe.getName() + " đã mất kết nối tới broker", probeModuleEntity, "4", 1, null);
                         } else {
                             // Thông báo gửi lệnh thất bại
                             System.out.println("Send to front end " + "không nhận được yêu cầu thực hiện");
-                            return responseMessageToFE("Probe " + probe.getName() + " không nhận được yêu cầu thực hiện", probeModuleEntity, "4", 1);
+                            return responseMessageToFE("Probe " + probe.getName() + " không nhận được yêu cầu thực hiện", probeModuleEntity, "4", 1, null);
                         }
                     }
                 } else if(checkResponse) {
@@ -176,13 +176,13 @@ public class ProbeModuleService implements IProbeModuleService {
                 if (statusModule != null && (statusModule.equals("1") || statusModule.equals("3"))) {
                     System.out.println("Module thành công hoặc thất bại" + responseMessage.toJSONString());
                     String mess = statusModule.equals("1") ? "Module chạy thành công" : "Module chạy thất bại";
-                    return responseMessageToFE(mess, probeModuleEntity, statusModule, 1);
+                    return responseMessageToFE(mess, probeModuleEntity, statusModule, 1, (String) responseMessage.get("PID"));
                 }
                 // TH không nhận được phản hồi
                 else if (count >= 3) {
                     System.out.println("Client không có phản hồi " + responseMessage.toJSONString());
                     // có nên gửi lại không??
-                    return responseMessageToFE("Không nhận được phản hồi từ client", probeModuleEntity, "4", 1);
+                    return responseMessageToFE("Không nhận được phản hồi từ client", probeModuleEntity, "4", 1, null);
                 } else {
                     count++;
                 }
@@ -288,11 +288,11 @@ public class ProbeModuleService implements IProbeModuleService {
                         if (!clientIsDisconnect) {
                             // Thông báo cho FE client đã mất kết nối
                             System.out.println("Send to front end " + "đã mất kết nối tới broker");
-                            return responseMessageToFE("Probe " + probe.getName() + " đã mất kết nối tới broker", probeModuleEntity, "4", 2);
+                            return responseMessageToFE("Probe " + probe.getName() + " đã mất kết nối tới broker", probeModuleEntity, "4", 2, null);
                         } else {
                             // Thông báo gửi lệnh thất bại
                             System.out.println("Send to front end " + "không nhận được yêu cầu thực hiện");
-                            return responseMessageToFE("Probe " + probe.getName() + " không nhận được yêu cầu thực hiện", probeModuleEntity, "4", 2);
+                            return responseMessageToFE("Probe " + probe.getName() + " không nhận được yêu cầu thực hiện", probeModuleEntity, "4", 2, null);
                         }
                     }
                 } else if(checkResponse) {
@@ -308,13 +308,13 @@ public class ProbeModuleService implements IProbeModuleService {
                 if (statusModule != null && (statusModule.equals("1") || statusModule.equals("2"))) {
                     System.out.println("Module stop thành công hoặc thất bại" + responseMessage.toJSONString());
                     String mess = statusModule.equals("2") ? "Module stop thành công" : "Module stop thất bại";
-                    return responseMessageToFE(mess, probeModuleEntity, statusModule, 2);
+                    return responseMessageToFE(mess, probeModuleEntity, statusModule, 2, responseMessage.get("PID"));
                 }
                 // TH không nhận được phản hồi
                 else if (count >= 3) {
                     System.out.println("Client không có phản hồi " + responseMessage.toJSONString());
                     // có nên gửi lại không??
-                    return responseMessageToFE("Không nhận được phản hồi từ client", probeModuleEntity, "4", 2);
+                    return responseMessageToFE("Không nhận được phản hồi từ client", probeModuleEntity, "4", 2, null);
                 } else {
                     count++;
                 }
@@ -472,9 +472,9 @@ public class ProbeModuleService implements IProbeModuleService {
         cmdHistoryRepository.save(cmdHistoryEntity);
     }
     // tạo json gửi đến front end
-    private JSONObject responseMessageToFE(String message, ProbeModuleEntity probeModuleEntity, String status, Integer statusExcept) {
+    private JSONObject responseMessageToFE(String message, ProbeModuleEntity probeModuleEntity, String status, Integer statusExcept, String pId) {
         String statusResult = statusResult(statusExcept, status);
-        saveModuleHistory(status, statusExcept, probeModuleEntity);
+        saveModuleHistory(status, statusExcept, probeModuleEntity, pId);
         return JsonUtil.createJsonResponse(message, statusResult.toString());
     }
     // Kiểm tra xem probe có còn kết nói với broker không
