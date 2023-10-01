@@ -64,12 +64,20 @@ public class JsonUtil {
     public static String createJsonStatus(String action, List<ProbeModuleEntity> probeModuleEntities) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("action", action);
-
+        Integer idProbe = null;
         JSONArray jsonArray = new JSONArray();
         for (ProbeModuleEntity probeModule : probeModuleEntities) {
-            jsonArray.put(probeModule);
+            JSONObject jsonObject1 = new JSONObject();
+            jsonObject1.put("id_probe_module", probeModule.getId());
+            jsonObject1.put("commandLine", probeModule.getCommand());
+            jsonObject1.put("path_log", probeModule.getPathLog());
+            jsonObject1.put("PID", probeModule.getProcessId());
+            jsonObject.put("cmd_win", probeModule.getCommand());
+            jsonObject.put("cmd_linux", probeModule.getCommand());
+            idProbe = probeModule.getIdProbe();
+            jsonArray.put(jsonObject1);
         }
-
+        jsonObject.put("id_probe", idProbe);
         jsonObject.put("listModule", jsonArray);
         return jsonObject.toJSONString();
     }

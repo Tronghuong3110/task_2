@@ -53,13 +53,7 @@ public class ModuleController {
     }
 
     @GetMapping("/test")
-    public String test(){
-        try {
-            Thread.sleep(2000);
-            return "hello";
-        }
-        catch (InterruptedException e) {
-            return null;
-        }
+    public Map<String, String> test(){
+        return probeModuleService.getStatusModulePeriodically();
     }
 }

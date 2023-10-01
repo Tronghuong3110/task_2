@@ -30,7 +30,7 @@ public class ModuleHistoryEntity {
     private String arg;
 
     @Column(name = "status")
-    private Integer status;
+    private String status;
 
     @Column(name = "at_time")
     private Date atTime;

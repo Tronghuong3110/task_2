@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -25,8 +26,8 @@ public interface ProbeRepository extends JpaRepository<ProbeEntity, Integer> {
                                                        @Param("vlan") String vlan,
                                                        Pageable pageable);
 
-    @Query(value = "select * from probe where id_probe = :id", nativeQuery = true)
-    Optional<ProbeEntity> findProbe(@Param("id") Integer id);
+    @Query(value = "select * from probemodule.probe where status = :status ", nativeQuery = true)
+    List<ProbeEntity> findProbeByStatus(@Param("status") String status);
 }
 
 
