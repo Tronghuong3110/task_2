@@ -2,7 +2,7 @@ package com.example.demo1;
 
 public class ProcessInfo {
     private Long pId;
-    private String command;
+    private String command; // caption
     private String commandLine;
     private String argument;
 

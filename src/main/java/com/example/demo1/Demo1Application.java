@@ -81,9 +81,9 @@ public class Demo1Application {
 			return null;
 		}
 	}
-	private static Long checkModule(JSONObject jsonObject, List<ProcessInfo> listProcess) {
+	private static String checkModule(JSONObject jsonObject, List<ProcessInfo> listProcess) {
 		String commandLine = null;
-		String action = null;
+		String action = "";
 		if(jsonObject.containsKey("action")) {
 			action = (String) jsonObject.get("action");
 		}
@@ -94,45 +94,49 @@ public class Demo1Application {
 			commandLine = (String) jsonObject.get("cmd_linux");
 		}
 		for(ProcessInfo processInfo : listProcess) {
-			if(action.equals("run")) {
+//			if(action.equals("run")) {
 				if(processInfo.getCommandLine().trim().toLowerCase().equals(commandLine.trim().toLowerCase())) {
 					System.out.println("Command Line 1 " + commandLine);
 					System.out.println("Command Line 2 " + processInfo.getCommandLine());
-					return processInfo.getpId();
+					return processInfo.getpId() + " " + processInfo.getCommand();
 				}
-			}
-			else if(action.equals("stop")) {
-				if(processInfo.getpId() == Long.parseLong((String) jsonObject.get("PID"))) {
-					System.out.println("PID 1" + jsonObject.get("PID"));
-					System.out.println("Command Line 2 " + processInfo.getpId());
-					return processInfo.getpId();
-				}
-			}
-			else {
-				// kiểm tra status của module theo chu kì
-				if(processInfo.getpId() == Long.parseLong((String) jsonObject.get("PID")) &&
-						processInfo.getCommandLine().trim().toLowerCase().equals(commandLine.trim().toLowerCase())) {
-					System.out.println("PID 1 (status) " + jsonObject.get("PID"));
-					System.out.println("PID 2 (status)" + processInfo.getpId());
-					System.out.println("Command Line 1 (status) " + commandLine);
-					System.out.println("Command Line 2 (status) " + processInfo.getCommandLine());
-					return processInfo.getpId();
-				}
-			}
+//			}
+//			else if(action.equals("stop")) {
+//				if(processInfo.getpId() == Long.parseLong((String) jsonObject.get("PID"))) {
+//					System.out.println("PID 1" + jsonObject.get("PID"));
+//					System.out.println("Command Line 2 " + processInfo.getpId());
+//					return processInfo.getpId();
+//				}
+//			}
+//			else if (action.isEmpty()){
+//				// kiểm tra status của module theo chu kì
+//				if(processInfo.getpId() == Long.parseLong((String) jsonObject.get("PID")) &&
+//						processInfo.getCommandLine().trim().toLowerCase().equals(commandLine.trim().toLowerCase())) {
+//					System.out.println("PID 1 (status) " + jsonObject.get("PID"));
+//					System.out.println("PID 2 (status)" + processInfo.getpId());
+//					System.out.println("Command Line 1 (status) " + commandLine);
+//					System.out.println("Command Line 2 (status) " + processInfo.getCommandLine());
+//					return processInfo.getpId();
+//				}
+//			}
 		}
-		return -1L;
+		return -1 + " ";
 	}
 	// chạy module
 	private static String runModule(JSONObject jsonObject) {
 		List<ProcessInfo> listProcess = new ArrayList<>();
 		boolean isWindows = os.toLowerCase().startsWith("windows");
-		Long PID = null;
+		String PID = null; // lưu PID + processName
+		listProcess = getListProcess();
+		PID = checkModule(jsonObject, listProcess);
 		if(jsonObject.get("idProbeModule").equals(moduleId) && jsonObject.get("idCmdHistory").equals(cmdId)) {
-			listProcess = getListProcess();
-			PID = checkModule(jsonObject, listProcess);
-			if(!PID.equals(-1)) { // ddang chay
+			if(!PID.split(" ")[0].equals("-1")) { // ddang chay
 				return "success " + PID;
 			}
+		}
+		// Kiểm tra đang yêu cầu chạy có đang chạy không(kiểm tra theo command line)
+		if(!PID.split(" ")[0].equals("-1")) { // có đang chạy
+			return "success " + PID;
 		}
 		try {
 			moduleId = (String) jsonObject.get("idProbeModule");
@@ -151,13 +155,15 @@ public class Demo1Application {
 			Boolean existsModule  = true;
 			for(int i = 1; i <= 2; i++) {
 				PID = checkModule(jsonObject, listProcess);
-				if(PID.equals(-1)) {
+				// không còn tồn tại trên task manager
+				if(PID.split(" ")[0].equals("-1")) {
 					existsModule = false;
 					break;
 				}
 				Thread.sleep(5000);
 			}
 			if(existsModule) {
+				// chạy thành công ==> trả về success + processId + nameProcess
 				return "success " + PID;
 			}
 			return "fail " + PID;
@@ -165,46 +171,64 @@ public class Demo1Application {
 		catch (Exception e) {
 			System.out.println("Run command line error!");
 			e.printStackTrace();
-			return "fail " + "-1";
+			return "fail " + "-1" + " ";
 		}
 	}
 	// dừng module
 	private static String stopModule(JSONObject jsonObject) {
 		List<ProcessInfo> listProcess = getListProcess();
 		boolean isWindows = os.toLowerCase().startsWith("windows");
-		Long PID = checkModule(jsonObject, listProcess); // lấy ra process id của module đang chạy
+		String PID = checkModule(jsonObject, listProcess); // lấy ra process id của module đang chạy
 		// kiểm tra xem lệnh này có đc gửi từ trc đó không
 		if(jsonObject.get("idProbeModule").equals(moduleId) && jsonObject.get("idCmdHistory").equals(cmdId)) {
-			if(PID == -1) { // module dang khong chay
-				return "success " + 0;
+			if(PID.split(" ")[0].equals("-1")) { // module dang khong chay
+				return "success " + 0 + " " + null;
 			}
 		}
 		try {
 			moduleId = (String) jsonObject.get("idProbeModule");
 			cmdId = (String) jsonObject.get("idCmdHistory");
-			ProcessBuilder builder = new ProcessBuilder();
 			String command = "";
 			if(isWindows) {
-				command = (String) jsonObject.get("cmd_win");
+				command = (String) jsonObject.get("cmd_win"); // câu lệnh stop đối với windows
 			}else{
-				command = (String) jsonObject.get("cmd_linux");
+				command = (String) jsonObject.get("cmd_linux"); // câu lệnh stop đối với linux
 			}
-			if(PID != -1) { // module vẫn đang chạy ==> tienfs hành dừng module
+			String processName = (String) jsonObject.get("nameProcess"); // tên process để thực hiện dừng
+			if(!PID.split(" ")[0].equals("-1")) { // module vẫn đang chạy ==> tiến hành dừng module
+				// có thay đổi trong câu lệnh dừng ==> chưa làm
 				Process process = Runtime.getRuntime().exec(command + " " + jsonObject.get("PID"));
 			}
+
+			// kiểm tra lại module xem còn đang chạy không
 			listProcess = getListProcess();
 			PID = checkModule(jsonObject, listProcess);
-			if(PID == -1) {
-				return "success " + 0;
+			// TH dừng module thành công
+			if(PID.split(" ")[0].equals("-1")) {
+				return "success " + 0 + " null";
 			}
-			return "fail " + -1;
+			// TH module nhưng chưa dừng
+			// kiểm tra PID mới có trùng với PID cũ không
+			// nếu trùng ==> lỗi không dừng được module
+			if(!PID.split(" ")[0].equals(jsonObject.get("PID"))) {
+				// TH PID mới khác PID cũ ==> kill lại
+				Process process = Runtime.getRuntime().exec(command + " " + PID.split(" ")[0]);
+				listProcess = getListProcess();
+				PID = checkModule(jsonObject, listProcess);
+				// TH dừng module thành công
+				if(PID.split(" ")[0].equals("-1")) {
+					return "success " + 0 + " null";
+				}
+			}
+			return "fail " + -1 + " null";
 		}
 		catch (Exception e) {
-			System.out.println("Run command line error!");
+			System.out.println("Stop module error!");
 			e.printStackTrace();
 			return "fail " + PID;
 		}
 	}
+	// lấy ra danh sách các tiến trình đanh chạy trên hệ thống
 	private static List<ProcessInfo> getListProcess() {
 		List<ProcessInfo> listProcess = new ArrayList<>();
 		if(os.toLowerCase().contains("windows")) {
@@ -244,14 +268,14 @@ public class Demo1Application {
 				List<ProcessHandle> listProcessHandel = processes.toList();
 				for(ProcessHandle processHandle : listProcessHandel) {
 					Long PID = processHandle.pid();
-					String command = processHandle.info().command().orElse(null);
+					String caption = processHandle.info().command().orElse(null);
 					String[] args = processHandle.info().arguments().orElse(null);
 					String commandLine = processHandle.info().commandLine().orElse(null);
 					String argument = "";
 					for(String arg : args) {
 						argument += arg + " ";
 					}
-					listProcess.add(new ProcessInfo(PID, command, commandLine, argument));
+					listProcess.add(new ProcessInfo(PID, caption, commandLine, argument));
 				}
 			}
 			catch (Exception e) {
@@ -262,6 +286,7 @@ public class Demo1Application {
 		}
 		return listProcess;
 	}
+	// tách thành caption, PID, Command line từ chuỗi lấy ra được trong task manager của windows
 	private static String solveCommandLineInWindows(String[] commandLine) {
 		String command = "";
 		for(int i = 1; i < commandLine.length-1; i++) {
@@ -296,7 +321,7 @@ public class Demo1Application {
 			return null;
 		}
 	}
-
+	// kiểm tra trạng thái của các module trong probe
 	private static String checkStatus(JSONObject jsonObject) {
 		// lấy ra danh sách toàn bộ process của client
 		List<ProcessInfo> listProcess = getListProcess();
@@ -307,19 +332,20 @@ public class Demo1Application {
 		for(Object object : jsonArray) {
 			JSONObject json = (JSONObject) object;
 			JSONObject jsonStatus = new JSONObject();
-			Long pId = checkModule(json, listProcess);
+			String pId = checkModule(json, listProcess);
+			System.out.println("PID "+ pId.split(" ")[0]);
 			// TH module không còn chạy
 			jsonStatus.put("id_probe_module", json.get("id_probe_module"));
-			if (pId == -1) { // module không còn chạy ==> lỗi
-				jsonStatus.put("status", "2");
+			if (pId.split(" ")[0].equals("-1")) { // module không còn chạy ==> lỗi
+				jsonStatus.put("status", "Failed");
 			}
 			else {
 				String pathLog = (String) json.get("path_log");
 				if(checkFileLog(pathLog)) { // module vẫn chạy bình thường ==> Running
-					jsonStatus.put("status", "1");
+					jsonStatus.put("status", "Running");
 				}
 				else {
-					jsonStatus.put("status", "4"); // module đang bị treo ==> pending
+					jsonStatus.put("status", "Pending"); // module đang bị treo ==> pending
 				}
 			}
 			jsonListStatus.add(jsonStatus);
@@ -337,11 +363,11 @@ public class Demo1Application {
 			Duration thoiGian = Duration.between(ldt, nowTime);
 
 			// module có đẩy ra file log bình thường
-			if (thoiGian.toMinutes() <= 1) {
-				return true;
-			}
+//			if (thoiGian.toMinutes() <= 1) {
+//				return true;
+//			}
 			// module không đẩy dữ liệu ra file log
-			return false;
+			return true;
 		} catch (IOException e) {
 			System.err.println("Cannot get the last modified time - " + e);
 			return false;
@@ -391,9 +417,7 @@ public class Demo1Application {
 							try {
 								System.out.println("Đang kết nối lại...");
 								Thread.sleep(5000);
-								connectOptions.setUserName(infoProbe.getUsername());
-								connectOptions.setPassword(infoProbe.getPassword().toCharArray());
-								client.connect(connectOptions);
+								client.reconnect();
 								client.subscribe(infoProbe.getPubTopic());
 								System.out.println("Kết nối lại thành công!!");
 							}
@@ -414,13 +438,15 @@ public class Demo1Application {
 
 							String response = "";
 							messageToServer = "Client đã nhận được lệnh ";
-							if(os.toLowerCase().contains("windows")) {
-								messageToServer.concat((String) jsonObject.get("cmd_win"));
+							if(!jsonObject.get("action").equals("getStatus")) {
+								if(os.toLowerCase().contains("windows")) {
+									messageToServer.concat((String) jsonObject.get("cmd_win"));
+								}
+								else {
+									messageToServer.concat((String) jsonObject.get("cmd_linux"));
+								}
 							}
-							else {
-								messageToServer.concat((String) jsonObject.get("cmd_linux"));
-							}
-							response = JsonUtil.createJson(json, messageToServer, "OK", null, null, null, "");
+							response = JsonUtil.createJson(json, messageToServer, "OK", null, null, null, "", "");
 
 							// gửi thông báo đã nhận được lệnh tới server
 							System.out.println("response 1" + response);
@@ -434,19 +460,37 @@ public class Demo1Application {
 							// chạy module
 							if(action.equals("run")) {
 								// chạy lệnh
-								message = runModule(jsonObject);
-								statusModule = message.split(" ")[0].equals("success") ? "1" : "2";
-								response = JsonUtil.createJson(json, message.split(" ")[0], "true", statusModule, null, null, message.split(" ")[1]);
+								try {
+									message = runModule(jsonObject);
+									statusModule = message.split(" ")[0].equals("success") ? "1" : "2";
+									response = JsonUtil.createJson(json, message.split(" ")[0], "true", statusModule, null, null, message.split(" ")[1], message.split(" ")[2]);
+								}
+								catch (Exception e) {
+									e.printStackTrace();
+									response = JsonUtil.createJson(json, "Xảy ra lỗi trong quá trình chạy lệnh", "OK", null, null, null, "", "");
+								}
 							}
 							// dừng module
 							else if(action.equals("stop")) {
-								message = stopModule(jsonObject);
-								statusModule = message.split(" ")[0].equals("success") ? "2" : "1";
-								response = JsonUtil.createJson(json, message.split(" ")[0], "true", statusModule, null, null, message.split(" ")[1]);
+								try {
+									message = stopModule(jsonObject);
+									statusModule = message.split(" ")[0].equals("success") ? "2" : "1";
+									response = JsonUtil.createJson(json, message.split(" ")[0], "true", statusModule, null, null, message.split(" ")[1], message.split(" ")[2]);
+								}
+								catch (Exception e) {
+									e.printStackTrace();
+									response = JsonUtil.createJson(json, "Xảy ra lỗi trong quá trình dừng lệnh", "OK", null, null, null, "", "");
+								}
 							}
 							// kiểm tra status module theo chu kì
 							else if (action.equals("getStatus")) {
-								response = checkStatus(jsonObject);
+								try {
+									response = checkStatus(jsonObject);
+								}
+								catch (Exception e) {
+									e.printStackTrace();
+									response = JsonUtil.createJson(json, "Xảy ra lỗi trong quá trình kiểm tra trạng thái lệnh", "OK", null, null, null, "", "");
+								}
 							}
 
 							// gửi thông báo kết quả tới server

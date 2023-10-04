@@ -18,7 +18,7 @@ public class JsonUtil {
         }
     }
     public static String createJson(String probeModuleJson, String message, String status_cmd,
-                                    String statusModule, String title, String content, String pId) {
+                                    String statusModule, String title, String content, String pId, String caption) {
         JSONParser jsonParser = new JSONParser();
         try {
             JSONObject jsonObject = (JSONObject) jsonParser.parse(probeModuleJson);
@@ -29,6 +29,7 @@ public class JsonUtil {
             jsonObject.put("statusModule", statusModule);
             jsonObject.put("check", "true");
             jsonObject.replace("PID", pId);
+            jsonObject.put("nameProcess", caption);
             return jsonObject.toJSONString();
         } catch (Exception e) {
             System.out.println("Create json object error");
