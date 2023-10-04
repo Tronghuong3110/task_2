@@ -27,7 +27,6 @@ public class ApiCheckConnect {
             JSONObject jsonObject = JsonUtil.parseJson(responseBody);
             try{
                 Object data = jsonObject.get("connected");
-
                 if(data.equals("true"))
                     return true;
             }

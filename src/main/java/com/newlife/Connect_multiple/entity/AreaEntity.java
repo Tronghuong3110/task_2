@@ -10,7 +10,7 @@ import javax.persistence.*;
 public class AreaEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_area")
     private Integer id;
 

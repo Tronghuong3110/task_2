@@ -13,18 +13,20 @@ public class Client2 {
 
     public static void main(String[] args) {
         try {
-            String broker = "tcp://192.168.100.5:1883";
-            String clientId = "Client_Id";
+            String broker = "tcp://localhost:1883";
+            String clientId = "Client_Id_2";
             MemoryPersistence persistence = new MemoryPersistence();
             MqttClient client = new MqttClient(broker, clientId, persistence);
 
             // MQTT connection option
             MqttConnectOptions connOpts = new MqttConnectOptions();
-            connOpts.setUserName("client");
+            connOpts.setUserName("client1");
             connOpts.setPassword("1234".toCharArray());
             connOpts.setKeepAliveInterval(3);
             connOpts.setCleanSession(true);
-
+            client.connect(connOpts);
+            String subTopic = "client_123456789";
+            client.subscribe(subTopic);
             // set callback
             client.setCallback(new MqttCallback() {
                 @Override
@@ -34,23 +36,19 @@ public class Client2 {
                 @Override
                 public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
                     String messageContent = new String(mqttMessage.getPayload());
-                    System.out.println("Received message: " + messageContent);
+                    String response = "Client 1 đã nhận được tin nhắn";
+                    if(!messageContent.equals(response)) {
+                        System.out.println("Received message: " + messageContent);
+                    }
+                    MqttMessage message = new MqttMessage(response.getBytes());
+                    message.setQos(2);
+                    client.publish(subTopic, message);
                 }
 
                 @Override
                 public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
                 }
             });
-
-            client.connect(connOpts);
-
-            // Nhập tên chủ đề bạn muốn subscribe (ví dụ: "client/client1")
-            String subTopic = "Probe_2/800137002640200_Probe_2";
-
-            // Subscribe vào chủ đề
-            client.subscribe(subTopic);
-
-            System.out.println("Client is subscribed to: " + subTopic);
 
         } catch (MqttException me) {
             me.printStackTrace();

@@ -10,9 +10,9 @@ public class Server {
     public static void main(String[] args) {
         int qos = 0;
         Scanner sc = new Scanner(System.in);
-
+        String[] publics = {"client_123456789", "client2_123456789"};
         try {
-            String broker = "tcp://192.168.100.5:1883";
+            String broker = "tcp://localhost:1883";
             String clientId = "Server_Id";
             MemoryPersistence persistence = new MemoryPersistence();
             MqttClient client = new MqttClient(broker, clientId, persistence);
@@ -23,6 +23,13 @@ public class Server {
             connOpts.setPassword("1234".toCharArray());
             connOpts.setKeepAliveInterval(3);
             connOpts.setCleanSession(true);
+            // Nhập nội dung tin nhắn bạn muốn gửi
+            System.out.println("Nhập lệnh muốn gửi:");
+            String content = sc.nextLine();
+            client.connect(connOpts);
+            for(String str : publics) {
+                client.subscribe(str);
+            }
 
             // set callback
             client.setCallback(new MqttCallback() {
@@ -33,29 +40,27 @@ public class Server {
                 @Override
                 public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
                     String responseFromClient = new String(mqttMessage.getPayload());
-                    System.out.println(responseFromClient);
+                    if(!responseFromClient.contains("Client")) {
+                        System.out.println(responseFromClient);
+                    }
                 }
-
                 @Override
                 public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
 
                 }
             });
-            client.connect(connOpts);
 
-            // Nhập tên client bạn muốn gửi tin nhắn đến
-//            System.out.println("Nhập tên client (client1, client2, ...):");
-//            String clientName = sc.nextLine();
-
-            // Nhập nội dung tin nhắn bạn muốn gửi
-            System.out.println("Nhập lệnh muốn gửi:");
-            String content = sc.nextLine();
 
             // Tạo tên chủ đề của client dựa trên tên client
-            String pubTopic = "Probe_2/800137002640200_Probe_2";
 
             // Gửi tin nhắn đến client cụ thể
-            client.publish(pubTopic, new MqttMessage(content.getBytes()));
+            int i = 0;
+            for(String str : publics) {
+                i++;
+                MqttMessage message = new MqttMessage((content + i).getBytes());
+                message.setQos(2);
+                client.publish(str, message);
+            }
 //            client.disconnect();
         } catch (MqttException me) {
             me.printStackTrace();

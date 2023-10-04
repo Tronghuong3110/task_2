@@ -11,7 +11,7 @@ import java.util.*;
 public class ProbeModuleEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_probe_module")
     private Integer id;
 
@@ -57,6 +57,8 @@ public class ProbeModuleEntity {
     @Column(name = "process_status")
     private Integer processStatus;
 
+    @Column(name = "process_name")
+    private String processName;
     @OneToMany(mappedBy = "probeModuleEntity")
     private List<ModuleHistoryEntity> moduleHistoryEntityList;
 

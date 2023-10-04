@@ -10,7 +10,7 @@ import javax.persistence.*;
 public class BrokerEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_broker")
     private Integer id;
 

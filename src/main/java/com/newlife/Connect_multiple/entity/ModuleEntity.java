@@ -11,7 +11,7 @@ import java.sql.Date;
 public class ModuleEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_module")
     private Integer id;
 

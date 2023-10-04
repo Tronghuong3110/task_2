@@ -10,7 +10,7 @@ import javax.persistence.*;
 public class SubtopicServerEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_subtopic")
     private Integer id;
 

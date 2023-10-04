@@ -10,6 +10,6 @@ import java.util.*;
 @Repository
 public interface ModuleRepository extends JpaRepository<ModuleEntity, Integer> {
 
-    @Query(value = "select * from module where name Collate Latin1_General_CI_AI like %:name%", nativeQuery = true)
+    @Query(value = "select * from module where name  like %:name%", nativeQuery = true) // Collate Latin1_General_CI_AI
     List<ModuleEntity> findAllByName(@Param("name") String name);
 }

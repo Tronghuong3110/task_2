@@ -1,5 +1,6 @@
 package com.newlife.Connect_multiple.service.impl;
 
+import com.newlife.Connect_multiple.api.ApiAddInfoToBroker;
 import com.newlife.Connect_multiple.converter.ProbeConverter;
 import com.newlife.Connect_multiple.converter.ProbeOptionConverter;
 import com.newlife.Connect_multiple.dto.ProbeDto;
@@ -31,6 +32,8 @@ public class ProbeService implements IProbeService {
     private ProbeOptionRepository probeOptionRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private ServerRepository serverRepository;
 
     @Override
     public ProbeDto saveProbe(ProbeDto probeDto, ProbeOptionDto probeOptionDto) {
@@ -58,29 +61,73 @@ public class ProbeService implements IProbeService {
                 responseProbe.setMessage("Ip address invalidate");
             }
             probeOptionEntity = probeOptionRepository.save(probeOptionEntity);
+            String responseAddUserToBroker = ApiAddInfoToBroker.addUserToBroker(probeOptionEntity.getUserName(), probeOptionEntity.getPassword());
+            // TH không thêm được user vào broker
+            if(!responseAddUserToBroker.equals("Create user success")) {
+                responseProbe.setMessage(responseAddUserToBroker);
+                return responseProbe;
+            }
             probeEntity.setProbeOptionEntity(probeOptionEntity);
             // create clientId
             String clientId = System.nanoTime() + "_" + probeEntity.getName().replaceAll(" ", "_");
             // create pubtopic
             String pubtopic = probeEntity.getName().replaceAll(" ", "_") + "/" + clientId;
-            probeEntity.setClientId(clientId);
-            probeEntity.setPubTopic(pubtopic);
-            probeEntity.setCreateAt(new Date(System.currentTimeMillis()));
 
-            // add user to broker (success)
-            if(createUserInBroker(probeOptionEntity.getUserName(), probeOptionEntity.getPassword(), clientId)) {
-                // add subtopic for server
-                SubtopicServerEntity subTopic = new SubtopicServerEntity();
-                subTopic.setSubTopic(pubtopic);
-                subtopicRepository.save(subTopic);
-
-                // addd probe to database
+            // thêm probe vào database
+            try {
+                probeEntity.setClientId(clientId);
+                probeEntity.setPubTopic(pubtopic);
+                probeEntity.setCreateAt(new Date(System.currentTimeMillis()));
                 probeEntity.setStatus("disconnect");
                 probeEntity.setDeleted(0);
                 probeEntity = probeRepository.save(probeEntity);
                 responseProbe = ProbeConverter.toDto(probeEntity);
                 responseProbe.setMessage("Create probe success");
+            }
+            catch (Exception e) {
+                System.out.println("Thêm mới vào bảng probe lỗi rồi!");
+                e.printStackTrace();
+            }
 
+            // thêm topic vào danh sách topic của server
+            try {
+                SubtopicServerEntity subTopic = new SubtopicServerEntity();
+                subTopic.setSubTopic(pubtopic);
+                subTopic.setIdProbe(probeEntity.getId());
+                subtopicRepository.save(subTopic);
+            }
+            catch (Exception e) {
+                System.out.println("Thêm mới vào bảng subTopic của server lỗi rồi");
+                e.printStackTrace();
+            }
+
+            // lấy thông tin server từ database
+            // cập nhật role để server subscribe tới topic của client
+            try {
+                ServerEntity server = serverRepository.findAll().get(0);
+                ProbeOptionEntity probeOptionOfServer = server.getProbeOptionEntity();
+                String responseAddRuleServer = ApiAddInfoToBroker.addRuleToBroker(probeOptionOfServer.getUserName(), pubtopic);
+                // TH thêm role cho server lỗi
+                if(!responseAddRuleServer.equals("Create rule success")) {
+                    responseProbe.setMessage(responseAddRuleServer);
+                    System.out.println("Thêm quyền cho server lỗi rồi!");
+                    return responseProbe;
+                }
+            }
+            catch (Exception e) {
+                System.out.println("Lấy thông tin server lỗi rồi!");
+                e.printStackTrace();
+            }
+
+            // Thêm quyền cho client
+            String responseAddRuleClient = ApiAddInfoToBroker.addRuleToBroker(probeOptionEntity.getUserName(), pubtopic);
+            // TH thêm quyền cho client lỗi
+            if(!responseAddRuleClient.equals("Create rule success")) {
+                responseProbe.setMessage(responseAddRuleClient);
+                System.out.println("Thêm quyền subscribe tới topic cho client lỗi");
+                return responseProbe;
+            }
+            try {
                 // add record to Probe_history
                 ProbeHistoryEntity probeHistoryEntity = new ProbeHistoryEntity();
                 probeHistoryEntity.setAction("Create");
@@ -89,10 +136,14 @@ public class ProbeService implements IProbeService {
                 probeHistoryEntity.setProbeEntity(probeEntity);
                 probeHistoryRepository.save(probeHistoryEntity);
             }
+            catch (Exception e) {
+                System.out.println("Thêm mới probe_history lỗi rồi!");
+                e.printStackTrace();
+            }
             return responseProbe;
         }
         catch (Exception e) {
-            System.out.println("Create probe error");
+            System.out.println("Tạo mới probe lỗi rồi");
             e.printStackTrace();
             responseProbe.setMessage("Create probe error");
             return responseProbe;
@@ -100,12 +151,10 @@ public class ProbeService implements IProbeService {
     }
 
     @Override
-    public List<ProbeDto> findAllProbe(String name, String location, String area, String vlan, String sortBy, Integer page) {
-        Sort sort = Sort.by(Sort.Direction.DESC, sortBy);
-        Pageable pageable = PageRequest.of(page, 10, sort);
-        Page<ProbeEntity> listProbe = probeRepository.findByNameOrLocationOrAreaOrVlan(name, location, area, vlan, pageable);
+    public List<ProbeDto> findAllProbe(String name, String location, String area, String vlan) {
+        List<ProbeEntity> listProbe = probeRepository.findByNameOrLocationOrAreaOrVlan(name, location, area, vlan);
         List<ProbeDto> listProbeDto = new ArrayList<>();
-        for(ProbeEntity entity : listProbe.getContent()) {
+        for(ProbeEntity entity : listProbe) {
             listProbeDto.add(ProbeConverter.toDto(entity));
         }
         return listProbeDto;

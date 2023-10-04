@@ -6,7 +6,7 @@ import java.util.*;
 
 public interface IProbeService {
     ProbeDto saveProbe(ProbeDto probeDto, ProbeOptionDto probeOptionDto);
-    List<ProbeDto> findAllProbe(String name, String location, String area, String vlan, String sortBy, Integer page);
+    List<ProbeDto> findAllProbe(String name, String location, String area, String vlan);
     String delete(Integer id);
     String updateProbe(ProbeDto probeDto);
     String backUpProbe(Integer id);

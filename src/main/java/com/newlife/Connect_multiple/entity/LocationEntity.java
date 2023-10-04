@@ -11,7 +11,7 @@ import java.util.*;
 public class LocationEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_location")
     private Integer id;
 

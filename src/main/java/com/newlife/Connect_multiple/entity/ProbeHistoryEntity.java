@@ -11,7 +11,7 @@ import java.sql.Date;
 public class ProbeHistoryEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_probe_history")
     private Integer id;
 

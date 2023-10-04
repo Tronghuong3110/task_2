@@ -10,7 +10,7 @@ import javax.persistence.*;
 public class ProbeOptionEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_probe_option")
     private Integer id;
 

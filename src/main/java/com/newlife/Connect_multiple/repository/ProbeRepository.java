@@ -15,16 +15,15 @@ import java.util.Optional;
 public interface ProbeRepository extends JpaRepository<ProbeEntity, Integer> {
     Boolean existsByIpAddress(String ipAddress);
     Boolean existsByName(String probeName);
-    @Query(value = "select * from probe where (name COLLATE Latin1_General_CI_AI like %:name%) " +
-                    "and (location COLLATE Latin1_General_CI_AI like %:location%) " +
-                    "and (area COLLATE Latin1_General_CI_AI like %:area%) " +
+    @Query(value = "select * from probe where (name  like %:name%) " + // COLLATE Latin1_General_CI_AI
+                    "and (location like %:location%) " +
+                    "and (area like %:area%) " +
                     "and (vlan like %:vlan%) " +
                     "and deleted = 0", nativeQuery = true)
-    Page<ProbeEntity> findByNameOrLocationOrAreaOrVlan(@Param("name") String name,
+    List<ProbeEntity> findByNameOrLocationOrAreaOrVlan(@Param("name") String name,
                                                        @Param("location") String location,
                                                        @Param("area") String area,
-                                                       @Param("vlan") String vlan,
-                                                       Pageable pageable);
+                                                       @Param("vlan") String vlan);
 
     @Query(value = "select * from probemodule.probe where status = :status ", nativeQuery = true)
     List<ProbeEntity> findProbeByStatus(@Param("status") String status);

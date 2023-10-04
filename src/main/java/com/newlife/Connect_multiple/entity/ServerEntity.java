@@ -10,7 +10,7 @@ import java.sql.Date;
 @Table(name = "server")
 public class ServerEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_server")
     private Integer id;
 
