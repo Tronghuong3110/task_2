@@ -227,7 +227,7 @@ public class ProbeModuleService implements IProbeModuleService {
             String idCmd = saveCmd(probeModuleEntity); // lưu thông tin lệnh vào database
             ProbeEntity probe = probeRepository.findById(probeModuleEntity.getIdProbe()).orElse(new ProbeEntity());
             // tạo json để gửi tới client
-            String jsonObject = JsonUtil.createJson(probeModuleEntity, idCmd, Optional.of("cmd /c taskkill /F /PID "), Optional.of("kill -9 "), "stop");
+            String jsonObject = JsonUtil.createJson(probeModuleEntity, idCmd, Optional.of("cmd /c taskkill /F /PID "), Optional.of("pkill -f "), "stop");
             MqttConnectOptions connectOptions = createOption(probeOption);
             // kết nối server voi broker
             List<BrokerEntity> broker = brokerRepository.findAll();

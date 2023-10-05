@@ -60,15 +60,17 @@ public class ProbeService implements IProbeService {
             if(!checkValidateIpAddress(probeEntity.getIpAddress())) {
                 responseProbe.setMessage("Ip address invalidate");
             }
-            probeOptionEntity = probeOptionRepository.save(probeOptionEntity);
-            String responseAddUserToBroker = ApiAddInfoToBroker.addUserToBroker(probeOptionEntity.getUserName(), probeOptionEntity.getPassword());
+            String responseAddUserToBroker = ApiAddInfoToBroker.addUserToBroker(probeOptionDto.getUsername(), probeOptionDto.getPassword());
             // TH không thêm được user vào broker
             if(!responseAddUserToBroker.equals("Create user success")) {
                 responseProbe.setMessage(responseAddUserToBroker);
                 return responseProbe;
             }
+            // thêm option vào database
+            probeOptionEntity = probeOptionRepository.save(probeOptionEntity);
             probeEntity.setProbeOptionEntity(probeOptionEntity);
-            // create clientId
+
+            // tạo clientId
             String clientId = System.nanoTime() + "_" + probeEntity.getName().replaceAll(" ", "_");
             // create pubtopic
             String pubtopic = probeEntity.getName().replaceAll(" ", "_") + "/" + clientId;

@@ -21,6 +21,6 @@ public class LocationEntity {
     @Column(name = "location_code")
     private String locationCode;
 
-    @OneToMany(mappedBy = "locationEntity")
+    @OneToMany(mappedBy = "locationEntity", fetch = FetchType.EAGER)
     List<AreaEntity> areaEntityList;
 }
