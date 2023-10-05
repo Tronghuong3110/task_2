@@ -78,8 +78,4 @@ public class ModuleController {
         }, executorService);
     }
 
-    @GetMapping("test")
-    public void test() {
-        probeModuleService.getStatusModulePeriodically();
-    }
 }

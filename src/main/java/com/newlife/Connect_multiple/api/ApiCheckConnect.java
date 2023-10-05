@@ -1,12 +1,9 @@
 package com.newlife.Connect_multiple.api;
-import com.google.gson.JsonArray;
 import com.newlife.Connect_multiple.util.JsonUtil;
 import com.squareup.okhttp.Credentials;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import org.json.simple.JSONObject;
 
 import java.io.IOException;

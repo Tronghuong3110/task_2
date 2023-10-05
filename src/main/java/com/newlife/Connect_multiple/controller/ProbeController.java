@@ -1,14 +1,18 @@
 package com.newlife.Connect_multiple.controller;
 
-import com.newlife.Connect_multiple.dto.LocationDto;
-import com.newlife.Connect_multiple.dto.ProbeDto;
-import com.newlife.Connect_multiple.dto.ProbeModuleDto;
-import com.newlife.Connect_multiple.dto.RequestData;
+import com.newlife.Connect_multiple.dto.*;
 import com.newlife.Connect_multiple.service.ILocationService;
 import com.newlife.Connect_multiple.service.IProbeService;
+import com.newlife.Connect_multiple.util.FileDownloadUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -76,6 +80,14 @@ public class ProbeController {
         return CompletableFuture.supplyAsync(() -> {
             String message = probeService.backUpProbe(id);
             return message;
+        }, executorService);
+    }
+
+    @GetMapping("/downloadFile/{probeId}")
+    public CompletableFuture<ResponseEntity<?>> downloadFile(@PathVariable("probeId") Integer probeId) {
+        return CompletableFuture.supplyAsync(() -> {
+            InfoLogin info = probeService.downlodFile(probeId);
+            return ResponseEntity.ok(info);
         }, executorService);
     }
 }

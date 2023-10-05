@@ -1,4 +1,4 @@
-package com.newlife.Connect_multiple.controller;
+package com.newlife.Connect_multiple.test;
 
 import com.newlife.Connect_multiple.dto.ResponseResult;
 import com.newlife.Connect_multiple.dto.UserDto;

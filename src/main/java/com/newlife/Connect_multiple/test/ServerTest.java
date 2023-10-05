@@ -1,4 +1,4 @@
-package com.newlife.Connect_multiple.controller;
+package com.newlife.Connect_multiple.test;
 
 import com.newlife.Connect_multiple.util.JsonUtil;
 import org.eclipse.paho.client.mqttv3.*;

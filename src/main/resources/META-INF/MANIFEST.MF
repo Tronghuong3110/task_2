@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
-Main-Class: com.newlife.Connect_multiple.controller.Test
+Main-Class: com.newlife.Connect_multiple.test.Test
 

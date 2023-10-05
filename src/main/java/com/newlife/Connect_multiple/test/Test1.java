@@ -1,4 +1,4 @@
-package com.newlife.Connect_multiple.controller;
+package com.newlife.Connect_multiple.test;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;

@@ -1,5 +1,6 @@
 package com.newlife.Connect_multiple.service;
 
+import com.newlife.Connect_multiple.dto.InfoLogin;
 import com.newlife.Connect_multiple.dto.ProbeDto;
 import com.newlife.Connect_multiple.dto.ProbeOptionDto;
 import java.util.*;
@@ -10,4 +11,5 @@ public interface IProbeService {
     String delete(Integer id);
     String updateProbe(ProbeDto probeDto);
     String backUpProbe(Integer id);
+    InfoLogin downlodFile(Integer idProbe);
 }

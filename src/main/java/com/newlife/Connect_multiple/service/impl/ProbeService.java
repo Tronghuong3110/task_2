@@ -3,11 +3,13 @@ package com.newlife.Connect_multiple.service.impl;
 import com.newlife.Connect_multiple.api.ApiAddInfoToBroker;
 import com.newlife.Connect_multiple.converter.ProbeConverter;
 import com.newlife.Connect_multiple.converter.ProbeOptionConverter;
+import com.newlife.Connect_multiple.dto.InfoLogin;
 import com.newlife.Connect_multiple.dto.ProbeDto;
 import com.newlife.Connect_multiple.dto.ProbeOptionDto;
 import com.newlife.Connect_multiple.entity.*;
 import com.newlife.Connect_multiple.repository.*;
 import com.newlife.Connect_multiple.service.IProbeService;
+import com.newlife.Connect_multiple.util.CreateTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,7 +36,8 @@ public class ProbeService implements IProbeService {
     private UserRepository userRepository;
     @Autowired
     private ServerRepository serverRepository;
-
+    @Autowired
+    private BrokerRepository brokerRepository;
     @Override
     public ProbeDto saveProbe(ProbeDto probeDto, ProbeOptionDto probeOptionDto) {
         ProbeDto responseProbe = new ProbeDto();
@@ -222,6 +225,39 @@ public class ProbeService implements IProbeService {
             System.out.println("Back up probe error");
             e.printStackTrace();
             return "Can not back up probe with id = " + id;
+        }
+    }
+
+    @Override
+    public InfoLogin downlodFile(Integer idProbe) {
+        try {
+            InfoLogin info = new InfoLogin();
+            ProbeEntity probe = probeRepository.findById(idProbe).orElse(null);
+            BrokerEntity broker = new BrokerEntity();
+            try {
+                broker = brokerRepository.findAll().get(0);
+            }
+            catch (Exception e) {
+                System.out.println("Lấy thông tin broker lỗi rồi!!");
+                e.printStackTrace();
+            }
+            if(probe == null) {
+                return null;
+            }
+            ProbeOptionEntity probeOption = probe.getProbeOptionEntity();
+            String login = CreateTokenUtil.encodeToken(probeOption.getUserName(), probeOption.getPassword(), probe.getPubTopic());
+            info.setLogin(login);
+            info.setCleanSession(probeOption.getCleanSession());
+            info.setBrokerUrl(broker.getUrl());
+            info.setKeepAlive(probeOption.getKeepAlive());
+            info.setConnectionTimeOut(probeOption.getConnectionTimeOut());
+            info.setClientId(probe.getClientId());
+            return info;
+        }
+        catch (Exception e) {
+            System.out.println("Tải file config lỗi rồi");
+            e.printStackTrace();
+            return null;
         }
     }
 

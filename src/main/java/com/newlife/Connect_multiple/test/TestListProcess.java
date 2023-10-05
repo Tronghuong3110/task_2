@@ -1,4 +1,4 @@
-package com.newlife.Connect_multiple.controller;
+package com.newlife.Connect_multiple.test;
 
 
 import java.io.IOException;
