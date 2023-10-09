@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import com.example.demo1.util.JsonUtil;
+import com.example.demo1.util.TokenUtil;
 import org.apache.commons.cli.*;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
@@ -88,18 +89,18 @@ public class Demo1Application {
 			action = (String) jsonObject.get("action");
 		}
 		if(os.toLowerCase().contains("windows")) {
-			commandLine = (String) jsonObject.get("cmd_win");
+			commandLine = (String) jsonObject.get("CommandLine");
 		}
 		else {
-			commandLine = (String) jsonObject.get("cmd_linux");
+			commandLine = (String) jsonObject.get("CommandLine");
 		}
 		for(ProcessInfo processInfo : listProcess) {
 //			if(action.equals("run")) {
-				if(processInfo.getCommandLine().trim().toLowerCase().equals(commandLine.trim().toLowerCase())) {
-					System.out.println("Command Line 1 " + commandLine);
-					System.out.println("Command Line 2 " + processInfo.getCommandLine());
-					return processInfo.getpId() + " " + processInfo.getCommand();
-				}
+			if(processInfo.getCommandLine().trim().toLowerCase().contains(commandLine.trim().toLowerCase())) {
+				System.out.println("Command Line 1 " + commandLine);
+				System.out.println("Command Line 2 " + processInfo.getCommandLine());
+				return processInfo.getpId() + " " + processInfo.getCommand();
+			}
 //			}
 //			else if(action.equals("stop")) {
 //				if(processInfo.getpId() == Long.parseLong((String) jsonObject.get("PID"))) {
@@ -148,7 +149,9 @@ public class Demo1Application {
 				builder.command("cmd.exe", "/c", command);
 			}else{
 				command = (String) jsonObject.get("cmd_linux");
-				builder.command("sh", "-c", command);
+				String [] cmd ={"gnome-terminal", "--", "bash", "-c", command + "; exec bash"};
+//				gnome-terminal --profile=cmd --command "ping 1.1.1.1"  -t "cmd test"
+				builder.command(cmd);
 			}
 			Process process = builder.start();
 			listProcess = getListProcess();
@@ -176,6 +179,7 @@ public class Demo1Application {
 	}
 	// dừng module
 	private static String stopModule(JSONObject jsonObject) {
+		ProcessBuilder processBuilder = new ProcessBuilder();
 		List<ProcessInfo> listProcess = getListProcess();
 		boolean isWindows = os.toLowerCase().startsWith("windows");
 		String PID = checkModule(jsonObject, listProcess); // lấy ra process id của module đang chạy
@@ -189,20 +193,27 @@ public class Demo1Application {
 			moduleId = (String) jsonObject.get("idProbeModule");
 			cmdId = (String) jsonObject.get("idCmdHistory");
 			String command = "";
+			String[] cmds = new String[1000];
 			if(isWindows) {
-				command = (String) jsonObject.get("cmd_win"); // câu lệnh stop đối với windows
+//				command = (String) jsonObject.get("cmd_win"); // câu lệnh stop đối với windows
+//				cmd /c taskkill /F /PID
+				cmds = new String[]{"cmd", "/c", "taskkill", "/F", "/PID", jsonObject.get("PID").toString()};
 			}else{
-				command = (String) jsonObject.get("cmd_linux"); // câu lệnh stop đối với linux
+//				command = (String) jsonObject.get("cmd_linux"); // câu lệnh stop đối với linux
+				cmds = new String[]{"pkill", "-f", jsonObject.get("CommandLine").toString()};
 			}
-			String processName = (String) jsonObject.get("nameProcess"); // tên process để thực hiện dừng
+			System.out.println("PID " + PID.split(" ")[0]);
 			if(!PID.split(" ")[0].equals("-1")) { // module vẫn đang chạy ==> tiến hành dừng module
 				// có thay đổi trong câu lệnh dừng ==> chưa làm
-				Process process = Runtime.getRuntime().exec(command + " " + jsonObject.get("PID"));
+				System.out.println("Command pkill " + command + jsonObject.get("CommandLine"));
+				processBuilder.command(cmds);
+				processBuilder.start();
 			}
 
 			// kiểm tra lại module xem còn đang chạy không
 			listProcess = getListProcess();
 			PID = checkModule(jsonObject, listProcess);
+			System.out.println("PID " + PID.split(" ")[0]);
 			// TH dừng module thành công
 			if(PID.split(" ")[0].equals("-1")) {
 				return "success " + 0 + " null";
@@ -269,13 +280,11 @@ public class Demo1Application {
 				for(ProcessHandle processHandle : listProcessHandel) {
 					Long PID = processHandle.pid();
 					String caption = processHandle.info().command().orElse(null);
-					String[] args = processHandle.info().arguments().orElse(null);
 					String commandLine = processHandle.info().commandLine().orElse(null);
 					String argument = "";
-					for(String arg : args) {
-						argument += arg + " ";
+					if(commandLine != null) {
+						listProcess.add(new ProcessInfo(PID, caption, commandLine, argument));
 					}
-					listProcess.add(new ProcessInfo(PID, caption, commandLine, argument));
 				}
 			}
 			catch (Exception e) {
@@ -295,28 +304,47 @@ public class Demo1Application {
 		return command;
 	}
 	private static InfoProbe readFile(String pathFile) {
+		InfoProbe infoProbe = new InfoProbe();
 		try {
-			File file = new File(pathFile);
-			Properties properties = new Properties();
-			properties.load(new FileInputStream(file));
-			JSONObject jsonObject = deCodeToken(properties.getProperty("token"), "tronghuong");
-			InfoProbe infoProbe = new InfoProbe();
-			infoProbe.setBroker(properties.getProperty("broker"));
-			infoProbe.setClientId((String) jsonObject.get("clientId"));
-			infoProbe.setPassword((String) jsonObject.get("password"));
-			infoProbe.setCleanSession(properties.getProperty("cleanSession"));
-			infoProbe.setPubTopic((String) jsonObject.get("pubtopic"));
-			infoProbe.setSubTopic((String) jsonObject.get("subtopic"));
-			infoProbe.setConnectionTimeOut(Integer.parseInt(properties.getProperty("connectionTimeOut")));
-			infoProbe.setUsername(properties.getProperty("username"));
-			infoProbe.setKeepAlive(Integer.parseInt(properties.getProperty("keepAlive")));
-
-			String username = properties.getProperty("username");
-			System.out.println("username" + username);
+			FileReader fileReader=new FileReader(pathFile);
+			BufferedReader bufferedReader = new BufferedReader(fileReader);
+			String line;
+			JSONObject jsonObject = new JSONObject();
+			JSONObject loginInfo = new JSONObject();
+			while ((line = bufferedReader.readLine()) != null) {
+				if(line.trim().startsWith("#")) {
+					continue;
+				}
+				String[] lines = line.split("=");
+				if (lines.length >= 2) {
+					String key = lines[0].trim();
+					String value = lines[1].trim();
+					// nếu là chuỗi mã hóa username, password, topic
+					if (key.equals("login")) {
+						loginInfo = TokenUtil.deCodeToken(value, "newlife123@");
+						continue;
+					}
+					jsonObject.put(key, value);
+				}
+			}
+			try {
+				infoProbe.setBroker(jsonObject.get("brokerUrl").toString());
+				infoProbe.setClientId(jsonObject.get("clientId").toString());
+				infoProbe.setConnectionTimeOut(Integer.parseInt(jsonObject.get("connectionTimeOut").toString()));
+				infoProbe.setCleanSession(jsonObject.get("cleanSession").toString());
+				infoProbe.setPassword(loginInfo.get("password").toString());
+				infoProbe.setUsername(loginInfo.get("username").toString());
+				infoProbe.setPubTopic(loginInfo.get("topic").toString());
+				infoProbe.setKeepAlive(Integer.parseInt(jsonObject.get("keepAlive").toString()));
+			}
+			catch (NumberFormatException nu) {
+				System.out.println("Chuyển từ string sang number lỗi rồi!!");
+				nu.printStackTrace();
+			}
 			return infoProbe;
 		}
 		catch (Exception e) {
-			System.out.println("Read file error");
+			System.out.println("Đọc file lỗi rồi!!");
 			e.printStackTrace();
 			return null;
 		}
@@ -390,131 +418,131 @@ public class Demo1Application {
 	}
 	public static void main(String[] args) throws Exception {
 		os = System.getProperty("os.name");
-//		String pathFile = getArgument(args);
-//		System.out.println("Đường dẫn tới file config: " + pathFile);
-//		InfoProbe infoProbe = readFile(pathFile); // lấy thông tin client từ file config
-			InfoProbe infoProbe = new InfoProbe();
-			infoProbe.setUsername("client1");
-			infoProbe.setKeepAlive(100);
-			infoProbe.setConnectionTimeOut(100);
-			infoProbe.setBroker("tcp://localhost:1883");
-			infoProbe.setPassword("1234");
-			infoProbe.setCleanSession("true");
-			infoProbe.setPubTopic("client_123456789");
-			infoProbe.setClientId("client1");
-			MqttConnectOptions connectOptions = createOption(infoProbe);
+		String pathFile = getArgument(args);
+		System.out.println("Đường dẫn tới file config: " + pathFile);
+		InfoProbe infoProbe = readFile(pathFile); // lấy thông tin client từ file config
+//			InfoProbe infoProbe = new InfoProbe();
+//			infoProbe.setUsername("client1");
+//			infoProbe.setKeepAlive(100);
+//			infoProbe.setConnectionTimeOut(100);
+//			infoProbe.setBroker("tcp://192.168.27.102:1883");
+//			infoProbe.setPassword("1234");
+//			infoProbe.setCleanSession("true");
+//			infoProbe.setPubTopic("client_123456789");
+//			infoProbe.setClientId("client1");
+		MqttConnectOptions connectOptions = createOption(infoProbe);
 //		while (true) {
-			try {
-				MemoryPersistence persistence = new MemoryPersistence();
-				MqttClient client = new MqttClient(infoProbe.getBroker(), infoProbe.getClientId(), persistence);
-				client.connect(connectOptions);
-				System.out.println(infoProbe.getUsername() + " " + infoProbe.getPassword() + " " + infoProbe.getClientId());
-				client.setCallback(new MqttCallback() {
-					@Override
-					public void connectionLost(Throwable throwable) {
-						// reconnect
-						while (!client.isConnected()) {
+		try {
+			MemoryPersistence persistence = new MemoryPersistence();
+			MqttClient client = new MqttClient(infoProbe.getBroker(), infoProbe.getClientId(), persistence);
+			client.connect(connectOptions);
+			System.out.println(infoProbe.getUsername() + " " + infoProbe.getPassword() + " " + infoProbe.getClientId());
+			client.setCallback(new MqttCallback() {
+				@Override
+				public void connectionLost(Throwable throwable) {
+					// reconnect
+					while (!client.isConnected()) {
+						try {
+							System.out.println("Đang kết nối lại...");
+							Thread.sleep(5000);
+							client.reconnect();
+							client.subscribe(infoProbe.getPubTopic());
+							System.out.println("Kết nối lại thành công!!");
+						}
+						catch(InterruptedException | MqttException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+				@Override
+				public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
+					String json = new String(mqttMessage.getPayload());
+					JSONObject jsonObject = JsonUtil.parseJson(json);
+					if(!jsonObject.containsKey("check") || (jsonObject.containsKey("check") && !jsonObject.get("check").equals("true"))) {
+						System.out.println("Lần gửi thứ " + mqttMessage.getId());
+						System.out.println("Message " + json);
+						// Xác nhân với server đã client đã nhận được lệnh
+						String messageToServer = "";
+
+						String response = "";
+						messageToServer = "Client đã nhận được lệnh ";
+						if(!jsonObject.get("action").equals("getStatus")) {
+							if(os.toLowerCase().contains("windows")) {
+								messageToServer.concat((String) jsonObject.get("cmd_win"));
+							}
+							else {
+								messageToServer.concat((String) jsonObject.get("cmd_linux"));
+							}
+						}
+						response = JsonUtil.createJson(json, messageToServer, "OK", null, null, null, "", "");
+
+						// gửi thông báo đã nhận được lệnh tới server
+						System.out.println("response 1" + response);
+						MqttMessage messageMqtt = new MqttMessage(response.getBytes());
+						messageMqtt.setQos(2);
+						client.publish(infoProbe.getPubTopic(), messageMqtt);
+
+						String action = (String) jsonObject.get("action");
+						String message = null;
+						String statusModule = null;
+						// chạy module
+						if(action.equals("run")) {
+							// chạy lệnh
 							try {
-								System.out.println("Đang kết nối lại...");
-								Thread.sleep(5000);
-								client.reconnect();
-								client.subscribe(infoProbe.getPubTopic());
-								System.out.println("Kết nối lại thành công!!");
+								message = runModule(jsonObject);
+								statusModule = message.split(" ")[0].equals("success") ? "1" : "2";
+								response = JsonUtil.createJson(json, message.split(" ")[0], "true", statusModule, null, null, message.split(" ")[1], message.split(" ")[2]);
 							}
-							catch(InterruptedException | MqttException e) {
+							catch (Exception e) {
 								e.printStackTrace();
+								response = JsonUtil.createJson(json, "Xảy ra lỗi trong quá trình chạy lệnh", "OK", null, null, null, "", "");
 							}
 						}
-					}
-					@Override
-					public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
-						String json = new String(mqttMessage.getPayload());
-						JSONObject jsonObject = JsonUtil.parseJson(json);
-						if(!jsonObject.containsKey("check") || (jsonObject.containsKey("check") && !jsonObject.get("check").equals("true"))) {
-							System.out.println("Lần gửi thứ " + mqttMessage.getId());
-							System.out.println("Message " + json);
-							// Xác nhân với server đã client đã nhận được lệnh
-							String messageToServer = "";
-
-							String response = "";
-							messageToServer = "Client đã nhận được lệnh ";
-							if(!jsonObject.get("action").equals("getStatus")) {
-								if(os.toLowerCase().contains("windows")) {
-									messageToServer.concat((String) jsonObject.get("cmd_win"));
-								}
-								else {
-									messageToServer.concat((String) jsonObject.get("cmd_linux"));
-								}
+						// dừng module
+						else if(action.equals("stop")) {
+							try {
+								message = stopModule(jsonObject);
+								statusModule = message.split(" ")[0].equals("success") ? "2" : "1";
+								response = JsonUtil.createJson(json, message.split(" ")[0], "true", statusModule, null, null, message.split(" ")[1], message.split(" ")[2]);
 							}
-							response = JsonUtil.createJson(json, messageToServer, "OK", null, null, null, "", "");
-
-							// gửi thông báo đã nhận được lệnh tới server
-							System.out.println("response 1" + response);
-							MqttMessage messageMqtt = new MqttMessage(response.getBytes());
-							messageMqtt.setQos(2);
-							client.publish(infoProbe.getPubTopic(), messageMqtt);
-
-							String action = (String) jsonObject.get("action");
-							String message = null;
-							String statusModule = null;
-							// chạy module
-							if(action.equals("run")) {
-								// chạy lệnh
-								try {
-									message = runModule(jsonObject);
-									statusModule = message.split(" ")[0].equals("success") ? "1" : "2";
-									response = JsonUtil.createJson(json, message.split(" ")[0], "true", statusModule, null, null, message.split(" ")[1], message.split(" ")[2]);
-								}
-								catch (Exception e) {
-									e.printStackTrace();
-									response = JsonUtil.createJson(json, "Xảy ra lỗi trong quá trình chạy lệnh", "OK", null, null, null, "", "");
-								}
+							catch (Exception e) {
+								e.printStackTrace();
+								response = JsonUtil.createJson(json, "Xảy ra lỗi trong quá trình dừng lệnh", "OK", null, null, null, "", "");
 							}
-							// dừng module
-							else if(action.equals("stop")) {
-								try {
-									message = stopModule(jsonObject);
-									statusModule = message.split(" ")[0].equals("success") ? "2" : "1";
-									response = JsonUtil.createJson(json, message.split(" ")[0], "true", statusModule, null, null, message.split(" ")[1], message.split(" ")[2]);
-								}
-								catch (Exception e) {
-									e.printStackTrace();
-									response = JsonUtil.createJson(json, "Xảy ra lỗi trong quá trình dừng lệnh", "OK", null, null, null, "", "");
-								}
-							}
-							// kiểm tra status module theo chu kì
-							else if (action.equals("getStatus")) {
-								try {
-									response = checkStatus(jsonObject);
-								}
-								catch (Exception e) {
-									e.printStackTrace();
-									response = JsonUtil.createJson(json, "Xảy ra lỗi trong quá trình kiểm tra trạng thái lệnh", "OK", null, null, null, "", "");
-								}
-							}
-
-							// gửi thông báo kết quả tới server
-							System.out.println("response 2" + response);
-							messageMqtt = new MqttMessage(response.getBytes());
-							messageMqtt.setQos(2);
-							client.publish(infoProbe.getPubTopic(), messageMqtt);
 						}
+						// kiểm tra status module theo chu kì
+						else if (action.equals("getStatus")) {
+							try {
+								response = checkStatus(jsonObject);
+							}
+							catch (Exception e) {
+								e.printStackTrace();
+								response = JsonUtil.createJson(json, "Xảy ra lỗi trong quá trình kiểm tra trạng thái lệnh", "OK", null, null, null, "", "");
+							}
+						}
+
+						// gửi thông báo kết quả tới server
+						System.out.println("response 2" + response);
+						messageMqtt = new MqttMessage(response.getBytes());
+						messageMqtt.setQos(2);
+						client.publish(infoProbe.getPubTopic(), messageMqtt);
 					}
-					@Override
-					public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
-					}
-				});
-				client.subscribe(infoProbe.getPubTopic());
-			}
-			catch (MqttException me) {
-				System.out.println("reason " + me.getReasonCode());
-				System.out.println("msg " + me.getMessage());
-				System.out.println("loc " + me.getLocalizedMessage());
-				System.out.println("cause " + me.getCause());
-				System.out.println("excep " + me);
-				me.printStackTrace();
+				}
+				@Override
+				public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
+				}
+			});
+			client.subscribe(infoProbe.getPubTopic());
+		}
+		catch (MqttException me) {
+			System.out.println("reason " + me.getReasonCode());
+			System.out.println("msg " + me.getMessage());
+			System.out.println("loc " + me.getLocalizedMessage());
+			System.out.println("cause " + me.getCause());
+			System.out.println("excep " + me);
+			me.printStackTrace();
 //				return null;
-			}
+		}
 //		}
 	}
 }
