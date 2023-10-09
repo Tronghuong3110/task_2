@@ -1,6 +1,7 @@
 package com.newlife.Connect_multiple.service.impl;
 
 import com.newlife.Connect_multiple.api.ApiAddInfoToBroker;
+import com.newlife.Connect_multiple.api.ApiCheckConnect;
 import com.newlife.Connect_multiple.converter.ProbeConverter;
 import com.newlife.Connect_multiple.converter.ProbeOptionConverter;
 import com.newlife.Connect_multiple.dto.InfoLogin;
@@ -10,6 +11,7 @@ import com.newlife.Connect_multiple.entity.*;
 import com.newlife.Connect_multiple.repository.*;
 import com.newlife.Connect_multiple.service.IProbeService;
 import com.newlife.Connect_multiple.util.CreateTokenUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,9 +19,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.Charset;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class ProbeService implements IProbeService {
@@ -63,12 +68,19 @@ public class ProbeService implements IProbeService {
             if(!checkValidateIpAddress(probeEntity.getIpAddress())) {
                 responseProbe.setMessage("Ip address invalidate");
             }
+            String validateUsernameMessage = checkValidateUserName(probeOptionDto.getUsername());
+            if(!validateUsernameMessage.equals("success")) {
+                responseProbe.setMessage(validateUsernameMessage);
+                return responseProbe;
+            }
+            // thêm username vào broker
             String responseAddUserToBroker = ApiAddInfoToBroker.addUserToBroker(probeOptionDto.getUsername(), probeOptionDto.getPassword());
             // TH không thêm được user vào broker
             if(!responseAddUserToBroker.equals("Create user success")) {
                 responseProbe.setMessage(responseAddUserToBroker);
                 return responseProbe;
             }
+
             // thêm option vào database
             probeOptionEntity = probeOptionRepository.save(probeOptionEntity);
             probeEntity.setProbeOptionEntity(probeOptionEntity);
@@ -199,6 +211,14 @@ public class ProbeService implements IProbeService {
             if(probeDto.getName() != null && checkProbeName(probeEntity.getName())) {
                 return "Name probe exists";
             }
+            if(probeDto.getStatus().equals("connected")) {
+                Boolean checkConnectToBroker = ApiCheckConnect.checkExistClient(probeEntity.getClientId());
+                if(!checkConnectToBroker) {
+                    probeEntity.setStatus("error");
+                    probeEntity = probeRepository.save(probeEntity);
+                    return "Probe có IP là " + probeEntity.getIpAddress() + " chưa được cài đặt, không thể thực hiện connect";
+                }
+            }
             probeEntity = probeRepository.save(probeEntity);
             return "Update probe success";
         }
@@ -227,7 +247,6 @@ public class ProbeService implements IProbeService {
             return "Can not back up probe with id = " + id;
         }
     }
-
     @Override
     public InfoLogin downlodFile(Integer idProbe) {
         try {
@@ -260,7 +279,6 @@ public class ProbeService implements IProbeService {
             return null;
         }
     }
-
     private Boolean checkUsername(String username) {
         return probeOptionRepository.existsByUserName(username);
     }
@@ -289,17 +307,15 @@ public class ProbeService implements IProbeService {
         }
         return true;
     }
-    private Boolean createUserInBroker(String userName, String password, String clientId) {
-        try {
-            UserEntity user = new UserEntity();
-            user.setUsername(userName);
-            user.setPassword(password);
-            userRepository.save(user);
-            return true;
+    private String checkValidateUserName(String userName) {
+        String[] usernames = userName.split(" ");
+        if(usernames.length >= 2) {
+            return "Username không được chứa khoảng trắng";
         }
-        catch (Exception e) {
-            e.printStackTrace();
-            return false;
+        boolean containsUTF8 = StringUtils.contains(userName, '\u0080');
+        if(containsUTF8) {
+            return "Username không được chứa ký tự UTF-8";
         }
+        return "success";
     }
 }
