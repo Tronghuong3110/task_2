@@ -1,0 +1,164 @@
+{
+    "location": [
+        {
+            "id": 1,
+            "name": "Hà Nội",
+            "code": "HN",
+            "listArea": [
+                {
+                    "id": 1,
+                    "name": "Quận Hoàn Kiếm",
+                    "code": "HK"
+                },
+                {
+                    "id": 2,
+                    "name": "Quận Đống Đa",
+                    "code": "DD"
+                },
+                {
+                    "id": 3,
+                    "name": "Quận Tây Hồ",
+                    "code": "TH"
+                },
+                {
+                    "id": 4,
+                    "name": "Quận Cầu Giấy",
+                    "code": "CG"
+                },
+                {
+                    "id": 5,
+                    "name": "Quận Thanh Xuân",
+                    "code": "TX"
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "name": "Hồ Chí Minh",
+            "code": "HCM",
+            "listArea": [
+                {
+                    "id": 6,
+                    "name": "Quận 1",
+                    "code": "Q1"
+                },
+                {
+                    "id": 7,
+                    "name": "Quận 2",
+                    "code": "Q2"
+                },
+                {
+                    "id": 8,
+                    "name": "Quận 3",
+                    "code": "Q3"
+                },
+                {
+                    "id": 9,
+                    "name": "Quận 4",
+                    "code": "Q4"
+                },
+                {
+                    "id": 10,
+                    "name": "Quận 5",
+                    "code": "Q5"
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "name": "Đà Nẵng",
+            "code": "DN",
+            "listArea": [
+                {
+                    "id": 11,
+                    "name": "Quận Hải Châu",
+                    "code": "HC"
+                },
+                {
+                    "id": 12,
+                    "name": "Quận Thanh Khê",
+                    "code": "TK"
+                },
+                {
+                    "id": 13,
+                    "name": "Quận Sơn Trà",
+                    "code": "ST"
+                },
+                {
+                    "id": 14,
+                    "name": "Quận Ngũ Hành Sơn",
+                    "code": "NHS"
+                },
+                {
+                    "id": 15,
+                    "name": "Quận Liên Chiểu",
+                    "code": "LC"
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "name": "Hải Phòng",
+            "code": "HP",
+            "listArea": [
+                {
+                    "id": 16,
+                    "name": "Quận Hồng Bàng",
+                    "code": "HB"
+                },
+                {
+                    "id": 17,
+                    "name": "Quận Lê Chân",
+                    "code": "LC"
+                },
+                {
+                    "id": 18,
+                    "name": "Quận Ngô Quyền",
+                    "code": "NQ"
+                },
+                {
+                    "id": 19,
+                    "name": "Quận Hải An",
+                    "code": "HA"
+                },
+                {
+                    "id": 20,
+                    "name": "Quận Kiến An",
+                    "code": "KA"
+                }
+            ]
+        },
+        {
+            "id": 5,
+            "name": "Cần Thơ",
+            "code": "CT",
+            "listArea": [
+                {
+                    "id": 21,
+                    "name": "Quận Ninh Kiều",
+                    "code": "NK"
+                },
+                {
+                    "id": 22,
+                    "name": "Quận Bình Thủy",
+                    "code": "BT"
+                },
+                {
+                    "id": 23,
+                    "name": "Quận Cái Răng",
+                    "code": "CR"
+                },
+                {
+                    "id": 24,
+                    "name": "Quận Ô Môn",
+                    "code": "OM"
+                },
+                {
+                    "id": 25,
+                    "name": "Quận Thốt Nốt",
+                    "code": "TN"
+                }
+            ]
+        }
+    ]
+}

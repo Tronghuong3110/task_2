@@ -1,0 +1,36 @@
+$primary: #0b0c24;
+$secondary: #27293d;
+$pink-color: #E14ECA;
+$blue-color: #9747FF;
+.sidebar{
+    padding: 20px 0;
+    background-image: linear-gradient($pink-color,$blue-color);
+    border-top-right-radius: 30px;
+    border-bottom-right-radius: 30px;
+    color: white;
+    height: 100%;
+    &-title{
+        padding: 20px 5px;
+        &-text{
+            
+            font-size: 0.9em;
+            padding-bottom: 10px;
+            border-bottom: 2px white solid;
+            text-align: center;
+        }
+    }
+    &-selections{
+        .selection{
+            padding: 10px 10px;
+            &-symbol{
+                // background-color: #0b0c24;
+                padding: 10px;
+            }
+            &-text{
+                font-size: 0.8em;
+                padding-left:5px;
+            }
+        }
+    }
+
+}

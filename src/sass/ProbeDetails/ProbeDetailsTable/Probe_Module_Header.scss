@@ -1,0 +1,46 @@
+$primary: #0b0c24;
+$secondary: #27293d;
+$pink-color: #E14ECA;
+$blue-color: #9747FF;
+
+.Probe_Module_Header{
+    tr{
+        th{
+            font-size: 0.75rem !important;
+            color: white !important;
+            text-align: center !important;
+            padding: 5px !important;
+            height: fit-content;
+            border: none !important;
+            line-height: 1rem;
+            border-bottom: 2px white solid !important;
+        }
+        .id{
+            width: 5%;
+        }
+        .errorPerWeek{
+            width: 7%;
+        }
+        .module_name{
+            width: 23%;
+        }
+        .caption{
+            width: 11%;
+        }
+        .status{
+            width: 8%;
+        }
+        .argument{
+            width: 12%;
+        }
+        .note{
+            width: 17%;
+        }
+        .actions{
+            width: 17%;
+        }
+        .processStatus{
+            width: 3%;
+        }
+    }
+}

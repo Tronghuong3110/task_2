@@ -1,0 +1,85 @@
+$primary: #0b0c24;
+$secondary: #27293d;
+$pink-color: #E14ECA;
+$blue-color: #1647F3;
+
+.confirmationScreen {
+    height: 100vh;
+    width: 100vw;
+    background-color: rgba(48, 39, 39, 0.7);
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+
+    .confirmation {
+        color: white;
+        font-size: 1em;
+        position: absolute;
+        width: 30%;
+        top: 30%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border: whitesmoke 2px solid;
+        border-radius: 10px;
+        padding: 20px 20px;
+        background-color: $secondary;
+        opacity: none;
+        box-shadow: rgba(100, 153, 223, 0.25) 0px 50px 100px -20px, rgba(100, 153, 223, 0.3) 0px 30px 60px -30px, rgba(100, 153, 223, 0.35) 0px -2px 6px 0px inset;
+
+        &-content {
+            padding: 5px 0;
+            font-size: 1.2em;
+        }
+
+        &-note {
+            padding: 5px 0;
+            font-size: 1em;
+        }
+
+        &-decision {
+            &-cancle {
+                button {
+                    // background: #D80032;
+                    background-color: transparent;
+                    border: 1px white solid;
+                    border-radius: 10px;
+                    padding: 5px 16px;
+                    font-size: 0.8em;
+                    color: white;
+                    &:hover{
+                        background: #D80032;
+                        -webkit-transition: background-color 200ms linear;
+                        -ms-transition: background-color 200ms linear;
+                        transition: background-color 200ms linear;
+                    }
+                    svg{
+                        padding: 0 7px;
+                    }
+                }
+            }
+
+            &-ok {
+                button {
+                    // background: #38E54D;
+                    background-color: transparent;
+                    border: 1px white solid;
+                    border-radius: 10px;
+                    padding: 5px 16px;
+                    font-size: 0.8em;
+                    color: white;
+                    &:hover{
+                        background: #38E54D;
+                        -webkit-transition: background-color 200ms linear;
+                        -ms-transition: background-color 200ms linear;
+                        transition: background-color 200ms linear;
+                    }
+                    svg{
+                        padding: 0 7px;
+                    }
+                }
+            }
+        }
+    }
+
+}

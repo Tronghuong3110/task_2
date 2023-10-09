@@ -1,0 +1,91 @@
+$primary: #0b0c24;
+$secondary: #27293d;
+$pink-color: #E14ECA;
+$blue-color: #9747FF;
+
+.Module_Table {
+    margin-top: 2em;
+    table {
+        background-color: $primary;
+        table-layout: fixed;
+        border-radius: 10px;
+        thead {
+            tr {
+                th {
+                    font-size: 0.8rem !important;
+                    color: white !important;
+                    text-align: center !important;
+                    padding: 5px !important;
+                    height: fit-content;
+                    border: none !important;
+                    line-height: 1rem;
+                }
+
+                .id {
+                    width: 5%;
+                }
+
+                .module_name {
+                    width: 20%;
+                }
+
+                .caption {
+                    width: 15%;
+                }
+
+                .arg {
+                    width: 20%;
+                }
+
+                .note {
+                    width: 30%;
+                }
+
+                .actions {
+                    width: 10%;
+                }
+            }
+        }
+
+        tbody {
+            td {
+                font-size: 0.7rem ;
+                color: white ;
+                text-align: center ;
+                padding: 5px ;
+                height: fit-content;
+                border: none ;
+                line-height: 1rem;
+                border-top: 2px white solid;
+                div {
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                .status {
+                    &-name {
+                        width: 25%;
+                    }
+                }
+
+                .action {
+                    display: flex !important;
+                    justify-content: center;
+                    align-items: center;
+
+                    button {
+                        background-color: transparent;
+                        outline: none;
+                        border: none;
+
+                        svg {
+                            font-size: 1.2em;
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+}

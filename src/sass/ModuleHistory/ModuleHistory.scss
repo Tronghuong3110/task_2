@@ -1,0 +1,119 @@
+$primary: #0b0c24;
+$secondary: #27293d;
+$pink-color: #E14ECA;
+$blue-color: #9747FF;
+$mixcolor: linear-gradient(90deg, $pink-color, $blue-color);
+
+.modulesHistory {
+    padding: 20px;
+    font-size: 0.8em !important;
+    width: 100%;
+    background-color: $secondary;
+    border-radius: 30px;
+    box-sizing: border-box;
+    .searchBar {
+        width: 100%;
+        font-size: 0.8em;
+        .searchTitle {
+            width: 30%;
+            position: relative;
+
+            input {
+                width: 100%;
+                background-color: $primary;
+                outline: none;
+                border: 2px solid white;
+                border-radius: 20px;
+                padding: 5px 0;
+                padding-left: 8%;
+                color: white;
+            }
+
+            svg {
+                position: absolute;
+                color: white;
+                top: 50%;
+                transform: translateY(-50%);
+                left: 3%;
+            }
+        }
+
+        .searchDate {
+            width: 15%;
+            input {
+                width: 100%;
+                color-scheme: dark;
+                box-sizing: border-box;
+                color: white;
+                background-color: $primary;
+                padding: 5px 20px;
+                border: 2px solid white;
+                border-radius: 20px;
+                appearance: none;
+            }
+        }
+
+        .searchProbe,
+        .searchModule {
+            width: 15%;
+            select {
+                width: 100%;
+                padding: 5px 20px;
+                border: 2px solid white;
+                border-radius: 20px;
+                background-color: $primary;
+                color: white;
+                appearance: none;
+                background-image: url("../../assets/pic/arrow.png");
+                background-repeat: no-repeat;
+                background-position: right 5% top 50%;
+                background-size: 0.65rem auto;
+                &:hover{
+                    cursor: pointer;
+                }
+            }
+        }
+
+        .searchButton {
+            padding: 5px 15px;
+            background: $primary;
+            border: 2px solid white;
+            border-radius: 20px;
+            color: white;
+            transition: ease-in-out 3000;
+            &:hover{
+                background: $secondary;
+            }
+            &-icon {
+                padding: 0 5px;
+            }
+        }
+    }
+    .actionBar{
+        .checkAll{
+            span{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                svg{
+                    height: 16px;
+                    width: 16px;
+                }
+            }
+        }
+        .refreshButton,.deleteButton{
+            padding: 9px;
+            button{
+                background: transparent;
+                border: none;
+                border-radius: 50%;
+                svg{
+                    color: white;
+                }
+                &:hover{
+                    background-color: $primary;
+                }
+            }
+        }
+    }
+}

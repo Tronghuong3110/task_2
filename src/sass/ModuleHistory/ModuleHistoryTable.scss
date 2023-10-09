@@ -1,0 +1,100 @@
+$primary: #0b0c24;
+$secondary: #27293d;
+$pink-color: #E14ECA;
+$blue-color: #9747FF;
+
+.Module_History_Table {
+    margin-top: 2em;
+    table {
+        table-layout: fixed;
+        border-radius: 10px;
+        thead {
+            tr {
+                th {
+                    font-size: 0.8rem !important;
+                    color: white !important;
+                    text-align: center !important;
+                    padding: 5px !important;
+                    height: fit-content;
+                    border: none !important;
+                    line-height: 1rem;
+                }
+
+                .checkbox {
+                    width: 3%;
+                }
+                .time{
+                    width: 14%;
+                }
+                .probe_name {
+                    width: 20%;
+                }
+
+                .module_name {
+                    width: 15%;
+                }
+
+                .title {
+                    width: 15%;
+                }
+
+                .content {
+                    width: 30%;
+                }
+
+                .actions {
+                    width: 3%;
+                }
+            }
+        }
+
+        tbody {
+            td {
+                font-size: 0.7rem ;
+                color: white ;
+                text-align: center ;
+                padding: 5px ;
+                height: fit-content;
+                border: none ;
+                line-height: 1rem;
+                border-top: 2px white solid;
+                div {
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                .action {
+                    display: flex !important;
+                    justify-content: center;
+                    align-items: center;
+                    border-radius: 50%;
+
+                    button {
+                        background-color: transparent;
+                        outline: none;
+                        border: none;
+                        svg {
+                            font-size: 1.2em;
+                        }
+                    }
+                }
+            }
+            .checkbox{
+                span{
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    svg{
+                        height: 16px;
+                        width: 16px;
+                    }
+                }
+            }
+            .content{
+                text-align: start;
+            }
+        }
+
+    }
+}

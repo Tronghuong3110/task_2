@@ -1,0 +1,109 @@
+$primary: #0b0c24;
+$secondary: #27293d;
+$pink-color: #E14ECA;
+$blue-color: #9747FF;
+
+.Probe_Module {
+    table {
+        margin-top: 20px !important;
+        table-layout: fixed;
+        background-color: $primary;
+        border-radius: 10px;
+
+        tbody {
+            tr {
+                border-bottom: white solid 2px;
+
+                td {
+                    font-size: 0.7rem !important;
+                    color: white !important;
+                    text-align: center !important;
+                    padding: 5px !important;
+                    height: fit-content;
+                    border: none !important;
+                    line-height: 1rem;
+
+                    div {
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+
+                    .action {
+                        display: flex !important;
+                        justify-content: center;
+                        align-items: center;
+
+                        button {
+                            background-color: transparent;
+                            outline: none;
+                            border: none;
+
+                            svg {
+                                font-size: 1.2em;
+                            }
+                        }
+                    }
+                }
+
+                .id {
+                    width: 5%;
+                }
+
+                .errorPerWeek {
+                    width: 7%;
+                }
+
+                .module_name {
+                    width: 11%;
+                }
+
+                .caption {
+                    width: 11%;
+                }
+
+                .status {
+                    width: 10%;
+                }
+
+                .argument {
+                    width: 12%;
+                }
+
+                .note {
+                    width: 17%;
+                }
+
+                .actions {
+                    width: 10%;
+                }
+
+                .processStatus {
+                    width: 17%;
+
+                    div {
+                        img {
+                            height: 12px;
+                        }
+                    }
+                }
+            }
+        }
+
+        .css-jtlhu6-MuiTablePagination-root {
+            overflow: unset;
+            color: white;
+            font-size: 0.7em !important;
+            display: flex;
+            align-items: center;
+
+            p {
+                margin: 0;
+            }
+
+            .css-194a1fa-MuiSelect-select-MuiInputBase-input {
+                font-size: 1.5em;
+            }
+        }
+    }
+}

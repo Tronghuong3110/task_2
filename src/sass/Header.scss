@@ -1,0 +1,51 @@
+$primary: #0b0c24;
+$secondary: #27293d;
+$pink-color: #E14ECA;
+$blue-color: #1647F3;
+.row{
+    margin: 0;
+}
+.header{
+    font-family: "Montserrat";
+    background-color: $primary;
+    padding: 10px 0;
+    &-name{
+        display: flex;
+        color: white;
+        align-items: center;
+        box-sizing: border-box;
+        padding-left: 10px;
+        font-size: 1em;
+    }
+    &-content{
+        padding-right: 50px;
+        &-icon{
+            padding: 5px 20px;
+        }
+        &-input{
+            padding: 5px 20px;
+            width: 40%;
+            position: relative;
+            .search-icon{
+                position: absolute;
+                top: 0;
+                height: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                left: 8%;
+            }
+            input{
+                width: 100%;
+                border-radius: 20px;
+                background-color: $secondary;
+                color: white;
+                outline: none;
+                border: none;
+                height: 100%;
+                padding-left: 10%;
+            }
+
+        }
+    }
+}

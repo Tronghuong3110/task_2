@@ -1,0 +1,174 @@
+$primary: #0b0c24;
+$secondary: #27293d;
+$pink-color: #e14eca;
+$blue-color: #9747ff;
+$mixcolor: linear-gradient(90deg, $pink-color, $blue-color);
+.probeDetails {
+    padding: 20px;
+    font-size: 0.7em !important;
+    width: 100%;
+    background-color: $secondary;
+    border-radius: 30px;
+    box-sizing: border-box;
+    color: white !important;
+    .infos {
+        .info {
+            &-title {
+                &-icon {
+                    color: white;
+                    padding: 10px 0;
+                    svg {
+                        padding-right: 5px;
+                    }
+                }
+            }
+            &-input {
+                position: relative;
+                .disabled{
+                    border: 2px solid gray !important;
+                }
+                input {
+                    width: 100%;
+                    background-color: $primary;
+                    outline: none;
+                    border: 2px solid $pink-color;
+                    border-radius: 5px;
+                    padding: 5px 10px;
+                    color: white;
+                    font-size: 0.8em;
+                    &::placeholder {
+                        color: white;
+                        opacity: 0.7;
+                    }
+                }
+                textarea {
+                    width: 100%;
+                    background: $primary;
+                    outline: none;
+                    border: 2px solid $pink-color;
+                    border-radius: 5px;
+                    padding: 5px 10px;
+                    color: white;
+                    &::placeholder {
+                        color: white;
+                        opacity: 0.7;
+                    }
+                }
+            }
+            .searchBar{
+                position: relative;
+                &-searchName{
+                    width: 30%;
+                    &-input{
+                        position: relative;
+                        input{
+                            width: 100%;
+                            border-radius: 20px;
+                            background-color: $primary;
+                            color: white;
+                            outline: none;
+                            border: $pink-color solid 2px;
+                            height: 100%;
+                            padding-left: 14%;
+                            padding-top: 5px;
+                            padding-bottom: 5px;
+                        }
+                        svg{
+                            position: absolute;
+                            top: 50%;
+                            left: 5%;
+                            transform: translateY(-50%);
+                        }
+                    }
+                }
+                &-searchStatus{
+                    width: 10%;
+                    position: absolute;
+                    left: 40%;
+                    select{
+                        width: 100%;
+                        border-radius: 20px;
+                        background-color: $primary;
+                        color: white;
+                        outline: none;
+                        border: $pink-color solid 2px;
+                        height: 100%;
+                        padding-left: 14%;
+                        padding-top: 5px;
+                        padding-bottom: 5px;
+                    }
+                }
+                .addBtn{
+                    position: absolute;
+                    right: 0;
+                    background-color: $mixcolor !important;
+                    padding: 5px 10px;
+                    font-size: 0.9em;
+                    background: $mixcolor !important ;
+                    color: white;
+                    border-radius: 5px;
+                    &-icon{
+                        svg{
+                            padding: 0 5px;
+                        }
+                    }
+                }
+            }
+            .select_container {
+                position: relative;
+                font-size: 0.8em;
+                .disabled{
+                    border: 2px solid gray !important;
+                    pointer-events: none;
+                }
+                .dropdown {
+                    padding: 5px 10px;
+                    border: 2px solid $pink-color;
+                    border-radius: 5px;
+                    background: $primary;
+                    .select {
+                        background-color: transparent;
+                        svg {
+                            display: none;
+                        }
+                    }
+                }
+                .down-arrow {
+                    position: absolute;
+                    top: 50%;
+                    right: 10%;
+                    color: white;
+                    transform: translateY(-50%);
+                }
+            }
+        }
+        .probe_name {
+            width: 23%;
+        }
+        .ip_address {
+            width: 23%;
+        }
+        .location {
+            width: 15%;
+        }
+        .area {
+            width: 15%;
+        }
+        .note {
+            width: 70%;
+        }
+        .saveOrEditButton {
+            .btn {
+                padding: 4px 17px;
+                font-size: 0.9em;
+                background: $mixcolor !important ;
+                color: white;
+                &-icon {
+                    svg {
+                        padding-right: 7px;
+                    }
+                }
+            }
+        }
+    }
+}
