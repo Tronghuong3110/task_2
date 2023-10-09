@@ -75,6 +75,7 @@ public class JsonUtil {
             jsonObject1.put("PID", probeModule.getProcessId());
             jsonObject1.put("cmd_win", probeModule.getCommand());
             jsonObject1.put("cmd_linux", probeModule.getCommand());
+            jsonObject1.put("CommandLine", probeModule.getCommand());
             idProbe = probeModule.getIdProbe();
             jsonArray.put(jsonObject1);
         }
