@@ -83,7 +83,7 @@ public class ProbeService implements IProbeService {
                 probeEntity.setClientId(clientId);
                 probeEntity.setPubTopic(pubtopic);
                 probeEntity.setCreateAt(new Date(System.currentTimeMillis()));
-                probeEntity.setStatus("disconnect");
+                probeEntity.setStatus("disconnected");
                 probeEntity.setDeleted(0);
                 probeEntity = probeRepository.save(probeEntity);
                 responseProbe = ProbeConverter.toDto(probeEntity);
@@ -193,10 +193,10 @@ public class ProbeService implements IProbeService {
             if(probeEntity == null) {
                 return "Can not update probe";
             }
-            if(checkValidateIpAddress(probeEntity.getIpAddress())) {
+            if(probeDto.getIpAddress() != null && checkValidateIpAddress(probeEntity.getIpAddress())) {
                 return "Ip address invalidate";
             }
-            if(checkProbeName(probeEntity.getName())) {
+            if(probeDto.getName() != null && checkProbeName(probeEntity.getName())) {
                 return "Name probe exists";
             }
             probeEntity = probeRepository.save(probeEntity);
