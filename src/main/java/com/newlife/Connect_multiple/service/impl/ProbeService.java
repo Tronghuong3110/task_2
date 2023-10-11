@@ -43,6 +43,18 @@ public class ProbeService implements IProbeService {
     private ServerRepository serverRepository;
     @Autowired
     private BrokerRepository brokerRepository;
+
+    @Override
+    public ProbeDto findOneProbe(Integer idProbe) {
+        try {
+            ProbeEntity probeEntity = probeRepository.findById(idProbe).orElse(null);
+            ProbeDto probeDto = ProbeConverter.toDto(probeEntity);
+            return probeDto;
+        } catch (Exception e){
+            ProbeDto probeDto = new ProbeDto();
+            return probeDto;
+        }
+    }
     @Override
     public ProbeDto saveProbe(ProbeDto probeDto, ProbeOptionDto probeOptionDto) {
         ProbeDto responseProbe = new ProbeDto();

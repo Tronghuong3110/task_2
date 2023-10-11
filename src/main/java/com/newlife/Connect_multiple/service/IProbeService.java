@@ -6,6 +6,7 @@ import com.newlife.Connect_multiple.dto.ProbeOptionDto;
 import java.util.*;
 
 public interface IProbeService {
+    ProbeDto findOneProbe(Integer idProbe);
     ProbeDto saveProbe(ProbeDto probeDto, ProbeOptionDto probeOptionDto);
     List<ProbeDto> findAllProbe(String name, String location, String area, String vlan);
     String delete(Integer id);

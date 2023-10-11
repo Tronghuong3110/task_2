@@ -30,6 +30,12 @@ public class ProbeController {
     private ILocationService locationService;
     private ExecutorService executorService = Executors.newFixedThreadPool(10);
 
+    @GetMapping("/probe")
+    public ProbeDto getOneProbe(@RequestParam("idProbe") Integer idProbe) {
+        ProbeDto probeDto = probeService.findOneProbe(idProbe);
+        return probeDto;
+    }
+
     @PostMapping("/probe/import")
     public CompletableFuture<ResponseEntity<?>> createProbe(@RequestBody RequestData requestData) {
         return CompletableFuture.supplyAsync(() -> {
