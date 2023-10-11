@@ -27,6 +27,8 @@ public interface ProbeRepository extends JpaRepository<ProbeEntity, Integer> {
 
     @Query(value = "select * from probemodule.probe where status = :status ", nativeQuery = true)
     List<ProbeEntity> findProbeByStatus(@Param("status") String status);
+
+    Integer countAllByStatus(String status);
 }
 
 

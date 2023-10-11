@@ -10,14 +10,17 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ModuleHistoryService implements IModuleHistoryService {
-    @Autowired
-    private ModuleHistoryRepository moduleHistoryRepository;
 
     @Autowired
-    private ModuleProbeRepository moduleProbeRepository;
+    private static ModuleHistoryRepository moduleHistoryRepository;
+
+    @Autowired
+    private static ModuleProbeRepository moduleProbeRepository;
+
 
     // HAN
     @Override
@@ -35,16 +38,43 @@ public class ModuleHistoryService implements IModuleHistoryService {
         return null;
     }
 
-    // HAN
     @Override
-    public String solveErrorPerWeekOfModule(Integer idProbeModule, Date timeBefore, Date timeAfter, String status) {
+    public String solveEPW(Integer idProbeModule, Date timeBefore, Date timeAfter, String status) {
         try {
-            Integer err = moduleHistoryRepository.solveErrorPerWeekOfModule(idProbeModule, timeBefore, timeAfter, status);
-            ProbeModuleEntity probeModule = moduleProbeRepository.findById(idProbeModule).orElse(null);
-            probeModule.setErrorPerWeek(err);
-            return "so loi cua module = " + err.toString();
-        } catch (Exception e) {
-            return "chua tinh dc loi";
+            Optional<Integer> error = moduleHistoryRepository.solveErrorPerWeekOfModule(idProbeModule, timeBefore, timeAfter, status);
+            return "so loi = " + error.toString();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return "khong tinh dc";
         }
     }
+
+    // HAN
+//    @Override
+//    public static String solveErrorPerWeekOfModule(Integer idProbeModule, Date timeBefore, Date timeAfter, String status) {
+//        try {
+//            Long err = moduleHistoryRepository.solveErrorPerWeekOfModule(idProbeModule, timeBefore, timeAfter, status)
+//                    .orElse(0L);
+//            System.out.println(err);
+//            ProbeModuleEntity probeModule = moduleProbeRepository.findById(idProbeModule).orElse(null);
+////            probeModule.setErrorPerWeek(err);
+//            return "so loi cua module = " + err.toString();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return "chua tinh dc loi";
+//        }
+//    }
+
+
+//    public static void main(String[] args) {
+//        Integer idProbe = 1;
+//        Date timeBefore = Date.valueOf("2023-10-01");
+//        Date timeAfter = Date.valueOf("2023-10-08");
+//        String status = "failed";
+//        String mess = null;
+//        mess = solveErrorPerWeekOfModule(idProbe, timeBefore, timeAfter, status);
+//        System.out.println(mess);
+//    }
+
 }

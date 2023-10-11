@@ -7,6 +7,7 @@ import java.util.List;
 public interface IModuleHistoryService {
     String deleteModuleHistory(String idModuleHistory); // HAN
     List<ModuleHistory> getModuleHistoryByWeek();
-    String solveErrorPerWeekOfModule(Integer idProbeModule, Date timeBefore, Date timeAfter, String status); // HAN
+//    String solveErrorPerWeekOfModule(Integer idProbeModule, Date timeBefore, Date timeAfter, String status); // HAN
+    String solveEPW(Integer idProbeModule, Date timeBefore, Date timeAfter, String status);
 
 }
