@@ -7,6 +7,8 @@ public interface IModuleService {
 
     List<ModuleDto> findAllModule(String name);
     ModuleDto findOneModule(Integer id);
-    void deleteModule(Integer id);
-    ModuleDto saveModule(ModuleDto moduleDto);
+    String deleteModule(Integer id);
+    String saveModule(ModuleDto moduleDto);
+
+    String updateModule(ModuleDto moduleDto);
 }

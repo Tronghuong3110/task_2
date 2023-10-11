@@ -22,4 +22,6 @@ public interface ModuleProbeRepository extends JpaRepository<ProbeModuleEntity, 
     List<ProbeModuleEntity> findAllModuleByProbeIdAndStatus(@Param("probeId") Integer id,
                                                             @Param("status1") String status1,
                                                             @Param("status2") String status2);
+
+    Boolean existsByCommand(String command);
 }

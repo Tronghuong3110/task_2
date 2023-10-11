@@ -30,6 +30,7 @@ public class ProbeController {
     private ILocationService locationService;
     private ExecutorService executorService = Executors.newFixedThreadPool(10);
 
+    // lấy ra 1 probe (đã test thành công) (Han)
     @GetMapping("/probe")
     public ProbeDto getOneProbe(@RequestParam("idProbe") Integer idProbe) {
         ProbeDto probeDto = probeService.findOneProbe(idProbe);

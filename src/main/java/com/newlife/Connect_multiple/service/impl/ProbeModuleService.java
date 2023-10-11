@@ -625,4 +625,36 @@ public class ProbeModuleService implements IProbeModuleService {
             moduleProbeRepository.save(probeModuleEntity);
         }
     }
+
+    @Override
+    public String delete(Integer idProbeModule) {
+        try {
+            //ProbeModuleEntity probeModule = moduleProbeRepository.findById(idProbeModule).orElse(null);
+            moduleProbeRepository.deleteById(idProbeModule);
+            return "Delete success";
+        } catch (Exception e) {
+            return "Delete failed";
+        }
+    }
+
+
+            // Thêm mới 1 module của 1 probe
+    @Override
+    public String saveProbeModule(ProbeModuleDto probeModuleDto) {
+        try {
+            ProbeModuleEntity probeModule = ProbeModuleConverter.toEntity(probeModuleDto);
+
+            String cmd = probeModule.getCommand();
+            if (moduleProbeRepository.existsByCommand(cmd)) {
+                return "trùng câu lệnh command";
+            } else {
+                probeModule.setProcessStatus(2); // dừng
+                probeModule.setExpectStatus(0);
+                moduleProbeRepository.save(probeModule);
+                return "Save probe module success";
+            }
+        } catch (Exception e) {
+            return "Save probe module failed";
+        }
+    }
 }

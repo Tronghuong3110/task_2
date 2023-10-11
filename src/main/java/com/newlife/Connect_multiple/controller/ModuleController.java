@@ -78,4 +78,42 @@ public class ModuleController {
         }, executorService);
     }
 
+    // Xóa 1 probe Module (đã test thành công) (Han)
+    @DeleteMapping("/probeModule")
+    public String deleteModuleProbe(@RequestParam("id") Integer id) {
+        String message = probeModuleService.delete(id);
+        return message;
+    }
+
+
+    // Thêm mới 1 probe Module (đã test thành công) (Han)
+    @PostMapping("/probeModule/import")
+    public String createModuleProbe(@RequestBody ProbeModuleDto probeModuleDto) {
+        String mess = probeModuleService.saveProbeModule(probeModuleDto);
+        return mess;
+    }
+
+    // Thêm mới 1 một module chung (đã test thành công) (Han)
+    @PostMapping("/module/import")
+    public String createModule(@RequestBody ModuleDto moduleDto) {
+        String mess = moduleService.saveModule(moduleDto);
+        return mess;
+    }
+
+
+    // Xóa 1 module lớn (ok) *****(cần xem xét việc xóa các module-probe con hay không)***
+    // (Han)
+    @DeleteMapping("/module")
+    public String deleteModule(@RequestParam("id") Integer id) {
+        String mess = moduleService.deleteModule(id);
+        return mess;
+    }
+
+    // Update 1 module lớn (đã test thành công)
+    @PutMapping("/module")
+    public String updateModule(@RequestBody ModuleDto moduleDto) {
+        String mess = moduleService.updateModule(moduleDto);
+        return mess;
+    }
+
 }

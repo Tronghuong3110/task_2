@@ -10,4 +10,6 @@ public interface IProbeModuleService {
     Object runModule(Integer idProbeModule);
     Object stopModule(Integer idProbeModule);
     void getStatusModulePeriodically();
+    String delete(Integer idProbeModule); // Han
+    String saveProbeModule(ProbeModuleDto probeModuleDto);
 }
