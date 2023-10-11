@@ -28,17 +28,6 @@ const ConfigFileGenerator = (props) => {
         const blob = new Blob([fileContent], { type: 'text/plain;charset=utf-8' });
         saveAs(blob, 'config.conf');
     }
-    // useEffect=()=>{
-        
-    // }
-    // const configData = [
-    //     { key: 'brokerUrl', value: 'tcp://localhost:1883' },
-    //     { key: 'clientId', value: 'client1' },
-    //     { key: 'cleanSession', value: 'true' },
-    //     { key: 'connectionTimeOut', value: '100' },
-    //     { key: 'keepAlive', value: '100' },
-    //     { key: 'login', value: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dpbiI6IntcInBhc3N3b3JkXCI6XCIxMjM0XCIsXCJ0b3BpY1wiOlwiY2xpZW50XzEyMzQ1Njc4OVwiLFwidXNlcm5hbWVcIjpcInNlcnZlclwifSJ9.PKuvmDEcyoxCRin73PA1SiUnUax9-ZGN5eAXsh3Gv7Y' }
-    // ];
 
     const createConfigFile = () => {
         fetch("http://localhost:8081/api/v1/downloadFile/"+props.id)

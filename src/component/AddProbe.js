@@ -286,7 +286,6 @@ const AddProbe = ({ handleCloseWindow }) => {
                                 </div>
                                 <div className='input_container-input'>
                                     <select name='clean-session' id='clean-session'>
-                                        <option>true</option>
                                         <option>false</option>
                                     </select>
                                 </div>

@@ -5,7 +5,7 @@ import Table from '@mui/material/Table';
 import '../../sass/ProbeDetails/ProbeDetailsTable/Probe_Modules.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-    faTrashCan, faCircleRight, faXmarkCircle
+    faTrashCan, faCircleRight, faXmarkCircle, faPenToSquare
 } from '@fortawesome/free-regular-svg-icons'
 import { faPlay, faArrowRotateLeft, faClockRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import Probe_Module_Header from './Probe_Module_Header';
@@ -41,6 +41,7 @@ const Probe_Modules = () => {
     }
     const setLoading = (isLoading) => {
     }
+    /*Phân trang*/ 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     }
@@ -48,6 +49,7 @@ const Probe_Modules = () => {
         setRowPerPage(parseInt(event.target.value), 10)
         setPage(0)
     }
+    /* Sắp xếp theo điều kiện EPW */
     const handleRequestSort = (event, property) => {
         console.log(property)
         const isAscending = (valueToOrderBy === property && orderDirection === 'asc')
@@ -76,6 +78,33 @@ const Probe_Modules = () => {
             return a[1] - b[1]
         })
         return stablilizeRowArray.map((el) => el[0])
+    }
+    /** Run or Restart or Stop module */
+    const actionWithModule = (id,action) =>{
+        const options = {
+            method : "POST",
+            header :{
+                "Content-Type": "application/json"
+            }
+        }
+        fetch("http://localhost:8081/api/v1/probeModule/"+action+"?id="+id,options)
+            .then(respone => respone.json())
+            .then(data => {
+                /*Xử lí data trả về*/ 
+            })
+    }
+    /** Delete module */
+    const deleteModule = (id) =>{
+        const options ={
+            method:"DELETE",
+            header:{
+                "Content-Type": "application/json"
+            }
+        }
+        fetch("http://localhost:8081/api/v1/probeModule?id="+id,options)
+            .then(respone => respone.json())
+            .then(data => console.log(data))
+            .catch(err => console.log(err))
     }
     return (
         <div className='Probe_Module'>
@@ -119,6 +148,11 @@ const Probe_Modules = () => {
                                                     <div className='action'>
                                                         <button >
                                                             <FontAwesomeIcon icon={faXmarkCircle} style={{ color: "#FF1C1C", }} />
+                                                        </button>
+                                                    </div>
+                                                    <div className='action'>
+                                                        <button >
+                                                            <FontAwesomeIcon icon={faPenToSquare} style={{ color: "powderblue", }} />
                                                         </button>
                                                     </div>
                                                     <div className='action'>

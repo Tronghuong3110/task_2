@@ -15,13 +15,14 @@ import AddProbeModule from './AddProbeModule';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const ProbeDetails = () => {
+const ProbeDetails = (props) => {
     const [isOpen,openCloseWindow] = useState(false);
     const [isAppear, setAppear] = useState(false)
     const [location, setLocation] = useState([])
     const [selectedLocation, setSelectedLocation] = useState(null);
     const [selectedArea, setSelectedArea] = useState(null);
     const [area, setArea] = useState([])
+    const [probeDetails,setProbeDetails] = useState({})
 
     //Hàm hiển thị select location và area
     const handleOptionSelectLocation = (selectedValue) => {
@@ -57,20 +58,39 @@ const ProbeDetails = () => {
     const handleCloseWindow = () =>{
         openCloseWindow(false)
     }
+    //Hàm hiển thị thông tin probe
+    useEffect(() => {
+        // fetch("http://localhost:8081/api/v1/probe?idProbe="+props.id)
+        fetch("http://localhost:3001/probes")
+            .then(response => response.json())
+            .then(data => console.log(data))
+            .catch(err => console.log(err))
+    },[])
     //Hàm lấy thông tin sau khi chỉnh sửa probe
     function getInput() {
-        let element = [];
-        element.push(document.getElementById('probe_name'));
-        element.push(document.getElementById('ip_address'));
-        element.push(document.getElementById('note'));
+        let infoInput = []
+        let elements = [];
+        // Get probe_name
+
+        elements.push(document.getElementById('probe_name'));
+        infoInput.push(document.getElementById('probe_name').value);
+        elements.push(document.getElementById('ip_address'));
+        infoInput.push(document.getElementById('ip_address').value);
+        elements.push(document.getElementById('note'));
+        infoInput.push(document.getElementById('note').value);
         document.querySelectorAll('.probeDetails .infos .info .select_container .dropdown').forEach(ele => {
-            element.push(ele)
+            elements.push(ele)
+            infoInput.push(ele.textContent)
         });
-        return element;
+        let infomation ={
+            infoInput,
+            elements
+        }
+        return infomation;
     }
     //Hàm cho phép edit và save thông tin của Probe
     const handleAllowEditInformations = () => {
-        let element = getInput();
+        let element = getInput().elements;
         element.forEach(ele => {
             ele.removeAttribute('disabled')
             ele.classList.remove('disabled')
@@ -78,11 +98,12 @@ const ProbeDetails = () => {
         setAppear(!isAppear)
     }
     const handleSaveInformations = () => {
-        var element = getInput();
+        var element = getInput().elements;
         element.forEach(ele => {
             ele.setAttribute('disabled', true);
             ele.classList.add('disabled')
         })
+        
         setAppear(!isAppear)
     }
     const setDefaultStatusInput =()=>{
@@ -97,8 +118,6 @@ const ProbeDetails = () => {
         setDefaultStatusInput()
         setAppear(!isAppear)
     }, [])
-
-    
 
     // Hiển thị thông báo
     const notify = () => {
