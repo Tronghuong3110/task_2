@@ -48,6 +48,16 @@ public class ModuleController {
         }, executorService);
     }
 
+    // Lấy ra 1 probeModule theo id
+    @GetMapping("/probe/module")
+    public CompletableFuture<ProbeModuleDto> findOneById(@RequestParam("idProbeModule") Integer idProbeModule) {
+        return CompletableFuture.supplyAsync(() -> {
+            ProbeModuleDto probeModuleDto = probeModuleService.findOneById(idProbeModule);
+            return probeModuleDto;
+        },executorService);
+    }
+
+    // chạy module
     @PostMapping("/probeModule/run")
     public CompletableFuture<ResponseEntity<?>> runModule(@RequestParam("idProbeModule") Optional<Integer> idProbeModule) {
         return CompletableFuture.supplyAsync(() -> {
@@ -56,6 +66,7 @@ public class ModuleController {
         }, executorService);
     }
 
+    // stop module
     @PostMapping("/probeModule/stop")
     public CompletableFuture<ResponseEntity<?>> stopModule(@RequestParam("idProbeModule") Optional<Integer> idProbeModule) {
         return CompletableFuture.supplyAsync(() -> {
@@ -64,6 +75,7 @@ public class ModuleController {
         }, executorService);
     }
 
+    // chạy lại module
     @PostMapping("/probeModule/restart")
     public CompletableFuture<ResponseEntity<?>> restartModule(@RequestParam("idProbeModule") Optional<Integer> idProbeModule){
         return CompletableFuture.supplyAsync(() -> {

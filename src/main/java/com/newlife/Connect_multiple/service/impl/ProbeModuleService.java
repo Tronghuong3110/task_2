@@ -2,6 +2,7 @@ package com.newlife.Connect_multiple.service.impl;
 
 import com.newlife.Connect_multiple.api.ApiCheckConnect;
 import com.newlife.Connect_multiple.converter.ProbeModuleConverter;
+import com.newlife.Connect_multiple.dto.ProbeDto;
 import com.newlife.Connect_multiple.dto.ProbeModuleDto;
 import com.newlife.Connect_multiple.entity.*;
 import com.newlife.Connect_multiple.repository.*;
@@ -666,6 +667,23 @@ public class ProbeModuleService implements IProbeModuleService {
         } catch (Exception e) {
             e.printStackTrace();
             return -1;
+        }
+    }
+
+    @Override
+    public ProbeModuleDto findOneById(Integer idProbeModule) {
+        try {
+            ProbeModuleEntity probeModuleEntity = moduleProbeRepository.findById(idProbeModule).orElse(null);
+            if(probeModuleEntity == null) {
+                return null;
+            }
+            ProbeModuleDto probeDto = ProbeModuleConverter.toDto(probeModuleEntity);
+            return probeDto;
+        }
+        catch (Exception e) {
+            System.out.println("Lấy ra 1 module probe lỗi rồi(Line 676)");
+            e.printStackTrace();
+            return null;
         }
     }
 }
