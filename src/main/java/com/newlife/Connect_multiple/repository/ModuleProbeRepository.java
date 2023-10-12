@@ -27,4 +27,5 @@ public interface ModuleProbeRepository extends JpaRepository<ProbeModuleEntity, 
     Boolean existsByCommand(String command);
 
     Integer countAllByStatus(String status);
+
 }

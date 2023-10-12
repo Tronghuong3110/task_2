@@ -1,17 +1,13 @@
 package com.newlife.Connect_multiple.service.impl;
 
-import com.newlife.Connect_multiple.dto.ModuleHistory;
-import com.newlife.Connect_multiple.entity.ProbeModuleEntity;
+import com.newlife.Connect_multiple.dto.ModuleHistoryDto;
 import com.newlife.Connect_multiple.repository.ModuleHistoryRepository;
 import com.newlife.Connect_multiple.repository.ModuleProbeRepository;
 import com.newlife.Connect_multiple.service.IModuleHistoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
-import java.text.DateFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -38,7 +34,7 @@ public class ModuleHistoryService implements IModuleHistoryService {
     }
 
     @Override
-    public List<ModuleHistory> getModuleHistoryByWeek() {
+    public List<ModuleHistoryDto> getModuleHistoryByWeek() {
         return null;
     }
 
