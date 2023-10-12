@@ -215,4 +215,18 @@ public class ProbeService implements IProbeService {
             return false;
         }
     }
+
+    // Han
+    // màn dashboard
+    @Override
+    public Integer countProbeByStatus(String status) {
+        try {
+            Integer tmp = probeRepository.countAllByStatus(status);
+            return tmp;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+
+    }
 }

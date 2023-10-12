@@ -64,4 +64,15 @@ public class ProbeController {
         String message = probeService.backUpProbe(id);
         return message;
     }
+    // Han
+    @GetMapping("dashboard/probe")
+    public Integer countProbeByStatus(@RequestParam("status") String status) {
+        try {
+            Integer tmp = probeService.countProbeByStatus(status);
+            return tmp;
+        } catch (Exception e){
+            e.printStackTrace();
+            return -1;
+        }
+    }
 }

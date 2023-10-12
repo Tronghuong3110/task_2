@@ -23,6 +23,8 @@ public interface ProbeRepository extends JpaRepository<ProbeEntity, Integer> {
                                                        @Param("area") String area,
                                                        @Param("vlan") String vlan,
                                                        Pageable pageable);
+
+    Integer countAllByStatus(String status);
 }
 
 

@@ -10,4 +10,6 @@ public interface IProbeService {
     String delete(Integer id);
     String updateProbe(ProbeDto probeDto);
     String backUpProbe(Integer id);
+
+    Integer countProbeByStatus(String status);
 }
