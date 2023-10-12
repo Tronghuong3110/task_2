@@ -26,25 +26,25 @@ const TableHeader = (props) => {
                 <TableCell className='status'>
                     <div className='status-container d-flex'>
                         <TableSortLabel
-                            className='status-name'
+                            className='status-name running'
                             active={valueToOrderBy === "numberRunningModule"}
                             direction={valueToOrderBy === "numberRunningModule" ? orderDirection : 'asc'}
                             onClick={createSortHandler('numberRunningModule')}
                         ><Tooltip title="Running"><div key="numberRunningModule" className='statusModule' >SR</div></Tooltip></TableSortLabel>
                         <TableSortLabel
-                            className='status-name'
+                            className='status-name pending'
                             active={valueToOrderBy === "numberPendingModule"}
                             direction={valueToOrderBy === "numberPendingModule" ? orderDirection : 'asc'}
                             onClick={createSortHandler('numberPendingModule')}
                         ><Tooltip title="Pending"><div key="numberPendingModule" className='statusModule'>SP</div></Tooltip></TableSortLabel>
                         <TableSortLabel
-                            className='status-name'
+                            className='status-name stopped'
                             active={valueToOrderBy === "numberStopedModule"}
                             direction={valueToOrderBy === "numberStopedModule" ? orderDirection : 'asc'}
                             onClick={createSortHandler('numberStopedModule')}
                         ><Tooltip title="Stopped"><div key="numberStopedModule" className='statusModule' >SS</div></Tooltip></TableSortLabel>
                         <TableSortLabel
-                            className='status-name'
+                            className='status-name failed'
                             active={valueToOrderBy === "numberFailedModule"}
                             direction={valueToOrderBy === "numberFailedModule" ? orderDirection : 'asc'}
                             onClick={createSortHandler('numberFailedModule')}

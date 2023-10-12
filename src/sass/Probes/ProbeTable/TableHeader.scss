@@ -3,83 +3,103 @@ $secondary: #27293d;
 $pink-color: #E14ECA;
 $blue-color: #9747FF;
 
-    .Probe_Header {
-        tr {
-            th {
-                font-size: 0.75rem !important;
-                color: white !important;
-                text-align: center !important;
-                padding: 5px !important;
-                height: fit-content;
-                border: none !important;
-                line-height: 1rem;
-                border-bottom: 2px white solid !important;
-
-                .status {
-                    &-name {
-                        width: 25%;
-                    }
-                }
-            }
-
-            .id {
-                width: 4%;
-            }
-
-            .probe_name {
-                width: 9%;
-            }
-
-            .ip_address {
-                width: 9%;
-            }
-
-            .location,
-            .area,
-            .vlan,
-            .total_module {
-                width: 5%;
-            }
-            .probeStatus{
-                width: 3%;
-            }
+.Probe_Header {
+    tr {
+        th {
+            font-size: 0.75rem !important;
+            color: white !important;
+            text-align: center !important;
+            padding: 5px !important;
+            height: fit-content;
+            border: none !important;
+            line-height: 1rem;
+            border-bottom: 2px white solid !important;
 
             .status {
-                width: 16%;
-
                 &-container {
-                    svg {
-                        font-size: 0.7rem;
+                    .running {
+                        color: #00FF1A;
                     }
 
-                    .Mui-active {
-                        color: $pink-color;
-
-                        .MuiTableSortLabel-icon {
-                            color: $pink-color;
-                        }
+                    .pending {
+                        color: #FFD233;
                     }
 
-                    span {
-                        display: flex;
-                        justify-content: center;
-                        &:hover{
-                            color:$pink-color;
-                        }
+                    .stopped {
+                        color: #FF1CE8
+                    }
+
+                    .failed {
+                        color: #FF1C1C;
+                    }
+                }
+
+                &-name {
+                    width: 25%;
+                }
+            }
+        }
+
+        .id {
+            width: 4%;
+        }
+
+        .probe_name {
+            width: 9%;
+        }
+
+        .ip_address {
+            width: 9%;
+        }
+
+        .location,
+        .area,
+        .vlan,
+        .total_module {
+            width: 5%;
+        }
+
+        .probeStatus {
+            width: 3%;
+        }
+
+        .status {
+            width: 16%;
+
+            &-container {
+                svg {
+                    font-size: 0.7rem;
+                }
+
+                .Mui-active {
+                    color: $pink-color;
+
+                    .MuiTableSortLabel-icon {
+                        color: white;
+                    }
+                }
+
+                span {
+                    display: flex;
+                    justify-content: center;
+
+                    &:hover {
+                        color: white;
                     }
                 }
             }
+        }
 
-            .last_online {
-                width: 12%;
-            }
+        .last_online {
+            width: 12%;
+        }
 
-            .description {
-                width: 15%;
-            }
+        .description {
+            width: 15%;
+        }
 
-            .actions {
-                width: 12%;
-            }
+        .actions {
+            width: 12%;
         }
     }
+}

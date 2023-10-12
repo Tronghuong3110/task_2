@@ -13,6 +13,7 @@ import { faCircle, faDownload } from '@fortawesome/free-solid-svg-icons';
 import TableHeader from './TableHeader';
 import { ProbesContext } from './ProbesContext';
 import ConfigFileGenerator from '../action/download';
+import { Routes, Route, Link } from 'react-router-dom';
 const ProbesTable = () => {
     const probesContext = useContext(ProbesContext)
     const [probes, setProbes] = useState(probesContext.probes)
@@ -152,10 +153,10 @@ const ProbesTable = () => {
                                         <TableCell className='total_module' ><div>{probe.totalModule}</div></TableCell>
                                         <TableCell className='status' >
                                             <div className='status-container d-flex'>
-                                                <div className='status-name' key="numberRunningModule">{probe.numberRunningModule}</div>
-                                                <div className='status-name' key="numberPendingModule">{probe.numberPendingModule}</div>
-                                                <div className='status-name' key="numberStoppedModule">{probe.numberStopedModule}</div>
-                                                <div className='status-name' key="numberFailedModule">{probe.numberFailedModule}</div>
+                                                <div className='status-name running' key="numberRunningModule">{probe.numberRunningModule}</div>
+                                                <div className='status-name pending' key="numberPendingModule">{probe.numberPendingModule}</div>
+                                                <div className='status-name stopped' key="numberStoppedModule">{probe.numberStopedModule}</div>
+                                                <div className='status-name failed' key="numberFailedModule">{probe.numberFailedModule}</div>
                                             </div>
                                         </TableCell>
                                         <TableCell className='last_online' >
@@ -179,9 +180,7 @@ const ProbesTable = () => {
                                                     <ConfigFileGenerator id={probe.id}></ConfigFileGenerator>
                                                 </div>
                                                 <div className='action'>
-                                                    <button>
-                                                        <FontAwesomeIcon icon={faCircleRight} style={{ color: "#3f83f8", }} />
-                                                    </button>
+                                                    <Link to="/details"> <FontAwesomeIcon icon={faCircleRight} style={{ color: "#3f83f8", }} /></Link>
                                                 </div>
                                             </div>
                                         </TableCell>

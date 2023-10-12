@@ -26,14 +26,32 @@ $blue-color: #9747FF;
                     }
 
                     .status {
+                        &-container {
+                            .running {
+                                color: #00FF1A;
+                            }
+
+                            .pending {
+                                color: #FFD233;
+                            }
+
+                            .stopped {
+                                color: #FF1CE8
+                            }
+
+                            .failed {
+                                color: #FF1C1C;
+                            }
+                        }
+
                         &-name {
                             width: 25%;
-                            padding-right: 20px
+                            padding-right: 20px;
                         }
                     }
 
                     .action {
-                        display: flex ;
+                        display: flex;
                         justify-content: center;
                         align-items: center;
 
@@ -67,7 +85,8 @@ $blue-color: #9747FF;
                 .total_module {
                     width: 5%;
                 }
-                .probeStatus{
+
+                .probeStatus {
                     width: 3%;
                 }
 

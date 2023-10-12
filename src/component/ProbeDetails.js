@@ -16,13 +16,13 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const ProbeDetails = (props) => {
-    const [isOpen,openCloseWindow] = useState(false);
+    const [isOpen, openCloseWindow] = useState(false);
     const [isAppear, setAppear] = useState(false)
     const [location, setLocation] = useState([])
     const [selectedLocation, setSelectedLocation] = useState(null);
     const [selectedArea, setSelectedArea] = useState(null);
     const [area, setArea] = useState([])
-    const [probeDetails,setProbeDetails] = useState({})
+    const [probeDetails, setProbeDetails] = useState({})
 
     //Hàm hiển thị select location và area
     const handleOptionSelectLocation = (selectedValue) => {
@@ -52,20 +52,19 @@ const ProbeDetails = (props) => {
     }, [selectedLocation])
 
     //Hàm hiển thị và đóng cửa sổ thêm probe module
-    const handleOpenWindow = () =>{
+    const handleOpenWindow = () => {
         openCloseWindow(true)
     }
-    const handleCloseWindow = () =>{
+    const handleCloseWindow = () => {
         openCloseWindow(false)
     }
     //Hàm hiển thị thông tin probe
     useEffect(() => {
-        // fetch("http://localhost:8081/api/v1/probe?idProbe="+props.id)
-        fetch("http://localhost:3001/probes")
+        fetch("http://localhost:8081/api/v1/probe?idProbe=1")
             .then(response => response.json())
-            .then(data => console.log(data))
+            .then(data => setProbeDetails(data))
             .catch(err => console.log(err))
-    },[])
+    }, [])
     //Hàm lấy thông tin sau khi chỉnh sửa probe
     function getInput() {
         let infoInput = []
@@ -82,32 +81,60 @@ const ProbeDetails = (props) => {
             elements.push(ele)
             infoInput.push(ele.textContent)
         });
-        let infomation ={
-            infoInput,
-            elements
+        let infomation = {
+            "infoInput": infoInput,
+            "elements": elements
         }
         return infomation;
     }
     //Hàm cho phép edit và save thông tin của Probe
     const handleAllowEditInformations = () => {
-        let element = getInput().elements;
+        var infomation = getInput();
+        var element = infomation.elements;
         element.forEach(ele => {
             ele.removeAttribute('disabled')
             ele.classList.remove('disabled')
         })
         setAppear(!isAppear)
     }
-    const handleSaveInformations = () => {
-        var element = getInput().elements;
+    const getInfomationEdited =()=>{
+        var infomation = getInput();
+        const result = {};
+        let keys = ["name","ipAddress","description","location","area"]
+        let values = infomation.infoInput
+        for (let i = 0; i < keys.length; i++) {
+            result[keys[i]] = values[i];
+        }
+        var element = infomation.elements;
         element.forEach(ele => {
             ele.setAttribute('disabled', true);
             ele.classList.add('disabled')
         })
-        
+        return result
+    }
+    const handleSaveInformations = (id) => {
+        let info = {
+            ...getInfomationEdited(),
+            id: 1
+        }
+        console.log(info)
+        let options ={
+            method: "PUT",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(info)
+        }
+        fetch("http://localhost:8081/api/v1/probe",options)
+            .then(response => response.text())
+            .then(data => alert(data))
+            .catch(err => console.log(err))
+
         setAppear(!isAppear)
     }
-    const setDefaultStatusInput =()=>{
-        var element = getInput();
+    const setDefaultStatusInput = () => {
+        var infomation = getInput();
+        var element = infomation.elements;
         element.forEach(ele => {
             ele.setAttribute('disabled', true);
             ele.classList.add('disabled')
@@ -142,7 +169,7 @@ const ProbeDetails = (props) => {
                         <div className="info-title-text">PROBE NAME</div>
                     </div>
                     <div className="info-input">
-                        <input type="text" id="probe_name"></input>
+                        <input defaultValue={probeDetails.name} type="text" id="probe_name"></input>
                     </div>
                 </div>
                 <div className="info ip_address">
@@ -153,7 +180,7 @@ const ProbeDetails = (props) => {
                         <div className="info-title-text">IP ADDRESS</div>
                     </div>
                     <div className="info-input">
-                        <input type="text" id="ip_address"></input>
+                        <input defaultValue={probeDetails.ipAddress} type="text" id="ip_address"></input>
                     </div>
                 </div>
                 <div className="info location">
@@ -164,7 +191,7 @@ const ProbeDetails = (props) => {
                         <div className="info-title-text">LOCATION</div>
                     </div>
                     <div className="select_container" id="location">
-                        <DropdownWithInput  edit="true" type="Search location" options={location} onOptionSelect={handleOptionSelectLocation} value={selectedLocation} ></DropdownWithInput>
+                        <DropdownWithInput defaultValue={probeDetails.location} edit="true" type="Search location" options={location} onOptionSelect={handleOptionSelectLocation} value={selectedLocation} ></DropdownWithInput>
                     </div>
 
                 </div>
@@ -176,7 +203,7 @@ const ProbeDetails = (props) => {
                         <div className="info-title-text">AREA</div>
                     </div>
                     <div className="select_container" id="area">
-                        <DropdownWithInput  edit="true" type="Search area" options={area} onOptionSelect={handleOptionSelectArea} value={selectedArea}></DropdownWithInput>
+                        <DropdownWithInput defaultValue={probeDetails.area} edit="true" type="Search area" options={area} onOptionSelect={handleOptionSelectArea} value={selectedArea}></DropdownWithInput>
                     </div>
 
                 </div>
@@ -190,7 +217,7 @@ const ProbeDetails = (props) => {
                         <div className="info-title-text">DESCRIPTION</div>
                     </div>
                     <div className="info-input">
-                        <textarea rows={1} id="note"></textarea>
+                        <textarea defaultValue={probeDetails.description} rows={1} id="note"></textarea>
                     </div>
                 </div>
                 <div className="saveOrEditButton">
@@ -200,14 +227,16 @@ const ProbeDetails = (props) => {
                         </div>
                         <div className='btn-text' >Edit</div>
                     </button>}
-                    {!isAppear && <button className='btn d-flex align-items-center' onClick={handleSaveInformations} >
+                    {!isAppear && <button className='btn d-flex align-items-center' onClick={()=>{
+                        handleSaveInformations(probeDetails.id)
+                    }} >
                         <div className='btn-icon d-flex align-items-center' >
                             <FontAwesomeIcon icon={faFloppyDisk} />
                         </div>
                         <div className='btn-text' >Save</div>
                     </button>}
                 </div>
-                
+
             </div>
             <div className="infos">
                 <div className="info probe_modules">
@@ -242,8 +271,8 @@ const ProbeDetails = (props) => {
                     </div>
                 </div>
             </div>
-            <Probe_Modules></Probe_Modules>
-            {isOpen && <AddProbeModule handleCloseWindow={handleCloseWindow} notify ={notify} ></AddProbeModule>}
+            <Probe_Modules ></Probe_Modules>
+            {isOpen && <AddProbeModule handleCloseWindow={handleCloseWindow} notify={notify} ></AddProbeModule>}
             <ToastContainer ></ToastContainer>
         </div>
     )

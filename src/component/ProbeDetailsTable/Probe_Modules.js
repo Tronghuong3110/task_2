@@ -18,7 +18,7 @@ const Probe_Modules = () => {
     const [rowsPerPage, setRowPerPage] = useState(7)
     const [displayPagination, setDisplayPagination] = useState(false)
     useEffect(() => {
-        fetch("http://localhost:3003/probe_modules")
+        fetch("http://localhost:8081/api/v1/probe/modules?idProbe=1&&name=&&status=")
             .then(response => response.json())
             .then(data => setProbeModules(data))
             .catch(err => console.log(err))
@@ -136,7 +136,7 @@ const Probe_Modules = () => {
                                             <TableCell className='actions' >
                                                 <div className='actions-container d-flex justify-content-between'>
                                                     <div className='action'>
-                                                        <button >
+                                                        <button>
                                                             <FontAwesomeIcon icon={faPlay} style={{ color: "#00FF1A", }} />
                                                         </button>
                                                     </div>

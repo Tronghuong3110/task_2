@@ -46,7 +46,7 @@ const DropdownWithInput = (props) => {
     <div className="dropdown">
       <div className="select" onClick={togglePopup}>
         <FontAwesomeIcon icon={typeSelect[props.type]} style={{ color: "#ffffff", padding: "0 10px" }} />
-        {renderInputValue || props.type}
+        { renderInputValue ||props.defaultValue|| props.type}
       </div>
       {isPopupOpen && (
         <div className="popup" style={{ zIndex: "2" }}>
