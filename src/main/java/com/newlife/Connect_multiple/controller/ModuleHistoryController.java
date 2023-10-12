@@ -14,10 +14,16 @@ public class ModuleHistoryController {
     @Autowired
     private IModuleHistoryService moduleHistoryService;
 
-
     @DeleteMapping("/module/history")  // HAN xóa 1 lịch sử module (đã test thành công)
     public String deleteModuleHistory (@RequestParam("id") String idModuleHistory) {
         String mess = moduleHistoryService.deleteModuleHistory(idModuleHistory);
         return mess;
+    }
+
+    // Hướng
+    @GetMapping("/module/history/count")
+    public String countModuleErrorPerWeek() {
+        String countError = moduleHistoryService.solveEPW(1, "Failed");
+        return countError;
     }
 }
