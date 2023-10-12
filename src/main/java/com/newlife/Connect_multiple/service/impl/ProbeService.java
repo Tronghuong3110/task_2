@@ -38,16 +38,18 @@ public class ProbeService implements IProbeService {
     @Autowired
     private ProbeOptionRepository probeOptionRepository;
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
     private ServerRepository serverRepository;
     @Autowired
     private BrokerRepository brokerRepository;
 
+    // hân
     @Override
     public ProbeDto findOneProbe(Integer idProbe) {
         try {
-            ProbeEntity probeEntity = probeRepository.findById(idProbe).orElse(null);
+            ProbeEntity probeEntity = probeRepository.findByIdAndDeleted(idProbe, 0).orElse(null);
+            if(probeEntity == null) {
+                return null;
+            }
             ProbeDto probeDto = ProbeConverter.toDto(probeEntity);
             return probeDto;
         } catch (Exception e){
@@ -55,25 +57,27 @@ public class ProbeService implements IProbeService {
             return probeDto;
         }
     }
+
+    // hướng
     @Override
     public ProbeDto saveProbe(ProbeDto probeDto, ProbeOptionDto probeOptionDto) {
         ProbeDto responseProbe = new ProbeDto();
         try {
             ProbeEntity probeEntity = ProbeConverter.toEntity(probeDto);
             ProbeOptionEntity probeOptionEntity = ProbeOptionConverter.toEntity(probeOptionDto);
-            // check username, ip, name, clientId
+            // kiểm tra username, ip, name, clientId
             if(checkUsername(probeOptionEntity.getUserName())) {
-                // username exists
+                // username đã tồn tại
                 responseProbe.setMessage("Username exists");
                 return responseProbe;
             }
             if(checkProbeName(probeEntity.getName())) {
-                // probe name exists
+                // tên probe đã tồn tại
                 responseProbe.setMessage("Name probe exists");
                 return responseProbe;
             }
             if(checkIpAddress(probeEntity.getIpAddress())) {
-                // ip address exists
+                // địa chỉ ip đã tồn tại
                 responseProbe.setMessage("Ip address exists");
                 return responseProbe;
             }
@@ -162,7 +166,6 @@ public class ProbeService implements IProbeService {
                 probeHistoryEntity.setAction("Create");
                 probeHistoryEntity.setAtTime(new Date(System.currentTimeMillis()));
                 probeHistoryEntity.setProbeName(probeEntity.getName());
-                probeHistoryEntity.setProbeEntity(probeEntity);
                 probeHistoryRepository.save(probeHistoryEntity);
             }
             catch (Exception e) {
@@ -178,7 +181,7 @@ public class ProbeService implements IProbeService {
             return responseProbe;
         }
     }
-
+    // hướng
     @Override
     public List<ProbeDto> findAllProbe(String name, String location, String area, String vlan) {
         List<ProbeEntity> listProbe = probeRepository.findByNameOrLocationOrAreaOrVlan(name, location, area, vlan);
@@ -188,42 +191,64 @@ public class ProbeService implements IProbeService {
         }
         return listProbeDto;
     }
-
+    // hướng (Đưa probe vào thùng rác)
     @Override
     public String delete(Integer id) {
         try {
-            ProbeEntity probeEntity = probeRepository.findById(id)
+            ProbeEntity probeEntity = probeRepository.findByIdAndDeleted(id, 0)
                     .orElse(null);
             if(probeEntity == null) {
                 return "Can not found probe with id = " + id;
             }
+            ProbeHistoryEntity probeHistoryEntity = new ProbeHistoryEntity();
+            probeHistoryEntity.setProbeName(probeEntity.getName());
+            probeHistoryEntity.setAction("Moved to the trash");
+            probeHistoryEntity.setAtTime(new Date(System.currentTimeMillis()));
             probeEntity.setDeleted(1);
             probeEntity = probeRepository.save(probeEntity);
-            return "Delete probe with id " + id + " success";
+            probeHistoryRepository.save(probeHistoryEntity);
+            return "Probe with id " + id + " is moved to the trash";
         }
         catch (Exception e) {
-            System.out.println("Delete probe error");
+            System.out.println("Delete probe error(Di chuyển probe tới thùng rác)");
             e.printStackTrace();
             return "Can not delete probe with " + id;
         }
     }
-
+    // hướng
     @Override
     public String updateProbe(ProbeDto probeDto) {
         try {
-            ProbeEntity probeEntity = probeRepository.findById(probeDto.getId())
+            // lấy thông tin probe từ database với trạng thái vẫn hoạt động bình thường
+            ProbeEntity probeEntity = probeRepository.findByIdAndDeleted(probeDto.getId(), 0)
                     .orElse(null);
             probeEntity = ProbeConverter.toEntity(probeEntity, probeDto);
             if(probeEntity == null) {
                 return "Can not update probe";
             }
+
+            // kiểm tra tính hợp lệ của địa chỉ ip của probe
             if(probeDto.getIpAddress() != null && checkValidateIpAddress(probeEntity.getIpAddress())) {
                 return "Ip address invalidate";
             }
-            if(probeDto.getName() != null && checkProbeName(probeEntity.getName())) {
-                return "Name probe exists";
+            // kiểm tra địa chỉ ip đã tồn tại trong database chưa
+            if(probeDto.getIpAddress() != null) {
+                Integer newId = getIdProbeByIpAddress(probeDto.getIpAddress());
+                // địa chỉ ip đã tồn tại trong database và trùng với 1 probe khác
+                if(newId != null && newId != probeEntity.getId()) {
+                    return "IpAddress exists";
+                }
             }
-            if(probeDto.getStatus().equals("connected")) {
+            // kiểm tra tên probe đã tồn tại trong database chưa
+            if(probeDto.getName() != null) {
+                Integer newId = getIdOfProbeByName(probeDto.getName());
+                // tên probe trùng với 1 probe khác đã có trong database
+                if(newId != null && newId != probeEntity.getId()) {
+                    return "Name probe exists";
+                }
+            }
+            //phục vụ cho việc yêu cầu kết nối và ngắt kết nối tới broker
+            if(probeDto.getStatus() != null && probeDto.getStatus().equals("connected")) {
                 Boolean checkConnectToBroker = ApiCheckConnect.checkExistClient(probeEntity.getClientId());
                 if(!checkConnectToBroker) {
                     probeEntity.setStatus("error");
@@ -231,8 +256,21 @@ public class ProbeService implements IProbeService {
                     return "Probe có IP là " + probeEntity.getIpAddress() + " chưa được cài đặt, không thể thực hiện connect";
                 }
             }
-            probeEntity = probeRepository.save(probeEntity);
-            return "Update probe success";
+            // lưu thông tin lịch sử khi cập nhật probe
+            try {
+                ProbeHistoryEntity probeHistoryEntity = new ProbeHistoryEntity();
+                probeHistoryEntity.setProbeName(probeEntity.getName());
+                probeHistoryEntity.setAction("Update probe");
+                probeHistoryEntity.setAtTime(new Date(System.currentTimeMillis()));
+                probeEntity = probeRepository.save(probeEntity);
+                probeHistoryRepository.save(probeHistoryEntity);
+                return "Update probe success";
+            }
+            catch (Exception e) {
+                System.out.println("Cập nhật probe lỗi rồi!! (Line 260)");
+                e.printStackTrace();
+                return "Update probe failed";
+            }
         }
         catch (Exception e) {
             System.out.println("Update probe error");
@@ -240,17 +278,23 @@ public class ProbeService implements IProbeService {
             return "Can not update probe";
         }
     }
-
+    // hướng
     @Override
     public String backUpProbe(Integer id) {
         try {
-            ProbeEntity probeEntity = probeRepository.findById(id)
+            // lấy probe từ database theo id và trạng thái đã đưa vào thùng rác
+            ProbeEntity probeEntity = probeRepository.findByIdAndDeleted(id, 1)
                     .orElse(null);
             if(probeEntity == null) {
                 return "Can not found probe with id = " + id;
             }
+            ProbeHistoryEntity probeHistoryEntity = new ProbeHistoryEntity();
+            probeHistoryEntity.setProbeName(probeEntity.getName());
+            probeHistoryEntity.setAction("Permanently Deleted");
+            probeHistoryEntity.setAtTime(new Date(System.currentTimeMillis()));
             probeEntity.setDeleted(0);
             probeEntity = probeRepository.save(probeEntity);
+            probeHistoryRepository.save(probeHistoryEntity);
             return "Back up probe with id = " + id + " success";
         }
         catch (Exception e) {
@@ -259,11 +303,15 @@ public class ProbeService implements IProbeService {
             return "Can not back up probe with id = " + id;
         }
     }
+    // hướng
     @Override
     public InfoLogin downlodFile(Integer idProbe) {
         try {
             InfoLogin info = new InfoLogin();
-            ProbeEntity probe = probeRepository.findById(idProbe).orElse(null);
+            ProbeEntity probe = probeRepository.findByIdAndDeleted(idProbe, 0).orElse(null);
+            if(probe == null) {
+                return null;
+            }
             BrokerEntity broker = new BrokerEntity();
             try {
                 broker = brokerRepository.findAll().get(0);
@@ -302,18 +350,48 @@ public class ProbeService implements IProbeService {
             e.printStackTrace();
             return 0;
         }
-
     }
 
+    // hướng - xóa 1 probe từ thùng rác
+    @Override
+    public String deleteProbe(Integer id) {
+        // tìm probe theo id có trong thùng rác(deleted = 1)
+        ProbeEntity probe = probeRepository.findByIdAndDeleted(id, 1).orElse(null);
+        if(probe == null) {
+            return "Probe đã bị xóa vĩnh viễn không còn tồn tại";
+        }
+        // thêm lịch sử vào bảng probebHistory
+        try {
+            ProbeHistoryEntity probeHistoryEntity = new ProbeHistoryEntity();
+            probeHistoryEntity.setProbeName(probe.getName());
+            probeHistoryEntity.setAction("Permanently Deleted");
+            probeHistoryEntity.setAtTime(new Date(System.currentTimeMillis()));
+            // xóa probe
+            probeRepository.deleteById(id);
+            // Lưu thông tin vào lịch sử
+            probeHistoryRepository.save(probeHistoryEntity);
+            return "Delete probe success";
+        }
+        catch (Exception e) {
+            System.out.println("Lưu lịch sử probe lỗi rồi(Xóa vĩnh viễn probe từ thùng rác Line 338)");
+            e.printStackTrace();
+            return "Delete failed";
+        }
+    }
+
+    //hướng
     private Boolean checkUsername(String username) {
         return probeOptionRepository.existsByUserName(username);
     }
+    // hướng
     private Boolean checkIpAddress(String ipAddress) {
         return probeRepository.existsByIpAddress(ipAddress);
     }
+    // hướng
     private Boolean checkProbeName(String probeName) {
         return probeRepository.existsByName(probeName);
     }
+    // hướng
     private Boolean checkValidateIpAddress(String ipAddress) {
         String[] ips = ipAddress.split(".");
         if(ips.length < 4) return false;
@@ -333,6 +411,7 @@ public class ProbeService implements IProbeService {
         }
         return true;
     }
+    // hướng
     private String checkValidateUserName(String userName) {
         String[] usernames = userName.split(" ");
         if(usernames.length >= 2) {
@@ -343,5 +422,21 @@ public class ProbeService implements IProbeService {
             return "Username không được chứa ký tự UTF-8";
         }
         return "success";
+    }
+    //hướng
+    private Integer getIdOfProbeByName(String name) {
+        ProbeEntity probe = probeRepository.findByName(name).orElse(null);
+        if(probe == null) {
+            return null;
+        }
+        return probe.getId();
+    }
+    // hướng
+    private Integer getIdProbeByIpAddress(String ipAddress) {
+        ProbeEntity probe = probeRepository.findByIpAddress(ipAddress).orElse(null);
+        if(probe == null) {
+            return null;
+        }
+        return probe.getId();
     }
 }

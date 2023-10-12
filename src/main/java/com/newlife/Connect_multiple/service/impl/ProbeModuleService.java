@@ -47,9 +47,9 @@ public class ProbeModuleService implements IProbeModuleService {
     private MqttClient client = null;
     private ExecutorService executorService = Executors.newFixedThreadPool(10);
     @Override
-    public List<ProbeModuleDto> findAllProbeModule(String moduleName, String status) {
+    public List<ProbeModuleDto> findAllProbeModule(String moduleName, String status, Integer idProbe) {
         try {
-            List<ProbeModuleEntity> listProbeModuleEntity = moduleProbeRepository.findAllByProbeNameOrStatus(moduleName, status);
+            List<ProbeModuleEntity> listProbeModuleEntity = moduleProbeRepository.findAllByProbeNameOrStatusAndIdProbe(moduleName, status, idProbe);
             List<ProbeModuleDto> listProbeModuleDto = new ArrayList<>();
             for(ProbeModuleEntity entity : listProbeModuleEntity) {
                 listProbeModuleDto.add(ProbeModuleConverter.toDto(entity));

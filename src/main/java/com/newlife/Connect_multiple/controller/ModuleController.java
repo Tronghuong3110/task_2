@@ -36,12 +36,14 @@ public class ModuleController {
         }, executorService);
     }
 
+    // lấy ra toàn bộ module theo probe
     @GetMapping("/probe/modules")
     public CompletableFuture<List<ProbeModuleDto>> findAllProbeModule(@RequestParam("name") Optional<String> name,
-                                                   @RequestParam("status") Optional<String> status) {
+                                                                      @RequestParam("status") Optional<String> status,
+                                                                      @RequestParam("idProbe") Integer idProbe) {
         return CompletableFuture.supplyAsync(() -> {
             List<ProbeModuleDto> listProbeModules = probeModuleService.findAllProbeModule(name.orElse(""),
-                                                                                            status.orElse(""));
+                                                                                            status.orElse(""), idProbe);
             return listProbeModules;
         }, executorService);
     }

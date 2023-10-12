@@ -13,6 +13,6 @@ public interface IProbeService {
     String updateProbe(ProbeDto probeDto);
     String backUpProbe(Integer id);
     InfoLogin downlodFile(Integer idProbe);
-
     Integer countProbeByStatus(String status);
+    String deleteProbe(Integer id);
 }

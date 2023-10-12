@@ -57,6 +57,4 @@ public class ProbeEntity {
     @OneToOne
     @JoinColumn(name = "id_probe_option")
     private ProbeOptionEntity probeOptionEntity;
-    @OneToMany(mappedBy = "probeEntity")
-    List<ProbeHistoryEntity> probeHistoryEntityList;
 }

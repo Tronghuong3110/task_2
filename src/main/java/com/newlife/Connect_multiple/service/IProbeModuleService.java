@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface IProbeModuleService {
-    List<ProbeModuleDto> findAllProbeModule(String moduleName, String status);
+    List<ProbeModuleDto> findAllProbeModule(String moduleName, String status, Integer idProbe);
     Object runModule(Integer idProbeModule);
     Object stopModule(Integer idProbeModule);
     void getStatusModulePeriodically();

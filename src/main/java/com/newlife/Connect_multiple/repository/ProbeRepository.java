@@ -29,6 +29,9 @@ public interface ProbeRepository extends JpaRepository<ProbeEntity, Integer> {
     List<ProbeEntity> findProbeByStatus(@Param("status") String status);
 
     Integer countAllByStatus(String status);
+    Optional<ProbeEntity> findByName(String name);
+    Optional<ProbeEntity> findByIpAddress(String ipAddress);
+    Optional<ProbeEntity> findByIdAndDeleted(Integer id, Integer deleted);
 }
 
 

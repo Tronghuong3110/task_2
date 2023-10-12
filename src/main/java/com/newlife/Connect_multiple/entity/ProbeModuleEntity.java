@@ -59,8 +59,5 @@ public class ProbeModuleEntity {
 
     @Column(name = "process_name")
     private String processName;
-    @OneToMany(mappedBy = "probeModuleEntity")
-    private List<ModuleHistoryEntity> moduleHistoryEntityList;
-
 
 }
