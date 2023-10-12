@@ -41,9 +41,4 @@ public class ModuleHistoryEntity {
     @Column(name = "note", columnDefinition = "text")
     private String note;
 
-    @ManyToOne
-    @JoinColumn(name = "id_probe_module")
-    private ProbeModuleEntity probeModuleEntity;
-
-
 }

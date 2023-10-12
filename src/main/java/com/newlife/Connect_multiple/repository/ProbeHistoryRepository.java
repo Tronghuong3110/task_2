@@ -12,4 +12,5 @@ import java.util.List;
 public interface ProbeHistoryRepository extends JpaRepository<ProbeHistoryEntity, Integer> {
     @Query(value = "select * from module_history order by id_probe_history desc  limit num", nativeQuery = true)
     List<ProbeHistoryEntity> findLastNRecord(@Param("num") Integer n);
+
 }

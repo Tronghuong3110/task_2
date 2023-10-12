@@ -9,6 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
+import java.text.DateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,13 +43,20 @@ public class ModuleHistoryService implements IModuleHistoryService {
     }
 
     @Override
-    public String solveEPW(Integer idProbeModule, Date timeBefore, Date timeAfter, String status) {
+    public String solveEPW(Integer idProbeModule, String status) {
         try {
-            Optional<Integer> error = moduleHistoryRepository.solveErrorPerWeekOfModule(idProbeModule, timeBefore, timeAfter, status);
+            String timeBefore = getTimeBefore();
+            String timeAfter = getTimeAfter();
+            if(timeBefore == null || timeAfter == null) {
+                System.out.println("Đếm lỗi module lồi rồi (line 50) !!!");
+                return null;
+            }
+            Optional<Long> error = moduleHistoryRepository.solveErrorPerWeekOfModule(idProbeModule, timeBefore, timeAfter, status);
             return "so loi = " + error.toString();
         }
         catch (Exception e) {
             e.printStackTrace();
+            System.out.println("Lỗi tính error (line 54) ");
             return "khong tinh dc";
         }
     }
@@ -66,15 +77,30 @@ public class ModuleHistoryService implements IModuleHistoryService {
 //        }
 //    }
 
-
-//    public static void main(String[] args) {
-//        Integer idProbe = 1;
-//        Date timeBefore = Date.valueOf("2023-10-01");
-//        Date timeAfter = Date.valueOf("2023-10-08");
-//        String status = "failed";
-//        String mess = null;
-//        mess = solveErrorPerWeekOfModule(idProbe, timeBefore, timeAfter, status);
-//        System.out.println(mess);
-//    }
-
+    // Hướng
+    private String getTimeBefore() {
+        try {
+            LocalDate currentDate = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            return currentDate.format(formatter);
+        }
+        catch (Exception e) {
+            System.out.println("Lấy ngày hiêện tại lỗi rồi line 77");
+            e.printStackTrace();
+            return null;
+        }
+    }
+    private String getTimeAfter() {
+        try {
+            LocalDate currentDate = LocalDate.now();
+            LocalDate sevenDateFromCurrent = currentDate.plusDays(7);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            return sevenDateFromCurrent.format(formatter);
+        }
+        catch (Exception e) {
+            System.out.println("Tính thời gian sau 7 ngày từ ngày hiện tại lỗi rồi");
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

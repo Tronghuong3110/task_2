@@ -37,6 +37,7 @@ public class ProbeController {
         return probeDto;
     }
 
+    // thêm mới probe
     @PostMapping("/probe/import")
     public CompletableFuture<ResponseEntity<?>> createProbe(@RequestBody RequestData requestData) {
         return CompletableFuture.supplyAsync(() -> {
@@ -45,6 +46,7 @@ public class ProbeController {
         }, executorService);
     }
 
+    // lấy ra toàn bộ location
     @GetMapping("/locations")
     public CompletableFuture<List<LocationDto>> getListLocation() {
         return CompletableFuture.supplyAsync(() -> {
@@ -53,7 +55,7 @@ public class ProbeController {
         }, executorService);
     }
 
-//    find all probe have pagination
+//    lấy ra toàn bộ probe + tìm kiếm theo các điều kiện
     @GetMapping("/probes")
     public CompletableFuture<List<ProbeDto>> searchprobe(@RequestParam("name") Optional<String> name,
                                        @RequestParam("location") Optional<String> location,
@@ -66,6 +68,7 @@ public class ProbeController {
         }, executorService);
     }
 
+    // xóa 1 probe (di chuyển probe tới thùng rác)
     @DeleteMapping("/probe")
     public CompletableFuture<String> deleteProbe(@RequestParam("id") Integer id) {
         return CompletableFuture.supplyAsync(() -> {
@@ -74,6 +77,16 @@ public class ProbeController {
         }, executorService);
     }
 
+    // xóa 1 probe (xóa vĩnh viễn probe từ probe)
+    @DeleteMapping("/probe/remove")
+    public CompletableFuture<String> deleteProbeFromTrash(@RequestParam("id") Integer id) {
+        return CompletableFuture.supplyAsync(() -> {
+            String messageDelete = probeService.deleteProbe(id);
+            return messageDelete;
+        }, executorService);
+    }
+
+    // cập nhật chỉnh sửa thông tin probe
     @PutMapping("/probe")
     public CompletableFuture<String> updateProbe(@RequestBody ProbeDto probeDto) {
         return CompletableFuture.supplyAsync(() -> {
@@ -82,6 +95,7 @@ public class ProbeController {
         }, executorService);
     }
 
+    //khôi phục probe từ thùng rác
     @PostMapping("/probe")
     public CompletableFuture<String> backUpProbe(@RequestParam("id") Integer id) {
         return CompletableFuture.supplyAsync(() -> {
@@ -90,6 +104,7 @@ public class ProbeController {
         }, executorService);
     }
 
+    // thông tin probe để kết nối tới broker (username, password, topic được mã hóa)
     @GetMapping("/downloadFile/{probeId}")
     public CompletableFuture<ResponseEntity<?>> downloadFile(@PathVariable("probeId") Integer probeId) {
         return CompletableFuture.supplyAsync(() -> {
@@ -109,6 +124,5 @@ public class ProbeController {
             return -1;
         }
     }
-
 
 }

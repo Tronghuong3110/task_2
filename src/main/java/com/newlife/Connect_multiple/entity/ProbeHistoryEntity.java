@@ -24,8 +24,4 @@ public class ProbeHistoryEntity {
     @Column(name = "probe_name", columnDefinition = "nvarchar(255)")
     private String probeName;
 
-    @ManyToOne
-    @JoinColumn(name = "id_probe")
-    private ProbeEntity probeEntity;
-
 }
