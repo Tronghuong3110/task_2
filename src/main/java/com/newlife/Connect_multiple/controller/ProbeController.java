@@ -97,4 +97,18 @@ public class ProbeController {
             return ResponseEntity.ok(info);
         }, executorService);
     }
+
+    // Test man Dashboard (da test thanh cong)
+    @GetMapping("/dashboard/probe")
+    public Integer countProbeByStatus(@RequestParam("status") String status) {
+        try {
+            Integer tmp = probeService.countProbeByStatus(status);
+            return tmp;
+        } catch (Exception e){
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+
 }

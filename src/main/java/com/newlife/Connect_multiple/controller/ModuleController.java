@@ -116,4 +116,11 @@ public class ModuleController {
         return mess;
     }
 
+    // Han
+    // man dashboard (da test thanh cong)
+    @GetMapping("/dashboard/module")
+    public Integer countModuleByStatus(@RequestParam("status") String status) {
+        Integer module = probeModuleService.countModuleByStatus(status);
+        return module;
+    }
 }

@@ -15,4 +15,5 @@ public interface IProbeService {
     InfoLogin downlodFile(Integer idProbe);
 
     Integer countProbeByStatus(String status);
+
 }

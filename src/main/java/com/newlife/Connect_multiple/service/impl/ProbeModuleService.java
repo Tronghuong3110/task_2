@@ -657,4 +657,15 @@ public class ProbeModuleService implements IProbeModuleService {
             return "Save probe module failed";
         }
     }
+    // Man Dashboard
+    @Override
+    public Integer countModuleByStatus(String status) {
+        try {
+            Integer module = moduleProbeRepository.countAllByStatus(status);
+            return module;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
 }
