@@ -12,6 +12,6 @@ public interface IProbeModuleService {
     void getStatusModulePeriodically();
     String delete(Integer idProbeModule); // Han
     String saveProbeModule(ProbeModuleDto probeModuleDto);
-
     Integer countModuleByStatus(String status);
+    ProbeModuleDto findOneById(Integer idProbeModule);
 }
