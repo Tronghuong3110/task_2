@@ -56,6 +56,7 @@ public class ModuleHistoryService implements IModuleHistoryService {
         }
         catch (Exception e) {
             e.printStackTrace();
+            System.out.println("Lỗi tính error (line 54) ");
             return "khong tinh dc";
         }
     }
