@@ -18,11 +18,15 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
     useEffect(() => {
         fetch("http://localhost:8081/api/v1/modules")
             .then(response => response.json())
-            .then(data => setListSampleModule(data))
+            .then(data => {
+                setListSampleModule(data)
+                setCommandValue(data[0].caption + " " + data[0].argDefalt)
+            })
             .catch(err => console.log(err))
     }, [])
     useEffect(() => {
         if (id != null) {
+            console.log(1)
             fetch("http://localhost:8081/api/v1/probe/module?idProbeModule=" + id)
                 .then(response => response.json())
                 .then(data => {
@@ -34,32 +38,71 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                 })
                 .catch(err => console.log(err))
         }
-    })
+    }, [])
 
-    const addModule = () => {
-        let data = getModuleInfo()
-        let options = {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
+    const addOrEditModule = () => {
+        let inputData = getModuleInfo().inputValue
+        let fullData = getModuleInfo().fullValue
+        if (findEmptyFields(inputData).length != 0) {
+            let message = "Field ";
+            let arrOption = findEmptyFields(inputData)
+            let arr = findEmptyFields(inputData);
+            arr = arr.concat(arrOption)
+            if (arr.length == 1) message += arr[0] + " is empty"
+            else {
+                for (let i = 0; i < arr.length; i++) {
+                    if (i != arr.length - 1) message += arr[i] + ", "
+                    else message += arr[i]
+                }
+                message += " are empty"
+            }
+            notify(message, 2)
         }
-        fetch("http://localhost:8081/api/v1/probeModule/import", options)
-            .then(response => response.text())
-            .then(data => {
-                if (data == "Save probe module success") {
-                    notify(data, 1)
-                    handleCloseWindow()
-                }
-                else if (data == "Save probe module failed") {
-                    notify(data, 0)
-                }
-                else {
-                    notify(data, 2)
-                }
-            })
-            .catch(err => console.log(err))
+        else {
+            let options = {
+                method: fullData.id != null ? "PUT" : "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(fullData)
+            }
+            if (fullData.id == null) {
+                console.log("POST NOW")
+                fetch("http://localhost:8081/api/v1/probeModule/import", options)
+                    .then(response => response.text())
+                    .then(data => {
+                        if (data == "Save probe module success") {
+                            notify(data, 1)
+                            handleCloseWindow()
+                        }
+                        else if (data == "Save probe module failed") {
+                            notify(data, 0)
+                        }
+                        else {
+                            notify(data, 2)
+                        }
+                    })
+                    .catch(err => console.log(err))
+            }
+            else {
+                console.log("PUT NOW")
+                fetch("http://localhost:8081/api/v1/probeModule/import", options)
+                    .then(response => response.text())
+                    .then(data => {
+                        if (data == "Save probe module success") {
+                            notify(data, 1)
+                            handleCloseWindow()
+                        }
+                        else if (data == "Save probe module failed") {
+                            notify(data, 0)
+                        }
+                        else {
+                            notify(data, 2)
+                        }
+                    })
+                    .catch(err => console.log(err))
+            }
+        }
     }
     const notify = (message, status) => {
         if (status === 1) {
@@ -87,7 +130,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
         else {
             toast.warn(message, {
                 position: "top-center",
-                autoClose: 3000,
+                autoClose: 5000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 draggable: true,
@@ -112,12 +155,28 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
             infoObject[element.id] = element.value;
         });
         let probe_module = {
-            ...infoObject,
-            idModule: idModule.value,
-            idProbe: idProbe,
-            caption: caption
+            fullValue: {
+                ...infoObject,
+                idModule: idModule.value,
+                idProbe: idProbe,
+                caption: caption,
+                id: id
+            },
+            inputValue: infoObject
         }
         return probe_module;
+    }
+
+    function findEmptyFields(obj) {
+        let emptyFields = [];
+
+        for (let key in obj) {
+            if (!obj[key]) {
+                emptyFields.push(key);
+            }
+        }
+
+        return emptyFields;
     }
     return (
         <div>
@@ -201,7 +260,9 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                     </div>
                     {/* Button */}
                     <div className='btn-container d-flex justify-content-end'>
-                        <button className='btn btn-success d-flex align-items-center' onClick={addModule} >
+                        <button className='btn btn-success d-flex align-items-center' onClick={() => {
+                            addOrEditModule()
+                        }} >
                             <div className='btn-icon d-flex align-items-center' >
                                 <FontAwesomeIcon icon={faFloppyDisk} />
                             </div>

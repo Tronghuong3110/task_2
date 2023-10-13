@@ -307,7 +307,7 @@ const ProbeDetails = () => {
                 </div>
             </div>
             <Probe_Modules id={id}  ></Probe_Modules>
-            {isOpen && <AddProbeModule idProbe={id} handleCloseWindow={handleCloseWindow}></AddProbeModule>}
+            {isOpen && <AddProbeModule idProbe={id} id={null} handleCloseWindow={handleCloseWindow}></AddProbeModule>}
             <ToastContainer ></ToastContainer>
         </div>
     )
