@@ -638,7 +638,7 @@ public class ProbeModuleService implements IProbeModuleService {
     }
 
 
-            // Thêm mới 1 module của 1 probe
+    // Thêm mới 1 module của 1 probe
     @Override
     public String saveProbeModule(ProbeModuleDto probeModuleDto) {
         try {
@@ -656,5 +656,37 @@ public class ProbeModuleService implements IProbeModuleService {
         } catch (Exception e) {
             return "Save probe module failed";
         }
+    }
+
+    @Override
+    public String updateProbeModule(ProbeModuleDto probeModuleDto) {
+        try {
+            ProbeModuleEntity probeModuleEntity = moduleProbeRepository.findById(probeModuleDto.getId()).orElse(null);
+            if(probeModuleEntity == null) {
+                return "Can not  found module of probe with id = " + probeModuleDto.getId();
+            }
+            probeModuleEntity = ProbeModuleConverter.toEntity(probeModuleDto, probeModuleEntity);
+            String command = probeModuleEntity.getCaption() + " " + probeModuleEntity.getArg();
+            Integer newId = checkCommadLine(command);
+            // kiểm tra xem có bị trùng command line không
+            if(newId != null && newId != probeModuleDto.getId()) {
+                return "Can not update module of probe because of duplicate commands";
+            }
+            moduleProbeRepository.save(probeModuleEntity);
+            return "Update module of probe success";
+        }
+        catch (Exception e) {
+            System.out.println("Cập nhật module của probe lỗi rồi!!");
+            e.printStackTrace();
+            return "Update module of probe error";
+        }
+    }
+
+    private Integer checkCommadLine(String commandLine) {
+        ProbeModuleEntity probeModuleEntity = moduleProbeRepository.findByCommand(commandLine).orElse(null);
+        if(probeModuleEntity == null) {
+            return null;
+        }
+        return probeModuleEntity.getId();
     }
 }

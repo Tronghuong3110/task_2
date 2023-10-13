@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ModuleProbeRepository extends JpaRepository<ProbeModuleEntity, Integer> {
@@ -25,4 +26,5 @@ public interface ModuleProbeRepository extends JpaRepository<ProbeModuleEntity, 
                                                             @Param("status2") String status2);
 
     Boolean existsByCommand(String command);
+    Optional<ProbeModuleEntity> findByCommand(String command);
 }

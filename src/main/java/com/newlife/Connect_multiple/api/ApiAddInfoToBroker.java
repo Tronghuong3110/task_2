@@ -6,6 +6,7 @@ import com.newlife.Connect_multiple.dto.Rules;
 import com.newlife.Connect_multiple.entity.ProbeEntity;
 import com.newlife.Connect_multiple.entity.ProbeOptionEntity;
 import com.newlife.Connect_multiple.entity.ServerEntity;
+import com.newlife.Connect_multiple.entity.SubtopicServerEntity;
 import com.squareup.okhttp.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -49,10 +50,10 @@ public class ApiAddInfoToBroker {
         }
         return null;
     }
-    public static String addRuleToBroker(String username, String topic) {
+    public static String addRuleToBroker(String username, List<SubtopicServerEntity> listTopic) {
         try {
             MediaType type = MediaType.parse("application/json; charset=utf-8");
-            String jsonData = createRule(username, topic);
+            String jsonData = createRule(username, listTopic);
             System.out.println(jsonData);
             OkHttpClient okHttpClient = new OkHttpClient();
             RequestBody body = RequestBody.create(type, jsonData);
@@ -76,20 +77,45 @@ public class ApiAddInfoToBroker {
         }
         return null;
     }
-    private static String createRule(String username, String topic) {
+    private static String createRule(String username, List<SubtopicServerEntity> listTopic) {
         JSONObject dataObject = new JSONObject();
         dataObject.put("username", username);
 
         JSONArray rulesArray = new JSONArray();
-        // danh sách rule
-        JSONObject rule = new JSONObject();
-        rule.put("action", "all");
-        rule.put("permission", "allow");
-        rule.put("topic", topic);
-        rulesArray.add(rule);
+        for(SubtopicServerEntity topic : listTopic) {
+            // danh sách rule
+            JSONObject rule = new JSONObject();
+            rule.put("action", "all");
+            rule.put("permission", "allow");
+            rule.put("topic", topic.getSubTopic());
+            rulesArray.add(rule);
+        }
         dataObject.put("rules", rulesArray);
 
         String jsonString = dataObject.toJSONString();
         return jsonString;
+    }
+
+    private static boolean deleteRoleOfUser(String username) {
+        try {
+            OkHttpClient okHttpClient = new OkHttpClient();
+            Request request = new Request.Builder()
+                    .url(urlApiAddRule + username)
+                    .header("Content-Type", "application/json")
+                    .header("Authorization", Credentials.basic(usernameBroker, passwordBroker))
+                    .delete()
+                    .build();
+            Response response = okHttpClient.newCall(request).execute();
+            Integer responseCode = response.code();
+            if(responseCode == 404 || responseCode == 204) {
+                return true;
+            }
+            return false;
+        }
+        catch (Exception e) {
+            System.out.println("Xóa role của username lỗi rồi!! (Line 99)");
+            e.printStackTrace();
+            return false;
+        }
     }
 }

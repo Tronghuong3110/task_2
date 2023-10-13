@@ -57,7 +57,6 @@ public class ProbeService implements IProbeService {
             return probeDto;
         }
     }
-
     // hướng
     @Override
     public ProbeDto saveProbe(ProbeDto probeDto, ProbeOptionDto probeOptionDto) {
@@ -123,8 +122,8 @@ public class ProbeService implements IProbeService {
             }
 
             // thêm topic vào danh sách topic của server
+            SubtopicServerEntity subTopic = new SubtopicServerEntity();
             try {
-                SubtopicServerEntity subTopic = new SubtopicServerEntity();
                 subTopic.setSubTopic(pubtopic);
                 subTopic.setIdProbe(probeEntity.getId());
                 subtopicRepository.save(subTopic);
@@ -137,9 +136,10 @@ public class ProbeService implements IProbeService {
             // lấy thông tin server từ database
             // cập nhật role để server subscribe tới topic của client
             try {
+                List<SubtopicServerEntity> listRoles = subtopicRepository.findAll();
                 ServerEntity server = serverRepository.findAll().get(0);
                 ProbeOptionEntity probeOptionOfServer = server.getProbeOptionEntity();
-                String responseAddRuleServer = ApiAddInfoToBroker.addRuleToBroker(probeOptionOfServer.getUserName(), pubtopic);
+                String responseAddRuleServer = ApiAddInfoToBroker.addRuleToBroker(probeOptionOfServer.getUserName(), listRoles);
                 // TH thêm role cho server lỗi
                 if(!responseAddRuleServer.equals("Create rule success")) {
                     responseProbe.setMessage(responseAddRuleServer);
@@ -153,7 +153,9 @@ public class ProbeService implements IProbeService {
             }
 
             // Thêm quyền cho client
-            String responseAddRuleClient = ApiAddInfoToBroker.addRuleToBroker(probeOptionEntity.getUserName(), pubtopic);
+            List<SubtopicServerEntity> listRoles = new ArrayList<>();
+            listRoles.add(subTopic);
+            String responseAddRuleClient = ApiAddInfoToBroker.addRuleToBroker(probeOptionEntity.getUserName(), listRoles);
             // TH thêm quyền cho client lỗi
             if(!responseAddRuleClient.equals("Create rule success")) {
                 responseProbe.setMessage(responseAddRuleClient);
@@ -351,7 +353,6 @@ public class ProbeService implements IProbeService {
             return 0;
         }
     }
-
     // hướng - xóa 1 probe từ thùng rác
     @Override
     public String deleteProbe(Integer id) {
@@ -378,7 +379,6 @@ public class ProbeService implements IProbeService {
             return "Delete failed";
         }
     }
-
     //hướng
     private Boolean checkUsername(String username) {
         return probeOptionRepository.existsByUserName(username);
