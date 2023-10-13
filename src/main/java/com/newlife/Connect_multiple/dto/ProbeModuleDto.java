@@ -19,6 +19,4 @@ public class ProbeModuleDto {
     private String moduleName;
     private Integer errorPerWeek;
     private Integer processStatus;
-
-
 }

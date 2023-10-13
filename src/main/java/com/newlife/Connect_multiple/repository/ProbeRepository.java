@@ -25,8 +25,8 @@ public interface ProbeRepository extends JpaRepository<ProbeEntity, Integer> {
                                                        @Param("area") String area,
                                                        @Param("vlan") String vlan);
 
-    @Query(value = "select * from probemodule.probe where status = :status ", nativeQuery = true)
-    List<ProbeEntity> findProbeByStatus(@Param("status") String status);
+    @Query(value = "select * from probemodule.probe where deleted = :deleted ", nativeQuery = true)
+    List<ProbeEntity> findProbeByStatus(@Param("deleted") Integer deleted);
 
     Integer countAllByStatus(String status);
     Optional<ProbeEntity> findByName(String name);

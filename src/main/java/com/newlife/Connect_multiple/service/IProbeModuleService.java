@@ -14,4 +14,5 @@ public interface IProbeModuleService {
     String saveProbeModule(ProbeModuleDto probeModuleDto);
     Integer countModuleByStatus(String status);
     ProbeModuleDto findOneById(Integer idProbeModule);
+    String updateProbeModule(ProbeModuleDto probeModuleDto);
 }

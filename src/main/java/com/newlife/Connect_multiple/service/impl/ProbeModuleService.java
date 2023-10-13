@@ -1,6 +1,7 @@
 package com.newlife.Connect_multiple.service.impl;
 
 import com.newlife.Connect_multiple.api.ApiCheckConnect;
+import com.newlife.Connect_multiple.converter.ProbeConverter;
 import com.newlife.Connect_multiple.converter.ProbeModuleConverter;
 import com.newlife.Connect_multiple.dto.ProbeDto;
 import com.newlife.Connect_multiple.dto.ProbeModuleDto;
@@ -356,7 +357,7 @@ public class ProbeModuleService implements IProbeModuleService {
     @Override
     public void getStatusModulePeriodically() {
         // status probe: connected 1 or disconnected 0
-        List<ProbeEntity> listProbes = probeRepository.findProbeByStatus("1");
+        List<ProbeEntity> listProbes = probeRepository.findProbeByStatus(0);
         // danh sách topic - listModule của từng probe đc để gưi tới client để kiểm tra trạng thái
         Map<String, String> messageToClient = new HashMap<>();
         for(ProbeEntity probe : listProbes) {
@@ -684,6 +685,51 @@ public class ProbeModuleService implements IProbeModuleService {
             System.out.println("Lấy ra 1 module probe lỗi rồi(Line 676)");
             e.printStackTrace();
             return null;
+        }
+    }
+
+    // cập nhật thông tin probeModule (Hướng)
+    @Override
+    public String updateProbeModule(ProbeModuleDto probeModuleDto) {
+        try {
+            ProbeModuleEntity probeModuleEntity = moduleProbeRepository.findById(probeModuleDto.getId())
+                    .orElse(null);
+            if(probeModuleEntity == null) {
+                return "Can not found module of probe with id = " + probeModuleDto.getId();
+            }
+            // chuyển đổi các thông số của probeModule cần cập nhật
+            probeModuleEntity = ProbeModuleConverter.toEntity(probeModuleDto, probeModuleEntity);
+            if(probeModuleEntity == null) {
+                System.out.println("Có trường null không thực hiện được!!");
+            }
+            String commandLine = probeModuleEntity.getCaption().trim() + " " + probeModuleEntity.getArg().trim();
+            Integer newId = getIdOfProbeModuleInDatabase(commandLine);
+            if(newId != null && newId != probeModuleDto.getId()) {
+                return "Can not update probeModule due to duplicate commands";
+            }
+            probeModuleEntity = moduleProbeRepository.save(probeModuleEntity);
+            return "Update probeModule with id = " + probeModuleDto.getId() + " success";
+        }
+        catch (Exception e) {
+            System.out.println("Update probeModule lỗi rồi!!(Line 695)");
+            e.printStackTrace();
+            return "Can not update probeModule";
+        }
+    }
+
+    // lấy ra id của probeModule theo command từ database để check có trùng không
+    private Integer getIdOfProbeModuleInDatabase(String commandLine) {
+        try {
+            ProbeModuleEntity probeModule = moduleProbeRepository.findByCommand(commandLine).orElse(null);
+            if(probeModule == null) {
+                return null;
+            }
+            return probeModule.getId();
+        }
+        catch (Exception e) {
+            System.out.println("Kiểm tra probeModule lỗi rồi!! (Line 716)");
+            e.printStackTrace();
+            return 0;
         }
     }
 }

@@ -19,7 +19,6 @@ public class ProbeModuleConverter {
             return new ProbeModuleDto();
         }
     }
-
     public static ProbeModuleEntity toEntity(ProbeModuleDto dto) {
         try {
             ModelMapper modelMapper = new ModelMapper();
@@ -30,6 +29,31 @@ public class ProbeModuleConverter {
             System.out.println("Convert from ProbeModuleDto to ProbeModuleEntity error");
             e.printStackTrace();
             return new ProbeModuleEntity();
+        }
+    }
+    public static ProbeModuleEntity toEntity(ProbeModuleDto dto, ProbeModuleEntity entity) {
+        try {
+            if(dto.getModuleName() != null) {
+                entity.setModuleName(dto.getModuleName());
+            }
+            if(dto.getPath() != null) {
+                entity.setPath(dto.getPath());
+            }
+            if(dto.getPathLog() != null) {
+                entity.setPathLog(dto.getPathLog());
+            }
+            if(dto.getArg() != null) {
+                entity.setArg(dto.getArg());
+            }
+            if(dto.getNote() != null) {
+                entity.setNote(dto.getNote());
+            }
+            return entity;
+        }
+        catch (Exception e) {
+            System.out.println("Chuyển đổi từ probeModuleDto sang probeModuleEntity lỗi rồi!!(ProbeModuleConverter.java Line 36)");
+            e.printStackTrace();
+            return null;
         }
     }
 }

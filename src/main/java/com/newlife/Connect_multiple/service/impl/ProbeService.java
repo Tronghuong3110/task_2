@@ -123,8 +123,8 @@ public class ProbeService implements IProbeService {
             }
 
             // thêm topic vào danh sách topic của server
+            SubtopicServerEntity subTopic = new SubtopicServerEntity();
             try {
-                SubtopicServerEntity subTopic = new SubtopicServerEntity();
                 subTopic.setSubTopic(pubtopic);
                 subTopic.setIdProbe(probeEntity.getId());
                 subtopicRepository.save(subTopic);
@@ -137,9 +137,11 @@ public class ProbeService implements IProbeService {
             // lấy thông tin server từ database
             // cập nhật role để server subscribe tới topic của client
             try {
+                // lấy ra danh sách toàn bộ topic của các client đã được thêm vào database
+                List<SubtopicServerEntity> listSubTopic = subtopicRepository.findAll();
                 ServerEntity server = serverRepository.findAll().get(0);
                 ProbeOptionEntity probeOptionOfServer = server.getProbeOptionEntity();
-                String responseAddRuleServer = ApiAddInfoToBroker.addRuleToBroker(probeOptionOfServer.getUserName(), pubtopic);
+                String responseAddRuleServer = ApiAddInfoToBroker.addRuleToBroker(probeOptionOfServer.getUserName(), listSubTopic);
                 // TH thêm role cho server lỗi
                 if(!responseAddRuleServer.equals("Create rule success")) {
                     responseProbe.setMessage(responseAddRuleServer);
@@ -153,7 +155,10 @@ public class ProbeService implements IProbeService {
             }
 
             // Thêm quyền cho client
-            String responseAddRuleClient = ApiAddInfoToBroker.addRuleToBroker(probeOptionEntity.getUserName(), pubtopic);
+            List<SubtopicServerEntity> listTopic = new ArrayList<>();
+            // tạo ra danh sách các topic (chỉ có 1 topic của client)
+            listTopic.add(subTopic);
+            String responseAddRuleClient = ApiAddInfoToBroker.addRuleToBroker(probeOptionEntity.getUserName(), listTopic);
             // TH thêm quyền cho client lỗi
             if(!responseAddRuleClient.equals("Create rule success")) {
                 responseProbe.setMessage(responseAddRuleClient);
