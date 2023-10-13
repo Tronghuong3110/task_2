@@ -110,37 +110,64 @@ const ProbeDetails = () => {
         }
         return result
     }
+    function findEmptyFields(obj) {
+        let emptyFields = [];
+
+        for (let key in obj) {
+            if (!obj[key]) {
+                emptyFields.push(key);
+            }
+        }
+
+        return emptyFields;
+    }
     const handleSaveInformations = (id) => {
-        let info = {
-            ...getInfomationEdited(),
-            id: id
-        }
-        console.log(info)
-        let options = {
-            method: "PUT",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(info)
-        }
-        fetch("http://localhost:8081/api/v1/probe", options)
-            .then(response => response.text())
-            .then(data => {
-                if (data == "Update probe success") {
-                    notify(data, 1)
-                    var infomation = getInput();
-                    var element = infomation.elements;
-                    element.forEach(ele => {
-                        ele.setAttribute('disabled', true);
-                        ele.classList.add('disabled')
-                    })
-                    setAppear(!isAppear)
+        let data = getInfomationEdited()
+        if (findEmptyFields(data) != 0) {
+            let message = "Field ";
+            let arr = findEmptyFields(data);
+            if (arr.length == 1) message += arr[0] + " is empty"
+            else {
+                for (let i = 0; i < arr.length; i++) {
+                    if (i != arr.length - 1) message += arr[i] + ", "
+                    else message += arr[i]
                 }
-                else {
-                    notify(data, 0)
-                }
-            })
-            .catch(err => console.log(err))
+                message += " are empty"
+            }
+            notify(message, 2)
+        }
+        else {
+            let info = {
+                ...getInfomationEdited(),
+                id: id
+            }
+            console.log(info)
+            let options = {
+                method: "PUT",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(info)
+            }
+            fetch("http://localhost:8081/api/v1/probe", options)
+                .then(response => response.text())
+                .then(data => {
+                    if (data == "Update probe success") {
+                        notify(data, 1)
+                        var infomation = getInput();
+                        var element = infomation.elements;
+                        element.forEach(ele => {
+                            ele.setAttribute('disabled', true);
+                            ele.classList.add('disabled')
+                        })
+                        setAppear(!isAppear)
+                    }
+                    else {
+                        notify(data, 0)
+                    }
+                })
+                .catch(err => console.log(err))
+        }
 
     }
     const setDefaultStatusInput = () => {
@@ -183,7 +210,7 @@ const ProbeDetails = () => {
         else {
             toast.warn(message, {
                 position: "top-center",
-                autoClose: 4000,
+                autoClose: 5000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 draggable: true,

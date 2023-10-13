@@ -104,14 +104,14 @@ const ProbesTable = () => {
             .catch(err => console.log(err))
     }
     const setIconConnect = (status) => {
-        if (status == "disconnected") {
+        if (status == "connected") {
             return (
-                <FontAwesomeIcon icon={faCirclePlay} style={{ color: "#02F212", }} />
+                <FontAwesomeIcon icon={faCircleStop} style={{ color: "#9A8383", }} />
             )
         }
         else {
             return (
-                <FontAwesomeIcon icon={faCircleStop} style={{ color: "#9A8383", }} />
+                <FontAwesomeIcon icon={faCirclePlay} style={{ color: "#02F212", }} />
             )
         }
     }
@@ -166,7 +166,7 @@ const ProbesTable = () => {
                                         <TableCell className='actions' >
                                             <div className='actions-container d-flex justify-content-around'>
                                                 <div className='action'  >
-                                                    <button disabled={probe.status === 'error'} onClick={() => { handleOnSwitch(probe.id, probe.status) }}>
+                                                    <button onClick={() => { handleOnSwitch(probe.id, probe.status) }}>
                                                         {setIconConnect(probe.status)}
                                                     </button>
                                                 </div>
