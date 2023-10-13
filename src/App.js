@@ -1,12 +1,12 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
-import Sidebar from './component/Sidebar';
-import Header from './component/Header';
-import Probes from './component/Probes';
-import ProbeDetails from './component/ProbeDetails';
-import Module from './component/Module';
-import ModuleHistory from './component/ModuleHistory';
-import { ProbesProvider } from "./component/ProbesTable/ProbesContext";
+import Sidebar from './component/Layout/Sidebar';
+import Header from './component/Layout/Header';
+import Probes from './component/Probes/Probes';
+import ProbeDetails from './component/ProbeDetails/ProbeDetails';
+// import Module from './component/Module';
+// import ModuleHistory from './component/ModuleHistory';
+import { ProbesProvider } from "./component/Probes/ProbesTable/ProbesContext";
 import {Routes,Route} from 'react-router-dom'
 function App() {
   return (
@@ -18,7 +18,7 @@ function App() {
         <div className='sidebarContainer' style={{ width: "10%", backgroundColor: "transparent", height: "100%" }}>
           <Sidebar></Sidebar>
         </div>
-        <div className='dataContainer' style={{ width: "90%", backgroundColor: "transparent", height: "100%", padding: "0 30px" }} >
+        <div className='dataContainer' style={{ width: "90%", backgroundColor: "transparent", height: "100vh", padding: "0 30px" }} >
           {/* <ProbesProvider>
             <Probes></Probes>
           </ProbesProvider>
@@ -27,7 +27,7 @@ function App() {
           {/* <ModuleHistory></ModuleHistory> */}
           <Routes>
             <Route path='/' element={<ProbesProvider><Probes></Probes></ProbesProvider>}></Route>
-            <Route path='/details' element={<ProbeDetails></ProbeDetails>}></Route>
+            <Route path='/details/:id' element={<ProbeDetails></ProbeDetails>}></Route>
             {/* <Route path='/simlist' element={<Simlist />}></Route>
             <Route path='/process' element={<Process />}></Route> */}
           </Routes>

@@ -3,8 +3,7 @@ import { TableBody, TableCell, Tooltip, TablePagination } from '@mui/material';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Table from '@mui/material/Table';
-import Switch from '../action/button/switch';
-import '../../sass/Probes/ProbeTable/ProbesTable.scss';
+import '../../../sass/Probes/ProbeTable/ProbesTable.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faTrashCan, faCircleRight, faCirclePlay, faCircleStop
@@ -12,7 +11,7 @@ import {
 import { faCircle, faDownload } from '@fortawesome/free-solid-svg-icons';
 import TableHeader from './TableHeader';
 import { ProbesContext } from './ProbesContext';
-import ConfigFileGenerator from '../action/download';
+import ConfigFileGenerator from '../../action/download';
 import { Routes, Route, Link } from 'react-router-dom';
 const ProbesTable = () => {
     const probesContext = useContext(ProbesContext)
@@ -180,7 +179,7 @@ const ProbesTable = () => {
                                                     <ConfigFileGenerator id={probe.id}></ConfigFileGenerator>
                                                 </div>
                                                 <div className='action'>
-                                                    <Link to="/details"> <FontAwesomeIcon icon={faCircleRight} style={{ color: "#3f83f8", }} /></Link>
+                                                    <Link to={`/details/${probe.id}`} > <FontAwesomeIcon icon={faCircleRight} style={{ color: "#3f83f8", }} /></Link>
                                                 </div>
                                             </div>
                                         </TableCell>

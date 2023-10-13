@@ -2,7 +2,7 @@ import { React, useState, useEffect } from 'react';
 import { TableCell, Tooltip, TableSortLabel } from '@mui/material';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import '../../sass/Probes/ProbeTable/TableHeader.scss';
+import '../../../sass/Probes/ProbeTable/TableHeader.scss';
 
 const TableHeader = (props) => {
     const { valueToOrderBy, orderDirection, handleRequestSort } = props;

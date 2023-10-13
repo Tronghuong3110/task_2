@@ -1,12 +1,12 @@
 import { useState, useEffect, useContext } from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
-import '../sass/Probes/AddProbe.scss';
+import '../../sass/Probes/AddProbe.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleXmark, faNoteSticky } from '@fortawesome/free-regular-svg-icons'
 import {
     faDisplay, faLocationDot, faUser, faCaretDown, faChartArea, faMapPin, faLock, faBolt, faWifi, faSeedling, faBroom, faBan, faFloppyDisk
 } from '@fortawesome/free-solid-svg-icons'
-import DropdownWithInput from './DropdownWithInput';
+import DropdownWithInput from '../action/DropdownWithInput';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { ProbesContext } from './ProbesTable/ProbesContext';

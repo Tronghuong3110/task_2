@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import '../sass/DropdownWithInput.scss';
+import '../../sass/DropdownWithInput.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faLocationDot, faChartArea, faNetworkWired

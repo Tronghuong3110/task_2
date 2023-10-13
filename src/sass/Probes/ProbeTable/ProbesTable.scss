@@ -109,6 +109,8 @@ $blue-color: #9747FF;
         }
 
         .css-jtlhu6-MuiTablePagination-root {
+            position: absolute;
+            bottom: 0;
             overflow: unset;
             color: white;
             font-size: 0.7em !important;
@@ -121,8 +123,11 @@ $blue-color: #9747FF;
 
             .css-194a1fa-MuiSelect-select-MuiInputBase-input {
                 font-size: 1.5em;
+                display: flex;
+                align-items: center;
             }
 
         }
+
     }
 }

@@ -6,7 +6,7 @@ import {
 
 } from '@fortawesome/free-regular-svg-icons'
 import { faCheck, faQuestion, faX } from '@fortawesome/free-solid-svg-icons';
-import { ProbesContext } from '../ProbesTable/ProbesContext';
+import { ProbesContext } from '../Probes/ProbesTable/ProbesContext';
 const Confirm = (props) => {
     const probesContext = useContext(ProbesContext)
     const {confirmContent} = props

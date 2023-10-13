@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import 'bootstrap/dist/css/bootstrap.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import '../sass/Module/Module.scss'
+import '../../sass/Module/Module.scss'
 import { faCube, faMagnifyingGlass, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { faPlusSquare } from '@fortawesome/free-regular-svg-icons';
 import ModuleTable from './ModuleTable/ModuleTable';

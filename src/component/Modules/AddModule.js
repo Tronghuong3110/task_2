@@ -5,7 +5,7 @@ import { faCircleXmark, faFolderOpen, faNoteSticky } from '@fortawesome/free-reg
 import {
     faFloppyDisk, faCube, faTerminal
 } from '@fortawesome/free-solid-svg-icons'
-import '../sass/Module/AddModule.scss';
+import '../../sass/Module/AddModule.scss';
 const AddModule = ({handleCloseWindow}) => {
 
     // Thêm mới một module mẫu

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import 'bootstrap/dist/css/bootstrap.css';
-import '../sass/ProbeDetails/ProbeDetails.scss'
+import '../../sass/ProbeDetails/ProbeDetails.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDisplay, faMapPin, faLocationDot, faChartArea, faCube, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import {
@@ -9,13 +9,15 @@ import {
     faStickyNote,
     faSquarePlus
 } from '@fortawesome/free-regular-svg-icons';
-import DropdownWithInput from "./DropdownWithInput";
+import DropdownWithInput from "../action/DropdownWithInput";
 import Probe_Modules from "./ProbeDetailsTable/Probe_Modules";
 import AddProbeModule from './AddProbeModule';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useParams } from "react-router-dom";
 
-const ProbeDetails = (props) => {
+const ProbeDetails = () => {
+    const { id } = useParams();
     const [isOpen, openCloseWindow] = useState(false);
     const [isAppear, setAppear] = useState(false)
     const [location, setLocation] = useState([])
@@ -60,7 +62,8 @@ const ProbeDetails = (props) => {
     }
     //Hàm hiển thị thông tin probe
     useEffect(() => {
-        fetch("http://localhost:8081/api/v1/probe?idProbe=1")
+        console.log(id)
+        fetch("http://localhost:8081/api/v1/probe?idProbe=" + id)
             .then(response => response.json())
             .then(data => setProbeDetails(data))
             .catch(err => console.log(err))
@@ -97,40 +100,48 @@ const ProbeDetails = (props) => {
         })
         setAppear(!isAppear)
     }
-    const getInfomationEdited =()=>{
+    const getInfomationEdited = () => {
         var infomation = getInput();
         const result = {};
-        let keys = ["name","ipAddress","description","location","area"]
+        let keys = ["name", "ipAddress", "description", "location", "area"]
         let values = infomation.infoInput
         for (let i = 0; i < keys.length; i++) {
             result[keys[i]] = values[i];
         }
-        var element = infomation.elements;
-        element.forEach(ele => {
-            ele.setAttribute('disabled', true);
-            ele.classList.add('disabled')
-        })
         return result
     }
     const handleSaveInformations = (id) => {
         let info = {
             ...getInfomationEdited(),
-            id: 1
+            id: id
         }
         console.log(info)
-        let options ={
+        let options = {
             method: "PUT",
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(info)
         }
-        fetch("http://localhost:8081/api/v1/probe",options)
+        fetch("http://localhost:8081/api/v1/probe", options)
             .then(response => response.text())
-            .then(data => alert(data))
+            .then(data => {
+                if (data == "Update probe success") {
+                    notify(data, 1)
+                    var infomation = getInput();
+                    var element = infomation.elements;
+                    element.forEach(ele => {
+                        ele.setAttribute('disabled', true);
+                        ele.classList.add('disabled')
+                    })
+                    setAppear(!isAppear)
+                }
+                else {
+                    notify(data, 0)
+                }
+            })
             .catch(err => console.log(err))
 
-        setAppear(!isAppear)
     }
     const setDefaultStatusInput = () => {
         var infomation = getInput();
@@ -139,7 +150,6 @@ const ProbeDetails = (props) => {
             ele.setAttribute('disabled', true);
             ele.classList.add('disabled')
         })
-        console.log(1)
     }
     useEffect(() => {
         setDefaultStatusInput()
@@ -147,16 +157,41 @@ const ProbeDetails = (props) => {
     }, [])
 
     // Hiển thị thông báo
-    const notify = () => {
-        toast.success("Success", {
-            position: "top-center",
-            autoClose: 500,
-            hideProgressBar: true,
-            closeOnClick: true,
-            draggable: true,
-            progress: undefined,
-            theme: "colored",
-        })
+    const notify = (message, status) => {
+        if (status === 1) {
+            toast.success(message, {
+                position: "top-center",
+                autoClose: 4000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+            })
+        }
+        else if (status === 0) {
+            toast.error(message, {
+                position: "top-center",
+                autoClose: 4000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+            })
+        }
+        else {
+            toast.warn(message, {
+                position: "top-center",
+                autoClose: 4000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+            })
+        }
+
     }
     return (
         <div className="probeDetails">
@@ -227,8 +262,8 @@ const ProbeDetails = (props) => {
                         </div>
                         <div className='btn-text' >Edit</div>
                     </button>}
-                    {!isAppear && <button className='btn d-flex align-items-center' onClick={()=>{
-                        handleSaveInformations(probeDetails.id)
+                    {!isAppear && <button className='btn d-flex align-items-center' onClick={() => {
+                        handleSaveInformations(id)
                     }} >
                         <div className='btn-icon d-flex align-items-center' >
                             <FontAwesomeIcon icon={faFloppyDisk} />
@@ -271,11 +306,10 @@ const ProbeDetails = (props) => {
                     </div>
                 </div>
             </div>
-            <Probe_Modules ></Probe_Modules>
-            {isOpen && <AddProbeModule handleCloseWindow={handleCloseWindow} notify={notify} ></AddProbeModule>}
+            <Probe_Modules id={id}  ></Probe_Modules>
+            {isOpen && <AddProbeModule idProbe={id} handleCloseWindow={handleCloseWindow}></AddProbeModule>}
             <ToastContainer ></ToastContainer>
         </div>
     )
 }
-
 export default ProbeDetails;

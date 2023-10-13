@@ -2,28 +2,38 @@ import { React, useState, useEffect } from 'react';
 import { TableBody, TableCell, Tooltip, TableSortLabel, TablePagination } from '@mui/material';
 import TableRow from '@mui/material/TableRow';
 import Table from '@mui/material/Table';
-import '../../sass/ProbeDetails/ProbeDetailsTable/Probe_Modules.scss';
+import '../../../sass/ProbeDetails/ProbeDetailsTable/Probe_Modules.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faTrashCan, faCircleRight, faXmarkCircle, faPenToSquare
 } from '@fortawesome/free-regular-svg-icons'
 import { faPlay, faArrowRotateLeft, faClockRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import Probe_Module_Header from './Probe_Module_Header';
-import loading from '../../assets/pic/ZKZg.gif';
-const Probe_Modules = () => {
+import loading from '../../../assets/pic/ZKZg.gif';
+import AddProbeModule from '../AddProbeModule';
+const Probe_Modules = ({id}) => {
+    const [isOpen,setOpenWindow] = useState(false)
     const [probe_modules, setProbeModules] = useState([])
     const [orderDirection, setOrderDirection] = useState('asc')
     const [valueToOrderBy, setValueToOrderBy] = useState('epw')
     const [page, setPage] = useState(0)
     const [rowsPerPage, setRowPerPage] = useState(7)
     const [displayPagination, setDisplayPagination] = useState(false)
+    const [isEditedModule,setEditedModule] = useState(null)
     useEffect(() => {
-        fetch("http://localhost:8081/api/v1/probe/modules?idProbe=1&&name=&&status=")
+        fetch("http://localhost:8081/api/v1/probe/modules?idProbe="+id+"&&name=&&status=")
             .then(response => response.json())
             .then(data => setProbeModules(data))
             .catch(err => console.log(err))
     }, [])
 
+    const handleOpenWindow = (id) => {
+        setOpenWindow(true)
+        setEditedModule(id)
+    }
+    const handleCloseWindow = () => {
+        setOpenWindow(false)
+    }
     /*Sắp xếp theo status*/
     const setStatusColor = (status) => {
         switch (status) {
@@ -152,7 +162,9 @@ const Probe_Modules = () => {
                                                     </div>
                                                     <div className='action'>
                                                         <button >
-                                                            <FontAwesomeIcon icon={faPenToSquare} style={{ color: "powderblue", }} />
+                                                            <FontAwesomeIcon icon={faPenToSquare} style={{ color: "powderblue", }} onClick={()=>{
+                                                                handleOpenWindow(module.id)
+                                                            }} />
                                                         </button>
                                                     </div>
                                                     <div className='action'>
@@ -194,6 +206,7 @@ const Probe_Modules = () => {
                     ></TablePagination>
                 }
             </Table >
+            {isOpen && <AddProbeModule id={isEditedModule} handleCloseWindow={handleCloseWindow}></AddProbeModule>}
         </div>
     )
 }

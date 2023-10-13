@@ -3,8 +3,8 @@ import 'bootstrap/dist/css/bootstrap.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCube, faMagnifyingGlass, faClockRotateLeft, faArrowRotateBack } from '@fortawesome/free-solid-svg-icons';
 import { faPlusSquare, faTrashCan } from '@fortawesome/free-regular-svg-icons';
-import '../sass/ModuleHistory/ModuleHistory.scss'
-import  CheckBox  from './action/button/CheckBox.js';
+import '../../sass/ModuleHistory/ModuleHistory.scss'
+import  CheckBox  from '../action/CheckBox.js';
 import ModuleHistoryTable from "./ModuleHistoryTable/ModuleHistoryTable";
 
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
-import '../../sass/Module/ModuleTable/ModuleTable.scss'
+import '../../../sass/Module/ModuleTable/ModuleTable.scss'
 import { TableRow, Table, TableHead, TableCell, TableBody } from "@mui/material";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPenToSquare, faTrashCan } from '@fortawesome/free-regular-svg-icons'

@@ -1,5 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.css';
-import '../sass/Header.scss';
+import '../../sass/Header.scss';
 import "@fontsource/montserrat";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {

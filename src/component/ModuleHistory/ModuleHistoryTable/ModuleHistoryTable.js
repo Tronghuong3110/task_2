@@ -5,9 +5,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPenToSquare, faTrashCan } from '@fortawesome/free-regular-svg-icons'
 import {
 } from '@fortawesome/free-solid-svg-icons'
-import '../../sass/ModuleHistory/ModuleHistoryTable.scss'
-import '../action/button/CheckBox'
-import CheckBox from '../action/button/CheckBox';
+import '../../../sass/ModuleHistory/Module_History_Table.scss'
+import CheckBox from '../../action/button/CheckBox';
 const ModuleHistoryTable = () => {
     return (
         <div className='Module_History_Table'>

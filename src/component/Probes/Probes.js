@@ -1,6 +1,6 @@
 import { React, useState, useEffect, useContext } from "react";
 import 'bootstrap/dist/css/bootstrap.css';
-import '../sass/Probes/Probes.scss';
+import '../../sass/Probes/Probes.scss';
 import Button from "@mui/material/Button"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -9,13 +9,13 @@ import {
 import {
     faSquarePlus
 } from '@fortawesome/free-regular-svg-icons';
-import DropdownWithInput from "./DropdownWithInput";
+import DropdownWithInput from "../action/DropdownWithInput";
 import ProbesTable from "./ProbesTable/ProbesTable";
 import AddProbe from './AddProbe';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { ProbesProvider, ProbesContext } from "./ProbesTable/ProbesContext";
-import Confirm from './action/Confirm'
+import Confirm from '../action/Confirm'
 
 const Probes = () => {
     const [isOpen, openCloseWindow] = useState(false);
