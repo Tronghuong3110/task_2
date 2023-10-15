@@ -15,12 +15,19 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
     const [listSampleModule, setListSampleModule] = useState([])
     const [commandValue, setCommandValue] = useState({})
     const [isEditedModule, setEditedModule] = useState({})
+    const [caption,setCaption] = useState("")
+    const [arg,setArg] = useState("")
     useEffect(() => {
         fetch("http://localhost:8081/api/v1/modules")
             .then(response => response.json())
             .then(data => {
                 setListSampleModule(data)
-                setCommandValue(data[0].caption + " " + data[0].argDefalt)
+                if (id == null) {
+                    setCommandValue(data[0].caption + " " + data[0].argDefalt);
+                    setCaption(data[0].caption)
+                    setArg(data[0].argDefalt)
+                    console.log(arg)
+                }
             })
             .catch(err => console.log(err))
     }, [])
@@ -31,13 +38,11 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                 .then(response => response.json())
                 .then(data => {
                     setEditedModule(data)
-                    let idModule = document.querySelector("#idModule")
-                    let caption = idModule.options[idModule.selectedIndex].getAttribute("caption")
-                    let argDefalt = idModule.options[idModule.selectedIndex].getAttribute("argdefault")
-                    setCommandValue(caption + " " + argDefalt);
+                    setCommandValue(data.caption + " " + data.arg);
                 })
                 .catch(err => console.log(err))
         }
+
     }, [])
 
     const addOrEditModule = () => {
@@ -145,6 +150,8 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
         const caption = selectedOption.getAttribute('caption');
         const argDefalt = selectedOption.getAttribute('argdefault');
         setCommandValue(caption + " " + argDefalt);
+        setCaption(caption)
+        setArg(argDefalt)
     }
     const getModuleInfo = () => {
         let idModule = document.querySelector("#idModule")
@@ -195,7 +202,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                                 <div className='input_container-icon-text'>SAMPLE MODULE</div>
                             </div>
                             <div className='input_container-input'>
-                                <select id='idModule' onChange={onChangeSampleModule} defaultValue={isEditedModule.idModule} >
+                                <select disabled={id != null} id='idModule' onChange={onChangeSampleModule} defaultValue={isEditedModule.idModule} >
                                     {
                                         listSampleModule.map(modules => {
                                             return (
@@ -230,7 +237,16 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                                 <input className='commandInput inputModuleInfo' type='text' placeholder='Path...' id='path' defaultValue={isEditedModule.path} ></input>
                             </div>
                             <div className='input_container-input'>
-                                <input className='commandInput exception inputModuleInfo' type='text' placeholder='Your argument' id='arg' defaultValue={isEditedModule.arg}></input>
+                                <input
+                                    className='commandInput exception inputModuleInfo'
+                                    type='text' placeholder='Your argument'
+                                    id='arg'
+                                    defaultValue={id==null?arg:isEditedModule.arg}
+                                    onChange={(e) => {
+                                        if(id!=null) setCommandValue(isEditedModule.caption + " " + e.target.value)
+                                        else setCommandValue(caption + " " + e.target.value)
+                                    }}
+                                ></input>
                             </div>
                         </div>
                     </div>
