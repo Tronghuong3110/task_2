@@ -5,6 +5,7 @@ import com.newlife.Connect_multiple.dto.ModuleDto;
 import com.newlife.Connect_multiple.entity.ModuleEntity;
 import com.newlife.Connect_multiple.repository.ModuleRepository;
 import com.newlife.Connect_multiple.service.IModuleService;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,17 +34,23 @@ public class ModuleService implements IModuleService {
     }
 
     @Override
-    public String deleteModule(Integer id) {
+    public JSONObject deleteModule(Integer id) {
+        JSONObject json = new JSONObject();
         try {
             moduleRepository.deleteById(id);
-            return "Delete module success";
+            json.put("code", "1");
+            json.put("message", "Delete module success");
+            return json;
         } catch (Exception e) {
-            return "Delete module failed";
+            json.put("code", "0");
+            json.put("message", "Delete module failed");
+            return json;
         }
     }
 
     @Override
-    public String saveModule(ModuleDto moduleDto) {
+    public JSONObject saveModule(ModuleDto moduleDto) {
+        JSONObject json = new JSONObject();
         try {
             ModuleEntity moduleEntity = ModuleConverter.toEntity(moduleDto);
             String name = moduleEntity.getName();
@@ -51,18 +58,26 @@ public class ModuleService implements IModuleService {
 
             // check trùng module name
             if (checkModuleName(name)) {
-                return "Trùng tên module";
+                json.put("code", "3");
+                json.put("message", "Trùng tên module");
+                return json;
             } else {
                 moduleRepository.save(moduleEntity);
-                return "Save new module success";
+                json.put("code", "1");
+                json.put("message", "Save new module success");
+                return json;
             }
         } catch (Exception e) {
-            return "Save new module failed";
+            e.printStackTrace();
+            json.put("code", 0);
+            json.put("message", "Save new module failed");
+            return json;
         }
     }
 
     @Override
-    public String updateModule(ModuleDto moduleDto) {
+    public JSONObject updateModule(ModuleDto moduleDto) {
+        JSONObject json = new JSONObject();
         try {
             ModuleEntity moduleEntity = ModuleConverter.toEntity(moduleDto);
             Integer idModule = moduleEntity.getId();
@@ -72,13 +87,19 @@ public class ModuleService implements IModuleService {
             String name = moduleEntity.getName();
             if (oldName.equals(name)) {
                 moduleRepository.save(moduleEntity);
-                return "Update module success";
+                json.put("code", "1");
+                json.put("message", "Update module success");
+                return json;
             } else {
                 if (checkModuleName(name)) {
-                    return "Trùng tên module";
+                    json.put("code", "3");
+                    json.put("message", "Trùng tên module");
+                    return json;
                 } else {
                     moduleRepository.save(moduleEntity);
-                    return "Update module success";
+                    json.put("code", "1");
+                    json.put("message", "Update module success");
+                    return json;
                 }
             }
 

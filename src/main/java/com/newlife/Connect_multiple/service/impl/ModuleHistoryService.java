@@ -4,6 +4,7 @@ import com.newlife.Connect_multiple.dto.ModuleHistoryDto;
 import com.newlife.Connect_multiple.repository.ModuleHistoryRepository;
 import com.newlife.Connect_multiple.repository.ModuleProbeRepository;
 import com.newlife.Connect_multiple.service.IModuleHistoryService;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,12 +21,17 @@ public class ModuleHistoryService implements IModuleHistoryService {
 
     // HAN
     @Override
-    public String deleteModuleHistory(String idModuleHistory) {
+    public JSONObject deleteModuleHistory(String idModuleHistory) {
+        JSONObject jsonObject = new JSONObject();
         try {
+            jsonObject.put("code", "1");
+            jsonObject.put("message", "Xóa thành công module history");
             moduleHistoryRepository.deleteById(idModuleHistory);
-            return "Xóa thành công module history";
+            return jsonObject;
         } catch (Exception e) {
-            return "xoa that bai";
+            jsonObject.put("code", "0");
+            jsonObject.put("message", "xoa that bai");
+            return jsonObject;
         }
     }
 

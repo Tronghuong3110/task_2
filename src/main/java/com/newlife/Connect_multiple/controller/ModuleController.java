@@ -47,18 +47,18 @@ public class ModuleController {
     // Xóa 1 module lớn (ok) *****(cần xem xét việc xóa các module-probe con hay không)***
     // (Han)
     @DeleteMapping("/module")
-    public CompletableFuture<String> deleteModule(@RequestParam("id") Integer id) {
+    public CompletableFuture<JSONObject> deleteModule(@RequestParam("id") Integer id) {
         return CompletableFuture.supplyAsync(() -> {
-            String mess = moduleService.deleteModule(id);
+            JSONObject mess = moduleService.deleteModule(id);
             return mess;
         }, executorService);
     }
 
     // Update 1 module lớn (đã test thành công) (Hân)
     @PutMapping("/module")
-    public CompletableFuture<String> updateModule(@RequestBody ModuleDto moduleDto) {
+    public CompletableFuture<JSONObject> updateModule(@RequestBody ModuleDto moduleDto) {
         return CompletableFuture.supplyAsync(() -> {
-            String mess = moduleService.updateModule(moduleDto);
+            JSONObject mess = moduleService.updateModule(moduleDto);
             return mess;
         }, executorService);
     }

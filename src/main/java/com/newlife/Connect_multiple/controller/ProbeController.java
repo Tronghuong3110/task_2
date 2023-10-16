@@ -3,6 +3,7 @@ package com.newlife.Connect_multiple.controller;
 import com.newlife.Connect_multiple.dto.*;
 import com.newlife.Connect_multiple.service.ILocationService;
 import com.newlife.Connect_multiple.service.IProbeService;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,9 +27,11 @@ public class ProbeController {
 
     // lấy ra 1 probe (đã test thành công) (Han)
     @GetMapping("/probe")
-    public ProbeDto getOneProbe(@RequestParam("idProbe") Integer idProbe) {
-        ProbeDto probeDto = probeService.findOneProbe(idProbe);
-        return probeDto;
+    public CompletableFuture<ProbeDto> getOneProbe(@RequestParam("idProbe") Integer idProbe) {
+        return CompletableFuture.supplyAsync(() -> {
+            ProbeDto probeDto = probeService.findOneProbe(idProbe);
+            return probeDto;
+        }, executorService);
     }
 
     // thêm mới probe
@@ -64,36 +67,36 @@ public class ProbeController {
 
     // xóa 1 probe (di chuyển probe tới thùng rác) - Hướng
     @DeleteMapping("/probe")
-    public CompletableFuture<String> deleteProbe(@RequestParam("id") Integer id) {
+    public CompletableFuture<JSONObject> deleteProbe(@RequestParam("id") Integer id) {
         return CompletableFuture.supplyAsync(() -> {
-            String message = probeService.delete(id);
+            JSONObject message = probeService.delete(id);
             return message;
         }, executorService);
     }
 
     // xóa 1 probe (xóa vĩnh viễn probe từ probe) - Hướng
     @DeleteMapping("/probe/remove")
-    public CompletableFuture<String> deleteProbeFromTrash(@RequestParam("id") Integer id) {
+    public CompletableFuture<JSONObject> deleteProbeFromTrash(@RequestParam("id") Integer id) {
         return CompletableFuture.supplyAsync(() -> {
-            String messageDelete = probeService.deleteProbe(id);
+            JSONObject messageDelete = probeService.deleteProbe(id);
             return messageDelete;
         }, executorService);
     }
 
     // cập nhật chỉnh sửa thông tin probe
     @PutMapping("/probe")
-    public CompletableFuture<String> updateProbe(@RequestBody ProbeDto probeDto) {
+    public CompletableFuture<JSONObject> updateProbe(@RequestBody ProbeDto probeDto) {
         return CompletableFuture.supplyAsync(() -> {
-            String message = probeService.updateProbe(probeDto);
+            JSONObject message = probeService.updateProbe(probeDto);
             return message;
         }, executorService);
     }
 
     //khôi phục probe từ thùng rác
     @PostMapping("/probe")
-    public CompletableFuture<String> backUpProbe(@RequestParam("id") Integer id) {
+    public CompletableFuture<JSONObject> backUpProbe(@RequestParam("id") Integer id) {
         return CompletableFuture.supplyAsync(() -> {
-            String message = probeService.backUpProbe(id);
+            JSONObject message = probeService.backUpProbe(id);
             return message;
         }, executorService);
     }
@@ -109,14 +112,15 @@ public class ProbeController {
 
     // Test man Dashboard (da test thanh cong)
     @GetMapping("/dashboard/probe")
-    public Integer countProbeByStatus(@RequestParam("status") String status) {
-        try {
-            Integer tmp = probeService.countProbeByStatus(status);
-            return tmp;
-        } catch (Exception e){
-            e.printStackTrace();
-            return -1;
-        }
+    public CompletableFuture<Integer> countProbeByStatus(@RequestParam("status") String status) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                Integer tmp = probeService.countProbeByStatus(status);
+                return tmp;
+            } catch (Exception e){
+                e.printStackTrace();
+                return -1;
+            }
+        }, executorService);
     }
-
 }
