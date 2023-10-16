@@ -11,17 +11,19 @@ import { faPlay, faArrowRotateLeft, faClockRotateLeft } from '@fortawesome/free-
 import Probe_Module_Header from './Probe_Module_Header';
 import loading from '../../../assets/pic/ZKZg.gif';
 import AddProbeModule from '../AddProbeModule';
-const Probe_Modules = ({id}) => {
-    const [isOpen,setOpenWindow] = useState(false)
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+const Probe_Modules = ({ id }) => {
+    const [isOpen, setOpenWindow] = useState(false)
     const [probe_modules, setProbeModules] = useState([])
     const [orderDirection, setOrderDirection] = useState('asc')
     const [valueToOrderBy, setValueToOrderBy] = useState('epw')
     const [page, setPage] = useState(0)
     const [rowsPerPage, setRowPerPage] = useState(7)
     const [displayPagination, setDisplayPagination] = useState(false)
-    const [isEditedModule,setEditedModule] = useState(null)
+    const [isEditedModule, setEditedModule] = useState(null)
     useEffect(() => {
-        fetch("http://localhost:8081/api/v1/probe/modules?idProbe="+id+"&&name=&&status=")
+        fetch("http://localhost:8081/api/v1/probe/modules?idProbe=" + id + "&&name=&&status=")
             .then(response => response.json())
             .then(data => setProbeModules(data))
             .catch(err => console.log(err))
@@ -51,7 +53,7 @@ const Probe_Modules = ({id}) => {
     }
     const setLoading = (isLoading) => {
     }
-    /*Phân trang*/ 
+    /*Phân trang*/
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     }
@@ -90,31 +92,70 @@ const Probe_Modules = ({id}) => {
         return stablilizeRowArray.map((el) => el[0])
     }
     /** Run or Restart or Stop module */
-    const actionWithModule = (id,action) =>{
+    const actionWithModule = (id, action) => {
+        console.log(id)
         const options = {
-            method : "POST",
-            header :{
+            method: "POST",
+            headers: {
                 "Content-Type": "application/json"
             }
         }
-        fetch("http://localhost:8081/api/v1/probeModule/"+action+"?id="+id,options)
+        fetch("http://localhost:8081/api/v1/probeModule/" + action + "?idProbeModule=" + id, options)
             .then(respone => respone.json())
             .then(data => {
-                /*Xử lí data trả về*/ 
+               notify(data.message,0)
+                // console.log(data.message,1)
             })
+            .catch(err => console.log(err))
     }
     /** Delete module */
-    const deleteModule = (id) =>{
-        const options ={
-            method:"DELETE",
-            header:{
+    const deleteModule = (id) => {
+        const options = {
+            method: "DELETE",
+            headers: {
                 "Content-Type": "application/json"
             }
         }
-        fetch("http://localhost:8081/api/v1/probeModule?id="+id,options)
+        fetch("http://localhost:8081/api/v1/probeModule?id=" + id, options)
             .then(respone => respone.json())
             .then(data => console.log(data))
             .catch(err => console.log(err))
+    }
+    const notify = (message, status) => {
+        if (status === 1) {
+            toast.success(message, {
+                position: "top-center",
+                autoClose: 4000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+            })
+        }
+        else if (status === 0) {
+            toast.error(message, {
+                position: "top-center",
+                autoClose: 4000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+            })
+        }
+        else {
+            toast.warn(message, {
+                position: "top-center",
+                autoClose: 4000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+            })
+        }
+
     }
     return (
         <div className='Probe_Module'>
@@ -146,29 +187,45 @@ const Probe_Modules = ({id}) => {
                                             <TableCell className='actions' >
                                                 <div className='actions-container d-flex justify-content-between'>
                                                     <div className='action'>
-                                                        <button>
+                                                        <button
+                                                            onClick={() => {
+                                                                actionWithModule(module.id, "run")
+                                                            }}
+                                                        >
                                                             <FontAwesomeIcon icon={faPlay} style={{ color: "#00FF1A", }} />
                                                         </button>
                                                     </div>
                                                     <div className='action'>
-                                                        <button>
+                                                        <button
+                                                            onClick={() => {
+                                                                actionWithModule(module.id, "restart")
+                                                            }}
+                                                        >
                                                             <FontAwesomeIcon icon={faArrowRotateLeft} flip="horizontal" style={{ color: "#699BF7" }} />
                                                         </button>
                                                     </div>
                                                     <div className='action'>
-                                                        <button >
+                                                        <button
+                                                            onClick={() => {
+                                                                actionWithModule(module.id, "stop")
+                                                            }}
+                                                        >
                                                             <FontAwesomeIcon icon={faXmarkCircle} style={{ color: "#FF1C1C", }} />
                                                         </button>
                                                     </div>
                                                     <div className='action'>
                                                         <button >
-                                                            <FontAwesomeIcon icon={faPenToSquare} style={{ color: "powderblue", }} onClick={()=>{
+                                                            <FontAwesomeIcon icon={faPenToSquare} style={{ color: "powderblue", }} onClick={() => {
                                                                 handleOpenWindow(module.id)
                                                             }} />
                                                         </button>
                                                     </div>
                                                     <div className='action'>
-                                                        <button >
+                                                        <button
+                                                            onClick={() => {
+                                                                deleteModule(module.id)
+                                                            }}
+                                                        >
                                                             <FontAwesomeIcon icon={faTrashCan} style={{ color: "#FFD233", }} />
                                                         </button>
                                                     </div>
@@ -207,6 +264,7 @@ const Probe_Modules = ({id}) => {
                 }
             </Table >
             {isOpen && <AddProbeModule id={isEditedModule} handleCloseWindow={handleCloseWindow}></AddProbeModule>}
+            <ToastContainer></ToastContainer>
         </div>
     )
 }
