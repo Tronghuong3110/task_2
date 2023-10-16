@@ -58,7 +58,7 @@ public class ProbeModuleController {
         return CompletableFuture.supplyAsync(() -> {
             JSONObject responseMessage = new JSONObject();
             JSONObject responseStop = (JSONObject) probeModuleService.stopModule(idProbeModule.orElse(0));
-            if(responseStop.get("status").equals("Stoped")) { // TH stop module thành công
+            if(responseStop.get("status").equals("Stopped")) { // TH stop module thành công
                 // Run module
                 return ResponseEntity.ok(probeModuleService.runModule(idProbeModule.orElse(0)));
             }
