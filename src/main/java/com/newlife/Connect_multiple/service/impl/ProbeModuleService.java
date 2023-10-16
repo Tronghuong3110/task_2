@@ -719,7 +719,10 @@ public class ProbeModuleService implements IProbeModuleService {
                 System.out.println("Có trường null không thực hiện được!!");
             }
             String commandLine = probeModuleEntity.getCaption().trim() + " " + probeModuleEntity.getArg().trim();
-            Integer newId = getIdOfProbeModuleInDatabase(commandLine);
+            Integer newId = getIdOfProbeModuleInDatabase(commandLine, probeModuleDto.getIdProbe());
+            System.out.println(commandLine);
+            System.out.println("NewId " + newId);
+            System.out.println();
             if(newId != null && newId != probeModuleDto.getId()) {
                 json.put("code", "0");
                 json.put("message", "Can not update probeModule due to duplicate commands");
@@ -740,9 +743,9 @@ public class ProbeModuleService implements IProbeModuleService {
     }
 
     // lấy ra id của probeModule theo command từ database để check có trùng không
-    private Integer getIdOfProbeModuleInDatabase(String commandLine) {
+    private Integer getIdOfProbeModuleInDatabase(String commandLine, Integer idProbe) {
         try {
-            ProbeModuleEntity probeModule = moduleProbeRepository.findByCommand(commandLine).orElse(null);
+            ProbeModuleEntity probeModule = moduleProbeRepository.findByCommandAndIdProbe(commandLine, idProbe).orElse(null);
             if(probeModule == null) {
                 return null;
             }
