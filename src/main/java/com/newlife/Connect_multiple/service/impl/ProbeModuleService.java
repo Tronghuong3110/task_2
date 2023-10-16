@@ -650,14 +650,16 @@ public class ProbeModuleService implements IProbeModuleService {
         JSONObject json = new JSONObject();
         try {
             ProbeModuleEntity probeModule = ProbeModuleConverter.toEntity(probeModuleDto);
-            String cmd = probeModule.getCommand();
+            String cmd = probeModuleDto.getCaption().trim() + " " + probeModuleDto.getArg().trim();
             if (moduleProbeRepository.existsByCommand(cmd)) {
                 json.put("code", "3");
-                json.put("message", "Trùng câu lệnh command");
+                json.put("message", "Can not save probeModule due to duplicate commands");
                 return json;
             } else {
                 probeModule.setProcessStatus(2); // dừng
                 probeModule.setExpectStatus(0);
+                probeModule.setCommand(cmd);
+                probeModule.setStatus("Stopped");
                 moduleProbeRepository.save(probeModule);
                 json.put("code", "1");
                 json.put("message", "Save probe module success");
