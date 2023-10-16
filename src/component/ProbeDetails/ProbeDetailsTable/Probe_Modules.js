@@ -13,7 +13,7 @@ import loading from '../../../assets/pic/ZKZg.gif';
 import AddProbeModule from '../AddProbeModule';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-const Probe_Modules = ({ id }) => {
+const Probe_Modules = ({ id,conditions }) => {
     const [isOpen, setOpenWindow] = useState(false)
     const [probe_modules, setProbeModules] = useState([])
     const [orderDirection, setOrderDirection] = useState('asc')
@@ -23,18 +23,25 @@ const Probe_Modules = ({ id }) => {
     const [displayPagination, setDisplayPagination] = useState(false)
     const [isEditedModule, setEditedModule] = useState(null)
     useEffect(() => {
+        getProbeModules()
+    }, [])
+    const getProbeModules = ()=>{
         fetch("http://localhost:8081/api/v1/probe/modules?idProbe=" + id + "&&name=&&status=")
             .then(response => response.json())
             .then(data => setProbeModules(data))
             .catch(err => console.log(err))
-    }, [])
-
+    }
     const handleOpenWindow = (id) => {
         setOpenWindow(true)
         setEditedModule(id)
     }
     const handleCloseWindow = () => {
         setOpenWindow(false)
+        fetch("http://localhost:8081/api/v1/probe/modules?idProbe=" + id + "&&name=&&status=")
+            .then(response => response.json())
+            .then(data => setProbeModules(data))
+            .catch(err => console.log(err))
+        
     }
     /*Sắp xếp theo status*/
     const setStatusColor = (status) => {
@@ -191,7 +198,7 @@ const Probe_Modules = ({ id }) => {
 
                                         <TableRow key={module.id} >
                                             <TableCell className='id' >
-                                                <div>{module.id}</div>
+                                                <div>{index+1}</div>
                                             </TableCell>
                                             <TableCell className='module_name' ><div>{module.moduleName}</div></TableCell>
                                             <TableCell className='caption' ><div>{module.caption}</div></TableCell>

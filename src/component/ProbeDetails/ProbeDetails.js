@@ -25,6 +25,10 @@ const ProbeDetails = () => {
     const [selectedArea, setSelectedArea] = useState(null);
     const [area, setArea] = useState([])
     const [probeDetails, setProbeDetails] = useState({})
+    const [conditions,setConditions] = useState({
+        name:"",
+        status: ""
+    })
 
     //Hàm hiển thị select location và area
     const handleOptionSelectLocation = (selectedValue) => {
@@ -220,6 +224,21 @@ const ProbeDetails = () => {
         }
 
     }
+    // Lấy điều kiện lọc
+    const getKeyWord = (e)=>{
+        setConditions({
+            ...conditions,
+            name: e.target.value
+        })
+        console.log(conditions)
+    }
+    const getStatus =(e)=>{
+        setConditions({
+            ...conditions,
+            status: e.target.value
+        })
+        console.log(conditions)
+    }
     return (
         <div className="probeDetails">
             <div className="infos d-flex justify-content-between align-items-center">
@@ -311,18 +330,20 @@ const ProbeDetails = () => {
                     <div className="searchBar d-flex align-items-center">
                         <div className="searchBar-searchName">
                             <div className="searchBar-searchName-input">
-                                <input type="text" placeholder="Search "></input>
+                                <input type="text" placeholder="Search "
+                                    onChange={getKeyWord}
+                                ></input>
                                 <FontAwesomeIcon icon={faMagnifyingGlass}></FontAwesomeIcon>
                             </div>
                         </div>
                         <div className="searchBar-searchStatus">
                             <div className="searchBar-searchStatus-select">
-                                <select>
-                                    <option>All</option>
-                                    <option>Running</option>
-                                    <option>Pending</option>
-                                    <option>Stopped</option>
-                                    <option>Failed</option>
+                                <select onChange={getStatus}> 
+                                    <option value= "All" >All</option>
+                                    <option value="Running">Running</option>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Stopped">Stopped</option>
+                                    <option value="Failed">Failed</option>
                                 </select>
                             </div>
                         </div>
@@ -333,7 +354,7 @@ const ProbeDetails = () => {
                     </div>
                 </div>
             </div>
-            <Probe_Modules id={id}  ></Probe_Modules>
+            <Probe_Modules id={id} conditions={conditions}  ></Probe_Modules>
             {isOpen && <AddProbeModule idProbe={id} id={null} handleCloseWindow={handleCloseWindow}></AddProbeModule>}
             <ToastContainer ></ToastContainer>
         </div>

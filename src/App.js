@@ -8,6 +8,7 @@ import ProbeDetails from './component/ProbeDetails/ProbeDetails';
 // import ModuleHistory from './component/ModuleHistory';
 import { ProbesProvider } from "./component/Probes/ProbesTable/ProbesContext";
 import {Routes,Route} from 'react-router-dom'
+import { ProbeDetailsProvider } from './component/ProbeDetails/ProbeDetailsTable/ProbeDetailsContext';
 function App() {
   return (
     <div className="App" style={{ padding: 0, margin: 0, height: "100vh", backgroundColor: "#0b0c24", overflowY: "hidden" }}>
@@ -27,7 +28,7 @@ function App() {
           {/* <ModuleHistory></ModuleHistory> */}
           <Routes>
             <Route path='/' element={<ProbesProvider><Probes></Probes></ProbesProvider>}></Route>
-            <Route path='/details/:id' element={<ProbeDetails></ProbeDetails>}></Route>
+            <Route path='/details/:id' element={<ProbeDetailsProvider><ProbeDetails></ProbeDetails></ProbeDetailsProvider>}></Route>
             {/* <Route path='/simlist' element={<Simlist />}></Route>
             <Route path='/process' element={<Process />}></Route> */}
           </Routes>

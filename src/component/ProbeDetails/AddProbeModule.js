@@ -45,9 +45,9 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
 
     }, [])
 
-    const addOrEditModule = () => {
-        let inputData = getModuleInfo().inputValue
-        let fullData = getModuleInfo().fullValue
+    const addOrEditModule = (id) => {
+        let inputData = getModuleInfo(id).inputValue
+        let fullData = getModuleInfo(id).fullValue
         if (findEmptyFields(inputData).length != 0) {
             let message = "Field ";
             let arrOption = findEmptyFields(inputData)
@@ -74,35 +74,33 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
             if (fullData.id == null) {
                 console.log("POST NOW")
                 fetch("http://localhost:8081/api/v1/probeModule/import", options)
-                    .then(response => response.text())
+                    .then(response => response.json())
                     .then(data => {
-                        if (data == "Save probe module success") {
-                            notify(data, 1)
+                        if (data.code==1) {
+                            notify(data.message, data.code)
                             handleCloseWindow()
                         }
-                        else if (data == "Save probe module failed") {
-                            notify(data, 0)
-                        }
                         else {
-                            notify(data, 2)
+                            notify(data.message, data.code)
                         }
                     })
                     .catch(err => console.log(err))
             }
             else {
                 console.log("PUT NOW")
-                fetch("http://localhost:8081/api/v1/probeModule/import", options)
-                    .then(response => response.text())
+                fetch("http://localhost:8081/api/v1/probe/module", options)
+                    .then(response => response.json())
                     .then(data => {
-                        if (data == "Save probe module success") {
-                            notify(data, 1)
+                        console.log(data)
+                        if (data.code==1) {
+                            notify(data.message, 1)
                             handleCloseWindow()
                         }
-                        else if (data == "Save probe module failed") {
-                            notify(data, 0)
+                        else if(data.code ==0 ){
+                            notify(data.message,0)
                         }
                         else {
-                            notify(data, 2)
+                            notify(data.message, 2)
                         }
                     })
                     .catch(err => console.log(err))
@@ -110,7 +108,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
         }
     }
     const notify = (message, status) => {
-        if (status === 1) {
+        if (status == 1) {
             toast.success(message, {
                 position: "top-center",
                 autoClose: 3000,
@@ -121,7 +119,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                 theme: "colored",
             })
         }
-        else if (status === 0) {
+        else if (status == 0) {
             toast.error(message, {
                 position: "top-center",
                 autoClose: 3000,
@@ -153,9 +151,9 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
         setCaption(caption)
         setArg(argDefalt)
     }
-    const getModuleInfo = () => {
+    const getModuleInfo = (id) => {
         let idModule = document.querySelector("#idModule")
-        let caption = idModule.options[idModule.selectedIndex].getAttribute("caption")
+        let caption = id==null?idModule.options[idModule.selectedIndex].getAttribute("caption"):isEditedModule.caption
         let listInfo = document.querySelectorAll(".input_container .input_container-input .inputModuleInfo")
         let infoObject = {};
         listInfo.forEach(element => {
@@ -277,7 +275,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                     {/* Button */}
                     <div className='btn-container d-flex justify-content-end'>
                         <button className='btn btn-success d-flex align-items-center' onClick={() => {
-                            addOrEditModule()
+                            addOrEditModule(id)
                         }} >
                             <div className='btn-icon d-flex align-items-center' >
                                 <FontAwesomeIcon icon={faFloppyDisk} />
