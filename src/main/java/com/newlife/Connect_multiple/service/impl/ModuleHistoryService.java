@@ -18,10 +18,6 @@ public class ModuleHistoryService implements IModuleHistoryService {
     @Autowired
     private static ModuleHistoryRepository moduleHistoryRepository;
 
-    @Autowired
-    private static ModuleProbeRepository moduleProbeRepository;
-
-
     // HAN
     @Override
     public String deleteModuleHistory(String idModuleHistory) {

@@ -2,6 +2,7 @@ package com.newlife.Connect_multiple.controller;
 
 import com.newlife.Connect_multiple.dto.ProbeModuleDto;
 import com.newlife.Connect_multiple.service.IProbeModuleService;
+import com.newlife.Connect_multiple.util.JsonUtil;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,29 +23,33 @@ public class ProbeModuleController {
     @Autowired
     private IProbeModuleService probeModuleService;
 
-    private ExecutorService executorService = Executors.newFixedThreadPool(7);
+    private ExecutorService executorService = Executors.newFixedThreadPool(10);
 
     // Thêm mới 1 probe Module (đã test thành công) (Han)
     @PostMapping("/probeModule/import")
-    public String createModuleProbe(@RequestBody ProbeModuleDto probeModuleDto) {
-        String mess = probeModuleService.saveProbeModule(probeModuleDto);
-        return mess;
+    public CompletableFuture<JSONObject> createModuleProbe(@RequestBody ProbeModuleDto probeModuleDto) {
+        return CompletableFuture.supplyAsync(() -> {
+            JSONObject response = probeModuleService.saveProbeModule(probeModuleDto);
+            return response;
+        }, executorService);
     }
 
     // Cập nhật probeModule Hướng
     @PutMapping("/probe/module")
-    public CompletableFuture<String> updateProbeModule(@RequestBody ProbeModuleDto probeModuleDto) {
+    public CompletableFuture<JSONObject> updateProbeModule(@RequestBody ProbeModuleDto probeModuleDto) {
         return CompletableFuture.supplyAsync(() -> {
-            String message = probeModuleService.updateProbeModule(probeModuleDto);
+            JSONObject message = probeModuleService.updateProbeModule(probeModuleDto);
             return message;
         }, executorService);
     }
 
     // Xóa 1 probe Module (đã test thành công) (Han)
     @DeleteMapping("/probeModule")
-    public String deleteModuleProbe(@RequestParam("id") Integer id) {
-        String message = probeModuleService.delete(id);
-        return message;
+    public CompletableFuture<JSONObject> deleteModuleProbe(@RequestParam("id") Integer id) {
+        return CompletableFuture.supplyAsync(() -> {
+            JSONObject response = probeModuleService.delete(id);
+            return response;
+        }, executorService);
     }
 
     // chạy lại module (Hướng)

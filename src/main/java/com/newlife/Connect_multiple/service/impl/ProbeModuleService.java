@@ -664,7 +664,10 @@ public class ProbeModuleService implements IProbeModuleService {
                 return json;
             }
         } catch (Exception e) {
-            return "Save probe module failed";
+            e.printStackTrace();
+            json.put("code", "0");
+            json.put("message", "Save probe module failed");
+            return json;
         }
     }
     // Man Dashboard
