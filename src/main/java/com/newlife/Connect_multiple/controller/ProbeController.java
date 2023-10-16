@@ -3,16 +3,10 @@ package com.newlife.Connect_multiple.controller;
 import com.newlife.Connect_multiple.dto.*;
 import com.newlife.Connect_multiple.service.ILocationService;
 import com.newlife.Connect_multiple.service.IProbeService;
-import com.newlife.Connect_multiple.util.FileDownloadUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -68,7 +62,7 @@ public class ProbeController {
         }, executorService);
     }
 
-    // xóa 1 probe (di chuyển probe tới thùng rác)
+    // xóa 1 probe (di chuyển probe tới thùng rác) - Hướng
     @DeleteMapping("/probe")
     public CompletableFuture<String> deleteProbe(@RequestParam("id") Integer id) {
         return CompletableFuture.supplyAsync(() -> {
@@ -77,7 +71,7 @@ public class ProbeController {
         }, executorService);
     }
 
-    // xóa 1 probe (xóa vĩnh viễn probe từ probe)
+    // xóa 1 probe (xóa vĩnh viễn probe từ probe) - Hướng
     @DeleteMapping("/probe/remove")
     public CompletableFuture<String> deleteProbeFromTrash(@RequestParam("id") Integer id) {
         return CompletableFuture.supplyAsync(() -> {

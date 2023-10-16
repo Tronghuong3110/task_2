@@ -638,17 +638,14 @@ public class ProbeModuleService implements IProbeModuleService {
             return "Delete failed";
         }
     }
-
-
-            // Thêm mới 1 module của 1 probe
+    // Thêm mới 1 module của 1 probe
     @Override
     public String saveProbeModule(ProbeModuleDto probeModuleDto) {
         try {
             ProbeModuleEntity probeModule = ProbeModuleConverter.toEntity(probeModuleDto);
-
             String cmd = probeModule.getCommand();
             if (moduleProbeRepository.existsByCommand(cmd)) {
-                return "trùng câu lệnh command";
+                return "Trùng câu lệnh command";
             } else {
                 probeModule.setProcessStatus(2); // dừng
                 probeModule.setExpectStatus(0);
@@ -708,7 +705,7 @@ public class ProbeModuleService implements IProbeModuleService {
                 return "Can not update probeModule due to duplicate commands";
             }
             probeModuleEntity = moduleProbeRepository.save(probeModuleEntity);
-            return "Update probeModule with id = " + probeModuleDto.getId() + " success";
+            return "Update probeModule success";
         }
         catch (Exception e) {
             System.out.println("Update probeModule lỗi rồi!!(Line 695)");
