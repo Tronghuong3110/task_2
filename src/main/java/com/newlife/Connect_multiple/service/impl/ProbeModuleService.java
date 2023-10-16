@@ -629,28 +629,39 @@ public class ProbeModuleService implements IProbeModuleService {
     }
 
     @Override
-    public String delete(Integer idProbeModule) {
+    public JSONObject delete(Integer idProbeModule) {
+        JSONObject json = new JSONObject();
         try {
             //ProbeModuleEntity probeModule = moduleProbeRepository.findById(idProbeModule).orElse(null);
             moduleProbeRepository.deleteById(idProbeModule);
-            return "Delete success";
+            json.put("code", "1");
+            json.put("message", "Delete success");
+            return json;
         } catch (Exception e) {
-            return "Delete failed";
+            System.out.println("Xóa probe module thất bại!(Line 636)");
+            json.put("code", "0");
+            json.put("message", "Delete failed");
+            return json;
         }
     }
     // Thêm mới 1 module của 1 probe
     @Override
-    public String saveProbeModule(ProbeModuleDto probeModuleDto) {
+    public JSONObject saveProbeModule(ProbeModuleDto probeModuleDto) {
+        JSONObject json = new JSONObject();
         try {
             ProbeModuleEntity probeModule = ProbeModuleConverter.toEntity(probeModuleDto);
             String cmd = probeModule.getCommand();
             if (moduleProbeRepository.existsByCommand(cmd)) {
-                return "Trùng câu lệnh command";
+                json.put("code", "3");
+                json.put("message", "Trùng câu lệnh command");
+                return json;
             } else {
                 probeModule.setProcessStatus(2); // dừng
                 probeModule.setExpectStatus(0);
                 moduleProbeRepository.save(probeModule);
-                return "Save probe module success";
+                json.put("code", "1");
+                json.put("message", "Save probe module success");
+                return json;
             }
         } catch (Exception e) {
             return "Save probe module failed";
@@ -687,12 +698,15 @@ public class ProbeModuleService implements IProbeModuleService {
 
     // cập nhật thông tin probeModule (Hướng)
     @Override
-    public String updateProbeModule(ProbeModuleDto probeModuleDto) {
+    public JSONObject updateProbeModule(ProbeModuleDto probeModuleDto) {
+        JSONObject json = new JSONObject();
         try {
             ProbeModuleEntity probeModuleEntity = moduleProbeRepository.findById(probeModuleDto.getId())
                     .orElse(null);
             if(probeModuleEntity == null) {
-                return "Can not found module of probe with id = " + probeModuleDto.getId();
+                json.put("code", "3");
+                json.put("message", "Can not found module of probe with id = " + probeModuleDto.getId());
+                return json;
             }
             // chuyển đổi các thông số của probeModule cần cập nhật
             probeModuleEntity = ProbeModuleConverter.toEntity(probeModuleDto, probeModuleEntity);
@@ -702,15 +716,21 @@ public class ProbeModuleService implements IProbeModuleService {
             String commandLine = probeModuleEntity.getCaption().trim() + " " + probeModuleEntity.getArg().trim();
             Integer newId = getIdOfProbeModuleInDatabase(commandLine);
             if(newId != null && newId != probeModuleDto.getId()) {
-                return "Can not update probeModule due to duplicate commands";
+                json.put("code", "0");
+                json.put("message", "Can not update probeModule due to duplicate commands");
+                return json;
             }
             probeModuleEntity = moduleProbeRepository.save(probeModuleEntity);
-            return "Update probeModule success";
+            json.put("code", "1");
+            json.put("message", "Update probeModule success");
+            return json;
         }
         catch (Exception e) {
             System.out.println("Update probeModule lỗi rồi!!(Line 695)");
             e.printStackTrace();
-            return "Can not update probeModule";
+            json.put("code", "0");
+            json.put("message", "Can not update probeModule");
+            return json;
         }
     }
 

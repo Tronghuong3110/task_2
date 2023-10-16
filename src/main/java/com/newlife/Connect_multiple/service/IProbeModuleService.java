@@ -1,6 +1,7 @@
 package com.newlife.Connect_multiple.service;
 
 import com.newlife.Connect_multiple.dto.ProbeModuleDto;
+import org.json.simple.JSONObject;
 
 import java.util.List;
 import java.util.Map;
@@ -10,9 +11,9 @@ public interface IProbeModuleService {
     Object runModule(Integer idProbeModule);
     Object stopModule(Integer idProbeModule);
     void getStatusModulePeriodically();
-    String delete(Integer idProbeModule); // Han
-    String saveProbeModule(ProbeModuleDto probeModuleDto);
+    JSONObject delete(Integer idProbeModule); // Han
+    JSONObject saveProbeModule(ProbeModuleDto probeModuleDto);
     Integer countModuleByStatus(String status);
     ProbeModuleDto findOneById(Integer idProbeModule);
-    String updateProbeModule(ProbeModuleDto probeModuleDto);
+    JSONObject updateProbeModule(ProbeModuleDto probeModuleDto);
 }
