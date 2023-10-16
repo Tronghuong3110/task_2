@@ -651,7 +651,7 @@ public class ProbeModuleService implements IProbeModuleService {
         try {
             ProbeModuleEntity probeModule = ProbeModuleConverter.toEntity(probeModuleDto);
             String cmd = probeModuleDto.getCaption().trim() + " " + probeModuleDto.getArg().trim();
-            if (moduleProbeRepository.existsByCommand(cmd)) {
+            if (moduleProbeRepository.existsByCommandAndIdProbe(cmd, probeModuleDto.getIdProbe())) {
                 json.put("code", "3");
                 json.put("message", "Can not save probeModule due to duplicate commands");
                 return json;
