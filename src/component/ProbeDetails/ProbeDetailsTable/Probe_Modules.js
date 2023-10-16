@@ -103,10 +103,25 @@ const Probe_Modules = ({ id }) => {
         fetch("http://localhost:8081/api/v1/probeModule/" + action + "?idProbeModule=" + id, options)
             .then(respone => respone.json())
             .then(data => {
-               notify(data.message,0)
-                // console.log(data.message,1)
+                let newArr = [...probe_modules]
+                newArr = newArr.map(probe_module => {
+                    if (probe_module.id == id) {
+                        return {
+                            ...probe_module,
+                            status: setStatusForModule(data.status)
+                        }
+                    }
+                    return probe_module
+                })
+                setProbeModules(newArr)
             })
             .catch(err => console.log(err))
+    }
+    const setStatusForModule = (num) => {
+        if (num == 1) return "Running"
+        else if (num == 2) return "Stopped"
+        else if (num == 3) return "Error"
+        else return "Pending"
     }
     /** Delete module */
     const deleteModule = (id) => {
