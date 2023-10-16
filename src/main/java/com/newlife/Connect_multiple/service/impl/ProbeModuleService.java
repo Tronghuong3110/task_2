@@ -557,7 +557,7 @@ public class ProbeModuleService implements IProbeModuleService {
             e.printStackTrace();
         }
     }
-    // So status trong task manager của client(1(Running), 2(Stoped), 3(Pending)) với status mà người dùng chọn(1(Running), 2(Stopped))
+    // So status trong task manager của client(1(Running), 2(Stopped), 3(Pending)) với status mà người dùng chọn(1(Running), 2(Stopped))
     private String statusResult(Integer statusExcept, String statusProcess) {
         if(statusExcept.equals(1)) {
             if(statusProcess.equals("1")) {
@@ -574,7 +574,7 @@ public class ProbeModuleService implements IProbeModuleService {
                 return "Failed";
             }
             else if(statusProcess.equals("2")) {
-                return "Stoped";
+                return "Stopped";
             }
             return "Pending";
         }
