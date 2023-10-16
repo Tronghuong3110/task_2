@@ -728,6 +728,7 @@ public class ProbeModuleService implements IProbeModuleService {
                 json.put("message", "Can not update probeModule due to duplicate commands");
                 return json;
             }
+            probeModuleEntity.setCommand(commandLine);
             probeModuleEntity = moduleProbeRepository.save(probeModuleEntity);
             json.put("code", "1");
             json.put("message", "Update probeModule success");
