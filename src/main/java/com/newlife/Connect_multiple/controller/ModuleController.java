@@ -37,9 +37,9 @@ public class ModuleController {
 
     // Thêm mới 1 một module chung (đã test thành công) (Han)
     @PostMapping("/module/import")
-    public CompletableFuture<String> createModule(@RequestBody ModuleDto moduleDto) {
+    public CompletableFuture<JSONObject> createModule(@RequestBody ModuleDto moduleDto) {
         return CompletableFuture.supplyAsync(() -> {
-            String mess = moduleService.saveModule(moduleDto);
+            JSONObject mess = moduleService.saveModule(moduleDto);
             return mess;
         }, executorService);
     }

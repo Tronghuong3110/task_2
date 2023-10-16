@@ -51,9 +51,11 @@ public class JsonUtil {
 
     public static JSONObject createJsonResponse(String message, String status) {
         try{
+            Integer code = codeResponse(status);
             JSONObject res = new JSONObject();
             res.put("message", message);
             res.put("status", status);
+            res.put("code", code);
             return res;
         }
         catch (Exception e) {
@@ -82,5 +84,19 @@ public class JsonUtil {
         jsonObject.put("id_probe", idProbe.toString());
         jsonObject.put("listModule", jsonArray);
         return jsonObject.toJSONString();
+    }
+
+    private static Integer codeResponse(String status) {
+        switch (status) {
+            case "Running":
+                return 1;
+            case "Failed":
+                return 3;
+            case "Pending":
+                return 4;
+            case "Stopped":
+                return 2;
+        }
+        return 0;
     }
 }
