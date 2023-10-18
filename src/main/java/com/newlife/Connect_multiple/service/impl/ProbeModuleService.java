@@ -67,6 +67,7 @@ public class ProbeModuleService implements IProbeModuleService {
     // Yêu cầu chạy module
     @Override
     public JSONObject runModule(Integer idProbeModule) {
+
         try {
             retry = 0;
             count = -2;
@@ -202,6 +203,9 @@ public class ProbeModuleService implements IProbeModuleService {
             catch (Exception me) {
                 me.printStackTrace();
                 System.out.println("Kết nối broker lỗi");
+                // set lại trường loading = 1 (đang loading), loading = 0 (loading xong)
+                probeModuleEntity.setLoading(0);
+                moduleProbeRepository.save(probeModuleEntity);
                 return JsonUtil.createJsonResponse("Error", "0");
             }
         }
@@ -346,6 +350,8 @@ public class ProbeModuleService implements IProbeModuleService {
             catch (Exception me) {
                 me.printStackTrace();
                 System.out.println("Chạy module lỗi rồi!");
+                probeModuleEntity.setLoading(0);
+                moduleProbeRepository.save(probeModuleEntity);
                 return JsonUtil.createJsonResponse("Error", "0");
             }
         }
@@ -367,6 +373,7 @@ public class ProbeModuleService implements IProbeModuleService {
             String json = JsonUtil.createJsonStatus("getStatus", listProbeModule);
             messageToClient.put(probe.getPubTopic(), json);
         }
+        System.out.println("Giá trị của biến kiểm tra client có nhận được lệnh hay không(khi thực hiện kiểm tra trạng thái theo chu kỳ) " + checkResponse);
         if(!checkResponse) {
             sendMessageGetStatus(messageToClient, listProbes);
         }
@@ -529,6 +536,7 @@ public class ProbeModuleService implements IProbeModuleService {
         // set lại trường loading = 0(đã loading xong)
         probeModuleEntity.setLoading(0);
         probeModuleEntity = moduleProbeRepository.save(probeModuleEntity);
+        System.out.println("Giá trị của biến kiểm tra client có nhận được lệnh hay không(sau khi thực hiện run hoặc stop lệnh) " + checkResponse);
         return JsonUtil.createJsonResponse(message, statusResult.toString());
     }
     // Kiểm tra xem probe có còn kết nói với broker không

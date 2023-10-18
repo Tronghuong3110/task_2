@@ -23,7 +23,9 @@ public class ApiCheckConnect {
             String responseBody = response.body().string();
             JSONObject jsonObject = JsonUtil.parseJson(responseBody);
             try{
+                System.out.println("Kiểm tra client có clientId la " + clientId + " có còn kết nối hay không?");
                 Object data = jsonObject.get("connected");
+                System.out.println("Kết Quả " + data);
                 if(data.equals("true"))
                     return true;
             }
