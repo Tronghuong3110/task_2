@@ -13,9 +13,20 @@ import TableHeader from './TableHeader';
 import { ProbesContext } from './ProbesContext';
 import ConfigFileGenerator from '../../action/download';
 import { Routes, Route, Link } from 'react-router-dom';
+import Confirm from '../../action/Confirm';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 const ProbesTable = () => {
     const probesContext = useContext(ProbesContext)
     const [probes, setProbes] = useState(probesContext.probes)
+    const [isOpenDeleteScreen, setOpenDeleteScreen] = useState(false)
+    const [deletingProbe, setDeletingProbe] = useState({
+        "id": null,
+        "name": "",
+        "message": "Are you sure to remove",
+        "note": "You can recover it around 7 days or remove permanently in recycle bin",
+    })
+    const [userChoice, setUserChoice] = useState(false);
     const [orderDirection, setOrderDirection] = useState('asc')
     const [valueToOrderBy, setValueToOrderBy] = useState('running')
     const [page, setPage] = useState(0)
@@ -26,16 +37,24 @@ const ProbesTable = () => {
     useEffect(() => {
         setProbes(probesContext.probes);
     }, [probesContext.probes]);
-    function openDeleteScreen(id, name) {
-        probesContext.setDeletedProbe({
-            "id": id,
-            "name": name,
-            "message": "Are you sure to remove",
-            "note": "You can recover it around 7 days or remove permanently in recycle bin",
-        })
-        probesContext.setOpenDeleteScreen(true)
-
-    }
+    useEffect(() => {
+        if (userChoice && deletingProbe) {
+            const options = {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            };
+            fetch("http://localhost:8081/api/v1/probe?id=" + deletingProbe.id, options)
+                .then(response => response.json())
+                .then(data => {
+                    const newArray = probes.filter(item => item.id !== deletingProbe.id);
+                    setProbes(newArray);
+                    notify(data.message,data.code)
+                })
+                .catch(err => console.log(err))
+        }
+    }, [userChoice, deletingProbe])
     /*Sắp xếp theo status*/
     const handleRequestSort = (event, property) => {
         const isAscending = (valueToOrderBy === property && orderDirection === 'asc')
@@ -115,6 +134,53 @@ const ProbesTable = () => {
             )
         }
     }
+    const handleUserChoice = (choice) => {
+        setUserChoice(choice);
+    };
+    const removeProbe = (id, name) => {
+        setOpenDeleteScreen(true)
+        setDeletingProbe({
+            ...deletingProbe,
+            "id": id,
+            "name": name
+        })
+    }
+    const notify = (message, status) => {
+        if (status == 1) {
+            toast.success(message, {
+                position: "top-center",
+                autoClose: 4000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+            })
+        }
+        else if (status == 0) {
+            toast.error(message, {
+                position: "top-center",
+                autoClose: 4000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+            })
+        }
+        else {
+            toast.warn(message, {
+                position: "top-center",
+                autoClose: 4000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+            })
+        }
+
+    }
     return (
         <div className='Probe_Table'>
             <Table>
@@ -171,7 +237,9 @@ const ProbesTable = () => {
                                                     </button>
                                                 </div>
                                                 <div className='action'>
-                                                    <button onClick={() => { openDeleteScreen(probe.id, probe.name) }}>
+                                                    <button onClick={() => {
+                                                        removeProbe(probe.id)
+                                                    }}>
                                                         <FontAwesomeIcon icon={faTrashCan} style={{ color: "#cc3f3f", }} />
                                                     </button>
                                                 </div>
@@ -200,6 +268,8 @@ const ProbesTable = () => {
                     ></TablePagination>
                 }
             </Table>
+            <ToastContainer></ToastContainer>
+            {isOpenDeleteScreen && <Confirm confirmContent={deletingProbe} setOpenDeleteScreen={setOpenDeleteScreen} onUserChoice={handleUserChoice} ></Confirm>}
         </div>
     )
 }

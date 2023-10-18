@@ -1,4 +1,3 @@
-import { useContext } from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import '../../sass/confirmation.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -6,16 +5,15 @@ import {
 
 } from '@fortawesome/free-regular-svg-icons'
 import { faCheck, faQuestion, faX } from '@fortawesome/free-solid-svg-icons';
-import { ProbesContext } from '../Probes/ProbesTable/ProbesContext';
 const Confirm = (props) => {
-    const probesContext = useContext(ProbesContext)
-    const {confirmContent} = props
+    const {confirmContent,setOpenDeleteScreen,onUserChoice} = props
     const handleCancel = () =>{
-        probesContext.setOpenDeleteScreen(false);
+        setOpenDeleteScreen(false);
+        onUserChoice(false)
     }
-    const handleOk = ()=>{
-        probesContext.setOpenDeleteScreen(false);
-        probesContext.removeProbe(confirmContent.id)
+    const handleOk = async ()=>{
+        setOpenDeleteScreen(false);
+        onUserChoice(true)
     }
     return (
         <div className='confirmationScreen'>

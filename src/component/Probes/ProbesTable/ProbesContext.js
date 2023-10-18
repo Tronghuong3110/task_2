@@ -3,8 +3,8 @@ import { createContext, useState,useEffect } from "react";
 const ProbesContext = createContext()
 
 const ProbesProvider =({children}) =>{
-    const [openDeleteScreen,setOpenDeleteScreen] = useState(false)
-    const [deletedProbe,setDeletedProbe] = useState({})
+    // const [openDeleteScreen,setOpenDeleteScreen] = useState(false)
+    // const [deletedProbe,setDeletedProbe] = useState({})
     const [probes,setProbes] = useState([])
     const [conditions,setConditions] = useState({
         "name": null,
@@ -12,22 +12,22 @@ const ProbesProvider =({children}) =>{
         "area":null,
         "vlan":null
     })
-    function removeProbe(id){
-        // alert("Xoa")
-        const options = {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        };
-        fetch("http://localhost:8081/api/v1/probe?id=" + id,options)
-            .then(response => response.text())
-            .then(data => {
-                const newArray = probes.filter(item => item.id !== id);
-                setProbes(newArray)
-            })
-            .catch(err => console.log(err))
-    }
+    // function removeProbe(id){
+    //     // alert("Xoa")
+    //     const options = {
+    //         method: 'DELETE',
+    //         headers: {
+    //             'Content-Type': 'application/json'
+    //         }
+    //     };
+    //     fetch("http://localhost:8081/api/v1/probe?id=" + id,options)
+    //         .then(response => response.text())
+    //         .then(data => {
+    //             const newArray = probes.filter(item => item.id !== id);
+    //             setProbes(newArray)
+    //         })
+    //         .catch(err => console.log(err))
+    // }
     useEffect(() => {
         let {name,location,area,vlan} = conditions
         let url = "http://localhost:8081/api/v1/probes?" + 
@@ -47,11 +47,7 @@ const ProbesProvider =({children}) =>{
         probes,
         setProbes,
         conditions,
-        setConditions,
-        openDeleteScreen,
-        setOpenDeleteScreen,
-        deletedProbe,setDeletedProbe,
-        removeProbe
+        setConditions
     }
 
     return (

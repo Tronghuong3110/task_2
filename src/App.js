@@ -22,8 +22,7 @@ function App() {
         <div className='dataContainer' style={{ width: "90%", backgroundColor: "transparent", height: "100vh", padding: "0 30px" }} >
           {/* <ProbesProvider>
             <Probes></Probes>
-          </ProbesProvider>
-          <ProbeDetails></ProbeDetails> */}
+          </ProbesProvider> */}
           {/* <Module></Module> */}
           {/* <ModuleHistory></ModuleHistory> */}
           <Routes>

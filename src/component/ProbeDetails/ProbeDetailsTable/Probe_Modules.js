@@ -13,9 +13,18 @@ import loading from '../../../assets/pic/ZKZg.gif';
 import AddProbeModule from '../AddProbeModule';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-const Probe_Modules = ({ id,conditions }) => {
+import Confirm from '../../action/Confirm';
+const Probe_Modules = ({ id, conditions }) => {
     const [isOpen, setOpenWindow] = useState(false)
     const [probe_modules, setProbeModules] = useState([])
+    const [isOpenDeleteScreen, setOpenDeleteScreen] = useState(false)
+    const [deletingProbeModule, setDeletingProbeModule] = useState({
+        "id": null,
+        "name": "",
+        "message": "Are you sure to remove",
+        "note": "It will be removed permanently",
+    })
+    const [userChoice, setUserChoice] = useState(null);
     const [orderDirection, setOrderDirection] = useState('asc')
     const [valueToOrderBy, setValueToOrderBy] = useState('epw')
     const [page, setPage] = useState(0)
@@ -24,8 +33,30 @@ const Probe_Modules = ({ id,conditions }) => {
     const [isEditedModule, setEditedModule] = useState(null)
     useEffect(() => {
         getProbeModules()
-    }, [])
-    const getProbeModules = ()=>{
+    }, [probe_modules])
+    useEffect(() => {
+        if (userChoice && deletingProbeModule) {
+            // Your deletion logic here
+            const options = {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            };
+    
+            fetch("http://localhost:8081/api/v1/probeModule?id=" + deletingProbeModule.id, options)
+                .then(response => response.json())
+                .then(data => notify(data.message,data.code)
+                //     {
+                //     const newArray = probe_modules.filter(item => item.id !== deletingProbeModule.id);
+                //     setProbeModules(newArray);
+                // }
+                )
+                .catch(err => console.log(err));
+        }
+    }, [userChoice, deletingProbeModule]);
+    
+    const getProbeModules = () => {
         fetch("http://localhost:8081/api/v1/probe/modules?idProbe=" + id + "&&name=&&status=")
             .then(response => response.json())
             .then(data => setProbeModules(data))
@@ -37,11 +68,7 @@ const Probe_Modules = ({ id,conditions }) => {
     }
     const handleCloseWindow = () => {
         setOpenWindow(false)
-        fetch("http://localhost:8081/api/v1/probe/modules?idProbe=" + id + "&&name=&&status=")
-            .then(response => response.json())
-            .then(data => setProbeModules(data))
-            .catch(err => console.log(err))
-        
+        getProbeModules()
     }
     /*Sắp xếp theo status*/
     const setStatusColor = (status) => {
@@ -57,8 +84,6 @@ const Probe_Modules = ({ id,conditions }) => {
             default:
                 return "white"
         }
-    }
-    const setLoading = (isLoading) => {
     }
     /*Phân trang*/
     const handleChangePage = (event, newPage) => {
@@ -110,12 +135,19 @@ const Probe_Modules = ({ id,conditions }) => {
         fetch("http://localhost:8081/api/v1/probeModule/" + action + "?idProbeModule=" + id, options)
             .then(respone => respone.json())
             .then(data => {
+                console.log(data)
+                if (data.code == 1 || data.code == 2) {
+                    notify(data.message, 1)
+                }
+                else {
+                    notify(data.message, 0)
+                }
                 let newArr = [...probe_modules]
                 newArr = newArr.map(probe_module => {
                     if (probe_module.id == id) {
                         return {
                             ...probe_module,
-                            status: setStatusForModule(data.status)
+                            status: data.status
                         }
                     }
                     return probe_module
@@ -124,27 +156,20 @@ const Probe_Modules = ({ id,conditions }) => {
             })
             .catch(err => console.log(err))
     }
-    const setStatusForModule = (num) => {
-        if (num == 1) return "Running"
-        else if (num == 2) return "Stopped"
-        else if (num == 3) return "Error"
-        else return "Pending"
-    }
     /** Delete module */
-    const deleteModule = (id) => {
-        const options = {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json"
-            }
-        }
-        fetch("http://localhost:8081/api/v1/probeModule?id=" + id, options)
-            .then(respone => respone.json())
-            .then(data => console.log(data))
-            .catch(err => console.log(err))
+    const handleUserChoice = (choice) => {
+        setUserChoice(choice);
+    };
+    const deleteModule = (id, name) => {
+        setOpenDeleteScreen(true)
+        setDeletingProbeModule({
+            ...deletingProbeModule,
+            "id": id,
+            "name": "module " + name
+        })
     }
     const notify = (message, status) => {
-        if (status === 1) {
+        if (status == 1) {
             toast.success(message, {
                 position: "top-center",
                 autoClose: 4000,
@@ -155,7 +180,7 @@ const Probe_Modules = ({ id,conditions }) => {
                 theme: "colored",
             })
         }
-        else if (status === 0) {
+        else if (status == 0) {
             toast.error(message, {
                 position: "top-center",
                 autoClose: 4000,
@@ -198,7 +223,7 @@ const Probe_Modules = ({ id,conditions }) => {
 
                                         <TableRow key={module.id} >
                                             <TableCell className='id' >
-                                                <div>{index+1}</div>
+                                                <div>{index + 1}</div>
                                             </TableCell>
                                             <TableCell className='module_name' ><div>{module.moduleName}</div></TableCell>
                                             <TableCell className='caption' ><div>{module.caption}</div></TableCell>
@@ -245,7 +270,7 @@ const Probe_Modules = ({ id,conditions }) => {
                                                     <div className='action'>
                                                         <button
                                                             onClick={() => {
-                                                                deleteModule(module.id)
+                                                                deleteModule(module.id, module.moduleName)
                                                             }}
                                                         >
                                                             <FontAwesomeIcon icon={faTrashCan} style={{ color: "#FFD233", }} />
@@ -260,7 +285,7 @@ const Probe_Modules = ({ id,conditions }) => {
                                             </TableCell>
                                             <TableCell className='processStatus' >
                                                 <div>
-                                                    <img src={loading}></img>
+                                                    <img src={loading} style={{ display: "block" }}></img>
                                                 </div>
                                             </TableCell>
                                         </TableRow>
@@ -287,6 +312,8 @@ const Probe_Modules = ({ id,conditions }) => {
             </Table >
             {isOpen && <AddProbeModule id={isEditedModule} handleCloseWindow={handleCloseWindow}></AddProbeModule>}
             <ToastContainer></ToastContainer>
+            {isOpenDeleteScreen && <Confirm confirmContent={deletingProbeModule} setOpenDeleteScreen={setOpenDeleteScreen} onUserChoice={handleUserChoice} ></Confirm>}
+
         </div>
     )
 }
