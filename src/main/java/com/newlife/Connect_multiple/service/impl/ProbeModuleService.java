@@ -79,6 +79,10 @@ public class ProbeModuleService implements IProbeModuleService {
             if(probeModuleEntity == null) {
                 return JsonUtil.createJsonResponse("Không tồn tại module có id = " + idProbeModule, "5");
             }
+            // set lại trường loading = 1 (đang loading), loading = 0 (loading xong)
+            probeModuleEntity.setLoading(1);
+            moduleProbeRepository.save(probeModuleEntity);
+
             SubtopicServerEntity subTopic = subtopicOnServerRepository.findByIdProbe(probeModuleEntity.getIdProbe())
                     .orElse(null);
             String idCmd = saveCmd(probeModuleEntity); // lưu thông tin lệnh vào database
@@ -95,6 +99,7 @@ public class ProbeModuleService implements IProbeModuleService {
                 if (client == null) {
                     client = new MqttClient(brokerURL, clientID, persistence);
                     client.connect(connectOptions);
+                    System.out.println("Subscribe topic " + subTopic.getSubTopic());
                     client.subscribe(subTopic.getSubTopic());
                 }
                 client.setCallback(new MqttCallback() {
@@ -117,7 +122,7 @@ public class ProbeModuleService implements IProbeModuleService {
                     public void messageArrived(String s, MqttMessage mqttMessage) {
                         String message = new String(mqttMessage.getPayload());
                         JSONObject json = JsonUtil.parseJson(message);
-                        if(json.containsKey("check")) {
+                        if(json.containsKey("check") && json.containsKey("action") && json.get("action").equals("run")) {
 //                            executorService.submit(() -> {
                                 checkResponse = true; // đánh dấu cliet đã nhận được lệnh ==> không gửi lại lệnh nữa
                                 System.out.println("Response " + message);
@@ -157,16 +162,15 @@ public class ProbeModuleService implements IProbeModuleService {
                     } else if (!checkResponse && retry > 2) {
                         if (retry > 2) {
                             updateCmdHistory(idCmd, 3, 4);
+                            System.out.println("ClientId của probe có tên " + probe.getName() + " là " + probe.getClientId());
                             Boolean clientIsDisconnect = checkClientIsDisconnect(probe.getClientId());
                             if (!clientIsDisconnect) {
                                 // Thông báo cho FE client đã mất kết nối
                                 System.out.println("Send to front end " + "đã mất kết nối tới broker");
-                                checkResponse = false;
                                 return responseMessageToFE("Probe " + probe.getName() + " đã mất kết nối tới broker", probeModuleEntity, "2", 1, null, null);
                             } else {
                                 // Thông báo gửi lệnh thất bại
                                 System.out.println("Send to front end " + "không nhận được yêu cầu thực hiện");
-                                checkResponse = false;
                                 return responseMessageToFE("Probe " + probe.getName() + " không nhận được yêu cầu thực hiện", probeModuleEntity, "2", 1, null, null);
                             }
                         }
@@ -183,14 +187,12 @@ public class ProbeModuleService implements IProbeModuleService {
                     if (statusModule != null && (statusModule.equals("1") || statusModule.equals("3"))) {
                         System.out.println("Module thành công hoặc thất bại" + responseMessage.toJSONString());
                         String mess = statusModule.equals("1") ? "Module chạy thành công" : "Module chạy thất bại";
-                        checkResponse = false;
                         return responseMessageToFE(mess, probeModuleEntity, statusModule, 1, (String) responseMessage.get("PID"), (String)responseMessage.get("nameProcess"));
                     }
                     // TH không nhận được phản hồi
                     else if (count >= 3) {
                         System.out.println("Client không có phản hồi " + responseMessage.toJSONString());
                         // có nên gửi lại không??
-                        checkResponse = false;
                         return responseMessageToFE("Không nhận được phản hồi từ client", probeModuleEntity, "2", 1, null, null);
                     } else {
                         count++;
@@ -224,6 +226,10 @@ public class ProbeModuleService implements IProbeModuleService {
             if(probeModuleEntity == null) {
                 return JsonUtil.createJsonResponse("Không tồn tại module có id = " + idProbeModule, "5");
             }
+            // cập nhật lại trường loading = 1 (đang loading), loading = 0 (loading xong)
+            probeModuleEntity.setLoading(1);
+            moduleProbeRepository.save(probeModuleEntity);
+
             SubtopicServerEntity subTopic = subtopicOnServerRepository.findByIdProbe(probeModuleEntity.getIdProbe())
                     .orElse(null); // lấy topic để thực hiện gửi message
             String idCmd = saveCmd(probeModuleEntity); // lưu thông tin lệnh vào database
@@ -261,7 +267,7 @@ public class ProbeModuleService implements IProbeModuleService {
                     public void messageArrived(String s, MqttMessage mqttMessage) {
                         String message = new String(mqttMessage.getPayload());
                         JSONObject json = JsonUtil.parseJson(message);
-                        if(json.containsKey("check")) {
+                        if(json.containsKey("check") && json.containsKey("action") && json.get("action").equals("stop")) {
 //                            executorService.submit(() ->{
                                 checkResponse = true; // đánh dấu cliet đã nhận được lệnh ==> không gửi lại lệnh nữa
                                 System.out.println("Response " + message);
@@ -305,12 +311,10 @@ public class ProbeModuleService implements IProbeModuleService {
                             if (!clientIsDisconnect) {
                                 // Thông báo cho FE client đã mất kết nối
                                 System.out.println("Send to front end " + "đã mất kết nối tới broker");
-                                checkResponse = false;
                                 return responseMessageToFE("Probe " + probe.getName() + " đã mất kết nối tới broker", probeModuleEntity, "1", 2, null, null);
                             } else {
                                 // Thông báo gửi lệnh thất bại
                                 System.out.println("Send to front end " + "không nhận được yêu cầu thực hiện");
-                                checkResponse = false;
                                 return responseMessageToFE("Probe " + probe.getName() + " không nhận được yêu cầu thực hiện", probeModuleEntity, "1", 2, null, null);
                             }
                         }
@@ -327,14 +331,12 @@ public class ProbeModuleService implements IProbeModuleService {
                     if (statusModule != null && (statusModule.equals("1") || statusModule.equals("2"))) {
                         System.out.println("Module stop thành công hoặc thất bại" + responseMessage.toJSONString());
                         String mess = statusModule.equals("2") ? "Module stop thành công" : "Module stop thất bại";
-                        checkResponse = false;
                         return responseMessageToFE(mess, probeModuleEntity, statusModule, 2, (String) responseMessage.get("PID"), (String) responseMessage.get("nameProcess"));
                     }
                     // TH không nhận được phản hồi
                     else if (count >= 3) {
                         System.out.println("Client không có phản hồi " + responseMessage.toJSONString());
                         // có nên gửi lại không??
-                        checkResponse = false;
                         return responseMessageToFE("Không nhận được phản hồi từ client", probeModuleEntity, "1", 2, null, null);
                     } else {
                         count++;
@@ -383,6 +385,8 @@ public class ProbeModuleService implements IProbeModuleService {
             // kết nối server voi broker
             List<BrokerEntity> broker = brokerRepository.findAll();
             String brokerURL = broker.get(0).getUrl();
+            // lấy toàn bộ topic mà server subscribe
+            List<SubtopicServerEntity> listTopics = subtopicOnServerRepository.findAll();
             // connect to broker
             MemoryPersistence persistence = new MemoryPersistence();
             try {
@@ -390,9 +394,9 @@ public class ProbeModuleService implements IProbeModuleService {
                     client = new MqttClient(brokerURL, clientID, persistence);
                     client.connect(connectOptions);
                     // Đăng kí để nhận tin phản hồi từ topic của client
-                    for (ProbeEntity probe : listProbe) {
-                        client.subscribe(probe.getPubTopic());
-                        System.out.println("Đã subscribe tới topic " + probe.getPubTopic());
+                    for (SubtopicServerEntity topic : listTopics) {
+                        client.subscribe(topic.getSubTopic());
+                        System.out.println("Đã subscribe tới topic " + topic.getSubTopic());
                     }
                 }
                 client.setCallback(new MqttCallback() {
@@ -422,7 +426,7 @@ public class ProbeModuleService implements IProbeModuleService {
                         // kiểm tra để đảm bản không dính vòng lặp vô hạn khi server gửi tin nhắn tới topic
                         // có biến check ==> tin nhắn được gửi từ client
 //                        executorService.submit(() -> {
-                            if (json.containsKey("check")) {
+                            if (json.containsKey("check") && json.containsKey("action") && json.get("action").equals("getStatus")) {
                                 // TH client thông báo nhận được tin nhắn
                                 try {
                                     if (json.containsKey("statusCmd") && json.get("statusCmd").equals("OK")) {
@@ -455,11 +459,12 @@ public class ProbeModuleService implements IProbeModuleService {
                     }
                 });
                 // gửi tin nhắn tới từng topic
-                for(ProbeEntity probe : listProbe) {
-                    String mess = messageToClient.get(probe.getPubTopic());
+                for (SubtopicServerEntity topic : listTopics) {
+                    String mess = messageToClient.get(topic.getSubTopic());
                     MqttMessage message = new MqttMessage(mess.getBytes());
                     message.setQos(2);
-                    client.publish(probe.getPubTopic(), message);
+                    client.publish(topic.getSubTopic(), message);
+                    System.out.println("Gửi tin nhắn tới topic " + topic.getSubTopic() + " " + mess);
                 }
             }
             catch (Exception e) {
@@ -520,6 +525,10 @@ public class ProbeModuleService implements IProbeModuleService {
     private JSONObject responseMessageToFE(String message, ProbeModuleEntity probeModuleEntity, String status, Integer statusExcept, String pId, String nameProcess) {
         String statusResult = statusResult(statusExcept, status);
         saveModuleHistory(status, statusExcept, probeModuleEntity, pId, nameProcess);
+        checkResponse = false;
+        // set lại trường loading = 0(đã loading xong)
+        probeModuleEntity.setLoading(0);
+        probeModuleEntity = moduleProbeRepository.save(probeModuleEntity);
         return JsonUtil.createJsonResponse(message, statusResult.toString());
     }
     // Kiểm tra xem probe có còn kết nói với broker không

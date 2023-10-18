@@ -60,4 +60,6 @@ public class ProbeModuleEntity {
     @Column(name = "process_name")
     private String processName;
 
+    @Column(name = "loading")
+    private Integer loading;
 }
