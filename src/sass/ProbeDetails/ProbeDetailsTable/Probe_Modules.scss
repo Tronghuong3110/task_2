@@ -2,92 +2,184 @@ $primary: #0b0c24;
 $secondary: #27293d;
 $pink-color: #E14ECA;
 $blue-color: #9747FF;
-
+$mixcolor: linear-gradient(90deg, $pink-color, $blue-color);
 .Probe_Module {
-    table {
-        margin-top: 20px !important;
-        table-layout: fixed;
-        background-color: $primary;
-        border-radius: 10px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
 
-        tbody {
-            tr {
-                border-bottom: white solid 2px;
+    .infos {
+        .searchBar {
+            position: relative;
 
-                td {
-                    font-size: 0.7rem !important;
-                    color: white !important;
-                    text-align: center !important;
-                    padding: 5px !important;
-                    height: fit-content;
-                    border: none !important;
-                    line-height: 1rem;
+            &-searchName {
+                width: 30%;
 
-                    div {
-                        white-space: nowrap;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
+                &-input {
+                    position: relative;
+
+                    input {
+                        width: 100%;
+                        border-radius: 20px;
+                        background-color: $primary;
+                        color: white;
+                        outline: none;
+                        border: $pink-color solid 2px;
+                        height: 100%;
+                        padding-left: 14%;
+                        padding-top: 5px;
+                        padding-bottom: 5px;
                     }
 
-                    .action {
-                        display: flex !important;
-                        justify-content: center;
-                        align-items: center;
+                    svg {
+                        position: absolute;
+                        top: 50%;
+                        left: 5%;
+                        transform: translateY(-50%);
+                    }
+                }
+            }
 
-                        button {
-                            background-color: transparent;
-                            outline: none;
-                            border: none;
+            &-searchStatus {
+                width: 10%;
+                position: absolute;
+                left: 40%;
 
-                            svg {
-                                font-size: 1.2em;
+                select {
+                    width: 100%;
+                    border-radius: 20px;
+                    background-color: $primary;
+                    color: white;
+                    outline: none;
+                    border: $pink-color solid 2px;
+                    height: 100%;
+                    padding-left: 14%;
+                    padding-top: 5px;
+                    padding-bottom: 5px;
+                }
+            }
+
+            .addBtn {
+                position: absolute;
+                right: 0;
+                background-color: $mixcolor !important;
+                padding: 5px 10px;
+                font-size: 0.9em;
+                background: $mixcolor !important;
+                color: white;
+                border-radius: 5px;
+                &-icon {
+                    svg {
+                        padding: 0 5px;
+                    }
+                }
+            }
+        }
+    }
+
+    .table-container {
+        flex-grow: 1;
+        background-color: $primary;
+        border-radius: 10px;
+        position: relative;
+
+        table {
+            table-layout: fixed;
+
+            tbody {
+                tr {
+                    border-bottom: white solid 2px;
+                    min-height: 50px;
+
+                    td {
+                        font-size: 0.7rem !important;
+                        color: white !important;
+                        text-align: center !important;
+                        padding: 5px !important;
+                        height: fit-content;
+                        border: none !important;
+                        line-height: 1rem;
+
+                        div {
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                        }
+
+                        .action {
+                            display: flex !important;
+                            justify-content: center;
+                            align-items: center;
+
+                            button {
+                                background-color: transparent;
+                                outline: none;
+                                border: none;
+
+                                svg {
+                                    font-size: 1.2em;
+                                }
+                            }
+                        }
+                    }
+
+                    .checkbox {
+                        width: 3%;
+
+                        input {
+                            vertical-align: middle;
+                        }
+                    }
+
+                    .id {
+                        width: 3%;
+                    }
+
+                    .errorPerWeek {
+                        width: 7%;
+                    }
+
+                    .module_name {
+                        width: 21%;
+                    }
+
+                    .caption {
+                        width: 11%;
+                    }
+
+                    .status {
+                        width: 8%;
+                    }
+
+                    .argument {
+                        width: 12%;
+                    }
+
+                    .note {
+                        width: 17%;
+                    }
+
+                    .actions {
+                        width: 15%;
+                    }
+
+                    .processStatus {
+                        width: 3%;
+
+                        div {
+                            img {
+                                height: 12px;
                             }
                         }
                     }
                 }
-
-                .id {
-                    width: 5%;
-                }
-
-                .errorPerWeek {
-                    width: 7%;
-                }
-
-                .module_name {
-                    width: 11%;
-                }
-
-                .caption {
-                    width: 11%;
-                }
-
-                .status {
-                    width: 10%;
-                }
-
-                .argument {
-                    width: 12%;
-                }
-
-                .note {
-                    width: 17%;
-                }
-
-                .actions {
-                    width: 10%;
-                }
-
-                .processStatus {
-                    width: 17%;
-
-                    div {
-                        img {
-                            height: 12px;
-                        }
-                    }
-                }
             }
+
+        }
+
+        .css-78c6dr-MuiToolbar-root-MuiTablePagination-toolbar {
+            position: absolute;
+            bottom: 0;
         }
 
         .css-jtlhu6-MuiTablePagination-root {
@@ -103,6 +195,23 @@ $blue-color: #9747FF;
 
             .css-194a1fa-MuiSelect-select-MuiInputBase-input {
                 font-size: 1.5em;
+            }
+        }
+    }
+
+    .actions-outside-container {
+        padding: 15px 0;
+
+        .action {
+            button {
+                background-color: transparent;
+                outline: none;
+                border: none;
+                padding: 0 15px;
+
+                svg {
+                    font-size: 1.2em;
+                }
             }
         }
     }

@@ -12,7 +12,7 @@ import {
 import DropdownWithInput from "../action/DropdownWithInput";
 import Probe_Modules from "./ProbeDetailsTable/Probe_Modules";
 import AddProbeModule from './AddProbeModule';
-import { ToastContainer, toast } from 'react-toastify';
+import {  toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useParams } from "react-router-dom";
 
@@ -25,10 +25,6 @@ const ProbeDetails = () => {
     const [selectedArea, setSelectedArea] = useState(null);
     const [area, setArea] = useState([])
     const [probeDetails, setProbeDetails] = useState({})
-    const [conditions,setConditions] = useState({
-        name:"",
-        status: ""
-    })
 
     //Hàm hiển thị select location và area
     const handleOptionSelectLocation = (selectedValue) => {
@@ -66,7 +62,6 @@ const ProbeDetails = () => {
     }
     //Hàm hiển thị thông tin probe
     useEffect(() => {
-        console.log(id)
         fetch("http://localhost:8081/api/v1/probe?idProbe=" + id)
             .then(response => response.json())
             .then(data => setProbeDetails(data))
@@ -154,10 +149,10 @@ const ProbeDetails = () => {
                 body: JSON.stringify(info)
             }
             fetch("http://localhost:8081/api/v1/probe", options)
-                .then(response => response.text())
+                .then(response => response.json())
                 .then(data => {
-                    if (data == "Update probe success") {
-                        notify(data, 1)
+                    if (data.code == 1) {
+                        notify(data.message, data.code)
                         var infomation = getInput();
                         var element = infomation.elements;
                         element.forEach(ele => {
@@ -167,7 +162,7 @@ const ProbeDetails = () => {
                         setAppear(!isAppear)
                     }
                     else {
-                        notify(data, 0)
+                        notify(data.message, data.code)
                     }
                 })
                 .catch(err => console.log(err))
@@ -189,7 +184,7 @@ const ProbeDetails = () => {
 
     // Hiển thị thông báo
     const notify = (message, status) => {
-        if (status === 1) {
+        if (status == 1) {
             toast.success(message, {
                 position: "top-center",
                 autoClose: 4000,
@@ -200,7 +195,7 @@ const ProbeDetails = () => {
                 theme: "colored",
             })
         }
-        else if (status === 0) {
+        else if (status == 0) {
             toast.error(message, {
                 position: "top-center",
                 autoClose: 4000,
@@ -223,21 +218,6 @@ const ProbeDetails = () => {
             })
         }
 
-    }
-    // Lấy điều kiện lọc
-    const getKeyWord = (e)=>{
-        setConditions({
-            ...conditions,
-            name: e.target.value
-        })
-        console.log(conditions)
-    }
-    const getStatus =(e)=>{
-        setConditions({
-            ...conditions,
-            status: e.target.value
-        })
-        console.log(conditions)
     }
     return (
         <div className="probeDetails">
@@ -319,44 +299,9 @@ const ProbeDetails = () => {
                 </div>
 
             </div>
-            <div className="infos">
-                <div className="info probe_modules">
-                    <div className="info-title d-flex align-items-center">
-                        <div className="info-title-icon">
-                            <FontAwesomeIcon icon={faCube}></FontAwesomeIcon>
-                        </div>
-                        <div className="info-title-text">PROBE_MODULES</div>
-                    </div>
-                    <div className="searchBar d-flex align-items-center">
-                        <div className="searchBar-searchName">
-                            <div className="searchBar-searchName-input">
-                                <input type="text" placeholder="Search "
-                                    onChange={getKeyWord}
-                                ></input>
-                                <FontAwesomeIcon icon={faMagnifyingGlass}></FontAwesomeIcon>
-                            </div>
-                        </div>
-                        <div className="searchBar-searchStatus">
-                            <div className="searchBar-searchStatus-select">
-                                <select onChange={getStatus}> 
-                                    <option value= "All" >All</option>
-                                    <option value="Running">Running</option>
-                                    <option value="Pending">Pending</option>
-                                    <option value="Stopped">Stopped</option>
-                                    <option value="Failed">Failed</option>
-                                </select>
-                            </div>
-                        </div>
-                        <button className="addBtn d-flex align-items-center" onClick={handleOpenWindow}>
-                            <div className="addBtn-icon"><FontAwesomeIcon icon={faSquarePlus}></FontAwesomeIcon></div>
-                            <div className="addBtn-text ">New module</div>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <Probe_Modules id={id} conditions={conditions}  ></Probe_Modules>
+            
+            <Probe_Modules id={id}   ></Probe_Modules>
             {isOpen && <AddProbeModule idProbe={id} id={null} handleCloseWindow={handleCloseWindow}></AddProbeModule>}
-            <ToastContainer ></ToastContainer>
         </div>
     )
 }

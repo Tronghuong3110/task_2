@@ -15,8 +15,8 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
     const [listSampleModule, setListSampleModule] = useState([])
     const [commandValue, setCommandValue] = useState({})
     const [isEditedModule, setEditedModule] = useState({})
-    const [caption,setCaption] = useState("")
-    const [arg,setArg] = useState("")
+    const [caption, setCaption] = useState("")
+    const [arg, setArg] = useState("")
     useEffect(() => {
         fetch("http://localhost:8081/api/v1/modules")
             .then(response => response.json())
@@ -76,12 +76,16 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                 fetch("http://localhost:8081/api/v1/probeModule/import", options)
                     .then(response => response.json())
                     .then(data => {
-                        if (data.code==1) {
+                        console.log(data)
+                        if (data.code == 1) {
                             notify(data.message, data.code)
                             handleCloseWindow()
                         }
+                        else if (data.code == 0) {
+                            notify(data.message, 0)
+                        }
                         else {
-                            notify(data.message, data.code)
+                            notify(data.message, 2)
                         }
                     })
                     .catch(err => console.log(err))
@@ -92,12 +96,12 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                     .then(response => response.json())
                     .then(data => {
                         console.log(data)
-                        if (data.code==1) {
+                        if (data.code == 1) {
                             notify(data.message, 1)
                             handleCloseWindow()
                         }
-                        else if(data.code ==0 ){
-                            notify(data.message,0)
+                        else if (data.code == 0) {
+                            notify(data.message, 0)
                         }
                         else {
                             notify(data.message, 2)
@@ -153,7 +157,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
     }
     const getModuleInfo = (id) => {
         let idModule = document.querySelector("#idModule")
-        let caption = id==null?idModule.options[idModule.selectedIndex].getAttribute("caption"):isEditedModule.caption
+        let caption = id == null ? idModule.options[idModule.selectedIndex].getAttribute("caption") : isEditedModule.caption
         let listInfo = document.querySelectorAll(".input_container .input_container-input .inputModuleInfo")
         let infoObject = {};
         listInfo.forEach(element => {
@@ -239,9 +243,9 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                                     className='commandInput exception inputModuleInfo'
                                     type='text' placeholder='Your argument'
                                     id='arg'
-                                    defaultValue={id==null?arg:isEditedModule.arg}
+                                    defaultValue={id == null ? arg : isEditedModule.arg}
                                     onChange={(e) => {
-                                        if(id!=null) setCommandValue(isEditedModule.caption + " " + e.target.value)
+                                        if (id != null) setCommandValue(isEditedModule.caption + " " + e.target.value)
                                         else setCommandValue(caption + " " + e.target.value)
                                     }}
                                 ></input>

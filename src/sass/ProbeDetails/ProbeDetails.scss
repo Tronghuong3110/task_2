@@ -4,6 +4,8 @@ $pink-color: #e14eca;
 $blue-color: #9747ff;
 $mixcolor: linear-gradient(90deg, $pink-color, $blue-color);
 .probeDetails {
+    display: flex;
+    flex-direction: column;
     height: 80%;
     padding: 20px;
     font-size: 0.7em !important;
@@ -53,65 +55,6 @@ $mixcolor: linear-gradient(90deg, $pink-color, $blue-color);
                     &::placeholder {
                         color: white;
                         opacity: 0.7;
-                    }
-                }
-            }
-            .searchBar{
-                position: relative;
-                &-searchName{
-                    width: 30%;
-                    &-input{
-                        position: relative;
-                        input{
-                            width: 100%;
-                            border-radius: 20px;
-                            background-color: $primary;
-                            color: white;
-                            outline: none;
-                            border: $pink-color solid 2px;
-                            height: 100%;
-                            padding-left: 14%;
-                            padding-top: 5px;
-                            padding-bottom: 5px;
-                        }
-                        svg{
-                            position: absolute;
-                            top: 50%;
-                            left: 5%;
-                            transform: translateY(-50%);
-                        }
-                    }
-                }
-                &-searchStatus{
-                    width: 10%;
-                    position: absolute;
-                    left: 40%;
-                    select{
-                        width: 100%;
-                        border-radius: 20px;
-                        background-color: $primary;
-                        color: white;
-                        outline: none;
-                        border: $pink-color solid 2px;
-                        height: 100%;
-                        padding-left: 14%;
-                        padding-top: 5px;
-                        padding-bottom: 5px;
-                    }
-                }
-                .addBtn{
-                    position: absolute;
-                    right: 0;
-                    background-color: $mixcolor !important;
-                    padding: 5px 10px;
-                    font-size: 0.9em;
-                    background: $mixcolor !important ;
-                    color: white;
-                    border-radius: 5px;
-                    &-icon{
-                        svg{
-                            padding: 0 5px;
-                        }
                     }
                 }
             }

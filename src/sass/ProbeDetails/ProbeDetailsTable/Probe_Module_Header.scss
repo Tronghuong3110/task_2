@@ -15,14 +15,27 @@ $blue-color: #9747FF;
             line-height: 1rem;
             border-bottom: 2px white solid !important;
         }
+        .checkbox{
+            width: 3%;
+            input{
+                vertical-align: middle;
+            }
+        }
         .id{
-            width: 5%;
+            width: 3%;
         }
         .errorPerWeek{
             width: 7%;
+            span{
+                color: white;
+                svg {
+                    opacity: 1;
+                    color: rgb(255 255 255 / 60%) !important;
+                }
+            }
         }
         .module_name{
-            width: 23%;
+            width: 21%;
         }
         .caption{
             width: 11%;
@@ -37,7 +50,7 @@ $blue-color: #9747FF;
             width: 17%;
         }
         .actions{
-            width: 17%;
+            width: 15%;
         }
         .processStatus{
             width: 3%;
