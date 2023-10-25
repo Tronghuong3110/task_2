@@ -114,7 +114,7 @@ public class ProbeModuleService implements IProbeModuleService {
                 topicCheckResultComandRun.add(idCmd + "-" + topicrequestRun.peek().getSubTopic());
 
                 // Create message json
-                String jsonObject = JsonUtil.createJson(probeModuleEntity, "idCmd", Optional.ofNullable(null), Optional.ofNullable(null), "run");
+                String jsonObject = JsonUtil.createJson(probeModuleEntity, idCmd, Optional.ofNullable(null), Optional.ofNullable(null), "run");
                 messageToClient.put(topicrequestRun.peek().getSubTopic(), jsonObject);
                 // gửi tin nhắn
                 System.out.println("Tin nhắn gửi đi " + jsonObject);
@@ -143,7 +143,7 @@ public class ProbeModuleService implements IProbeModuleService {
                             Long time = 0L;
                             // set thời gian chờ là 7s, nếu sau 7s không nhận được kết quả chạy lênh ==> set cmdHistory = failed
                             while ((!checkResultCommand.containsKey(topic) || (checkResultCommand.containsKey(topic) && !checkResultCommand.get(topic))) && time <= 7000) {
-                                Thread.sleep(2000);
+                                Thread.sleep(1000);
                                 time = System.currentTimeMillis() - timeCurrent;
                                 System.out.println("Chờ kết quả của topic " + topic + " " + checkResultCommand.get(topic));
                                 if(checkResultCommand.containsKey(topic) && checkResultCommand.get(topic)) {
@@ -151,16 +151,14 @@ public class ProbeModuleService implements IProbeModuleService {
                                     break;
                                 }
                             }
+                            if(check) continue;
                             System.out.println("Check " + check);
-                            if(!check) {
-                                System.out.println("Không nhận được phản hồi!!!");
-                                responseMessageToFE(probeModule1, "2", 1, null, null);
-                                probeModule1.setLoading(0);
-                                moduleProbeRepository.save(probeModule1);
-
-                                clientStatusMapRun.put(topic, false);
-                                updateCmdHistory(idCmdHistory, 3, 4);
-                            }
+                            System.out.println("Không nhận được phản hồi!!!");
+                            responseMessageToFE(probeModule1, "2", 1, null, null);
+                            probeModule1.setLoading(0);
+                            moduleProbeRepository.save(probeModule1);
+                            clientStatusMapRun.put(topic, false);
+                            updateCmdHistory(idCmdHistory, 3, 4);
                         }
                     }
                 }
@@ -190,7 +188,6 @@ public class ProbeModuleService implements IProbeModuleService {
                 if (probeModuleEntity == null) {
                     return JsonUtil.createJsonResponse("Không tồn tại module có id = " + idProbeModule, "5");
                 }
-
                 probeModuleEntity.setLoading(1);
                 moduleProbeRepository.save(probeModuleEntity);
 
@@ -242,13 +239,12 @@ public class ProbeModuleService implements IProbeModuleService {
                                 break;
                             }
                         }
+                        if(check) continue;
                         System.out.println("check " + check);
-                        if(!check) {
-                            System.out.println("Không nhận được phản hồi!!!");
-                            responseMessageToFE(probeModule, "2", 1, null, null);
-                            updateCmdHistory(idCmdHistory, 3, 4);
-                            clientStatusMapRun.put(topic, false);
-                        }
+                        System.out.println("Không nhận được phản hồi!!!");
+                        responseMessageToFE(probeModule, "2", 1, null, null);
+                        updateCmdHistory(idCmdHistory, 3, 4);
+                        clientStatusMapRun.put(topic, false);
                     }
                 }
             }
@@ -342,6 +338,7 @@ public class ProbeModuleService implements IProbeModuleService {
     // Cập nhật trạng thái của lịch sử gửi lệnh từ server tới client
     private void updateCmdHistory(String idCmd, Integer retry, Integer status) {
         CmdHistoryEntity cmdHistoryEntity = cmdHistoryRepository.findById(idCmd).orElse(null);
+        System.out.println("IDCMD " + idCmd);
         System.out.println("Cập nhật lại cmd history");
         if(retry >= 0) {
             cmdHistoryEntity.setRetryTimes(retry);
@@ -360,13 +357,10 @@ public class ProbeModuleService implements IProbeModuleService {
         }
         cmdHistoryRepository.save(cmdHistoryEntity);
     }
-    // tạo json gửi đến front end
+    // cập nhật lại trường loadding
     private void responseMessageToFE(ProbeModuleEntity probeModuleEntity, String status, Integer statusExcept, String pId, JSONObject responseMessage) {
         String statusResult = statusResult(statusExcept, status);
-        if(responseMessage != null) {
-            saveModuleHistory(status, statusExcept, probeModuleEntity, pId, responseMessage);
-        }
-        // set lại trường loading = 0(đã loading xong)
+        probeModuleEntity.setStatus(statusResult);
         probeModuleEntity.setLoading(0);
         moduleProbeRepository.save(probeModuleEntity);
     }
@@ -382,7 +376,7 @@ public class ProbeModuleService implements IProbeModuleService {
             ModuleHistoryEntity moduleHistoryEntity = new ModuleHistoryEntity();
             String id = String.valueOf(System.nanoTime());
             moduleHistoryEntity.setIdModuleHistory(id);
-            moduleHistoryEntity.setIdProbe((Integer) responseMessage.get(""));
+            moduleHistoryEntity.setIdProbe(Integer.parseInt(responseMessage.get("id_probe").toString()));
             moduleHistoryEntity.setContent((String)responseMessage.get("content"));
             moduleHistoryEntity.setTitle((String)responseMessage.get("title"));
             moduleHistoryEntity.setAtTime(new Date(System.currentTimeMillis()));
@@ -508,6 +502,7 @@ public class ProbeModuleService implements IProbeModuleService {
             } else {
                 probeModule.setProcessStatus(2); // dừng
                 probeModule.setExpectStatus(0);
+                probeModule.setErrorPerWeek(0);
                 probeModule.setCommand(cmd);
                 probeModule.setStatus("Stopped");
                 moduleProbeRepository.save(probeModule);
@@ -617,8 +612,6 @@ public class ProbeModuleService implements IProbeModuleService {
         String status = (String) response.get("statusModule");
         updateCmdHistory(idCmd, -1, 1);
         if (status.equals("1") || status.equals("2")) {
-            System.out.println("Status cmd " + response.get("message"));
-            // cập nhật status probe_module
             String pId = (String) response.get("PID");
             if(pId != null && !pId.equals(-1)) {
                 probeModuleEntity.setProcessId(pId);
@@ -628,7 +621,10 @@ public class ProbeModuleService implements IProbeModuleService {
             probeModuleEntity.setStatus(statusResult);
             saveModuleHistory(status, statusExcept, null, null, response);
             probeModuleEntity.setLoading(0);
-            moduleProbeRepository.save(probeModuleEntity);
+            probeModuleEntity = moduleProbeRepository.save(probeModuleEntity);
+            probeModuleEntityMapRun.put(topic, probeModuleEntity);
+            System.out.println("Status " + probeModuleEntity.getStatus());
+            // cập nhật status probe_module
         }
     }
     // gửi lại tin nhắn trong TH chạy module
@@ -641,7 +637,8 @@ public class ProbeModuleService implements IProbeModuleService {
                 MqttMessage message = new MqttMessage(mess.getBytes());
                 message.setQos(2);
                 Integer retry = 0;
-                String idCmd = topicCheckResultRun.get(topic.split("-")[0]);
+                String idCmd = topicCheckResultRun.get(topic).split("-")[0];
+                System.out.println("id cmd trong TH gửi lại " + idCmd);
                 int loop = 0;
                 while (loop <= 5) {
                     if(clientStatusMapRun.containsKey(topic) && clientStatusMapRun.get(topic)) {
@@ -661,8 +658,10 @@ public class ProbeModuleService implements IProbeModuleService {
                         }
                         // không tồn tại hoặc tồn tại những == false và số lần gửi vượt quá quy định
                         else if (!clientStatusMapRun.containsKey(topic) || (clientStatusMapRun.containsKey(topic) && !clientStatusMapRun.get(topic)) && retry > 2) {
-                            if (retry > 2) {
-                                System.out.println("TH gửi lại quá số lần quy định ");
+                            System.out.println("TH gửi lại quá số lần quy định ");
+                            // kiểm tra cmdHistory đã được cập nhật thành công chưa
+                            CmdHistoryEntity cmdHistoryEntity = cmdHistoryRepository.findById(idCmd).orElse(null);
+                            if(cmdHistoryEntity == null || cmdHistoryEntity.getMessage().equals("")) {
                                 if(!clientStatusMapRun.containsKey(topic) || (clientStatusMapRun.containsKey(topic) && !clientStatusMapRun.get(topic))) {
                                     updateCmdHistory(idCmd, 3, 4);
                                 }
@@ -684,8 +683,8 @@ public class ProbeModuleService implements IProbeModuleService {
                                     checkErrorMapRun.put(topic, true);
                                     break; // Thoát khỏi luồng khi xử lý xong
                                 }
-
                             }
+                            break;
                         }
                         // tồn tại và bằng true
                         else if (clientStatusMapRun.containsKey(topic) && clientStatusMapRun.get(topic)) {
@@ -714,7 +713,7 @@ public class ProbeModuleService implements IProbeModuleService {
                 message.setQos(2);
                 Integer retry = 0;
                 Boolean check = false;
-                String idCmd = topicCheckResultStop.get(topic.split("-")[0]);
+                String idCmd = topicCheckResultStop.get(topic).split("-")[0];
                 ProbeModuleEntity probeModuleCheck = moduleProbeRepository.findById(probeModule.getId()).orElse(null);
                 if(probeModuleCheck!=null && !probeModuleCheck.getStatus().equals("Stopped") && !probeModuleCheck.equals(probeModule.getStatus())) {
                     check = true;
@@ -727,12 +726,14 @@ public class ProbeModuleService implements IProbeModuleService {
                         System.out.println("Topic " + topic + (clientStatusMapStop.containsKey(topic) ? clientStatusMapStop.get(topic) : "null"));
                         if (retry <= 2 && (!clientStatusMapStop.containsKey(topic) || (clientStatusMapStop.containsKey(topic) && !clientStatusMapStop.get(topic)))) {
                             System.out.println("TH gửi lại");
+                            System.out.println("TH gửi lại");
                             retry++;
                             client.publish(topic, message);
                         }
                         // không tồn tại hoặc tồn tại những == false và số lần gửi vượt quá quy định
                         else if (!clientStatusMapStop.containsKey(topic) || (clientStatusMapStop.containsKey(topic) && !clientStatusMapStop.get(topic)) && retry > 2) {
-                            if (retry > 2) {
+                            CmdHistoryEntity cmdHistoryEntity = cmdHistoryRepository.findById(idCmd).orElse(null);
+                            if(cmdHistoryEntity == null || cmdHistoryEntity.getMessage().equals("")) {
                                 System.out.println("TH gửi lại quá số lần quy định ");
                                 if(!clientStatusMapStop.containsKey(topic) || (clientStatusMapStop.containsKey(topic) && !clientStatusMapStop.get(topic))) {
                                     updateCmdHistory(idCmd, 3, 4);
@@ -757,6 +758,7 @@ public class ProbeModuleService implements IProbeModuleService {
                                     break; // Thoát khỏi luồng khi xử lý xong
                                 }
                             }
+                            break;
                         }
                         // tồn tại và bằng true
                         else if (clientStatusMapStop.containsKey(topic) && clientStatusMapStop.get(topic)) {
@@ -844,6 +846,12 @@ public class ProbeModuleService implements IProbeModuleService {
                                     System.out.println("Status cmd " + json.get("message"));
                                     // lưu lại kết quả của module
                                     solveResponseMessage(topic, json, probeModuleEntityMapStop.get(topic), topicCheckResultStop.get(topic).split("-")[0], 2);
+                                    try {
+                                        Thread.sleep(3000);
+                                    }
+                                    catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
                                     clientStatusMapStop.put(topic, false);
                                 }
                             }
@@ -854,6 +862,12 @@ public class ProbeModuleService implements IProbeModuleService {
                                 if(!pid.equals("")) {
                                     checkResultCommand.put(topic, true); // đánh dấu đã nhận được kết quả lệnh từ client
                                     solveResponseMessage(topic, json, probeModuleEntityMapRun.get(topic), topicCheckResultRun.get(topic).split("-")[0], 1);
+                                    try {
+                                        Thread.sleep(3000);
+                                    }
+                                    catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
                                     clientStatusMapRun.put(topic, false);
                                 }
                             }

@@ -53,6 +53,9 @@ public class ProbeModuleController {
     @PostMapping("/probeModule/restart")
     public CompletableFuture<ResponseEntity<?>> restartModule(@RequestParam("idProbeModule") String idProbeModule){
         return CompletableFuture.supplyAsync(() -> {
+            if(idProbeModule.equals("")) {
+                return ResponseEntity.badRequest().body(0);
+            }
             ArrayList<String> listIpModule = new ArrayList<>(Arrays.asList(idProbeModule.split(" ")));
             for(String id : listIpModule) {
                 try {
@@ -72,6 +75,9 @@ public class ProbeModuleController {
     @PostMapping("/probeModule/run")
     public CompletableFuture<ResponseEntity> runModule(@RequestParam("idProbeModule") String idProbeModule) {
         return CompletableFuture.supplyAsync(() -> {
+            if(idProbeModule.equals("")) {
+                return ResponseEntity.badRequest().body(0);
+            }
             ArrayList<String> listIpModule = new ArrayList<>(Arrays.asList(idProbeModule.split(" ")));
             for(String id : listIpModule) {
                 try {
@@ -90,6 +96,9 @@ public class ProbeModuleController {
     @PostMapping("/probeModule/stop")
     public CompletableFuture<ResponseEntity<?>> stopModule(@RequestParam("idProbeModule") String idProbeModule) {
         return CompletableFuture.supplyAsync(() -> {
+            if(idProbeModule.equals("")) {
+                return ResponseEntity.badRequest().body(0);
+            }
             System.out.println("id " + idProbeModule);
             ArrayList<String> listIpModule = new ArrayList<>(Arrays.asList(idProbeModule.split(" ")));
             for(String id : listIpModule) {
