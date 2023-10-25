@@ -39,6 +39,7 @@ const Probe_Modules = ({ id }) => {
         "status": "All"
     })
     const [checkAllPages, setCheckAllPages] = useState([])
+    const [doneAction,setDoneAction] = useState(true)
     useEffect(() => {
         getProbeModules()
     }, [])
@@ -125,7 +126,9 @@ const Probe_Modules = ({ id }) => {
     }
     /** Run or Restart or Stop module */
     const actionWithModule = (id, action) => {
-        console.log(id)
+        let arrBtn = document.querySelectorAll(".actionBtn")
+        console.log(arrBtn)
+        arrBtn.forEach(btn => btn.setAttribute("disabled",true))
         fetch("http://" + IP + ":8081/api/v1/probeModule/" + action)
             .then(response => response.text())
             .then(data => {
@@ -405,7 +408,7 @@ const Probe_Modules = ({ id }) => {
                                                 <TableCell className='actions' >
                                                     <div className='actions-container d-flex justify-content-between'>
                                                         <div className='action'>
-                                                            <button
+                                                            <button className='actionBtn'
                                                                 disabled={module.loading}
                                                                 onClick={() => {
                                                                     actionWithModule(module.id, "run")
@@ -415,7 +418,7 @@ const Probe_Modules = ({ id }) => {
                                                             </button>
                                                         </div>
                                                         <div className='action'>
-                                                            <button
+                                                            <button className='actionBtn'
                                                                 disabled={module.loading}
                                                                 onClick={() => {
                                                                     actionWithModule(module.id, "restart")
@@ -425,8 +428,8 @@ const Probe_Modules = ({ id }) => {
                                                             </button>
                                                         </div>
                                                         <div className='action'>
-                                                            <button
-                                                                disabled={module.loading}
+                                                            <button className='actionBtn'
+                                                                disabled={module.loading && (module.status=="Stopped"||module.status=="Failed")?false:true}
                                                                 onClick={() => {
                                                                     actionWithModule(module.id, "stop")
                                                                 }}
