@@ -26,8 +26,10 @@ public class ApiCheckConnect {
                 System.out.println("Kiểm tra client có clientId la " + clientId + " có còn kết nối hay không?");
                 Object data = jsonObject.get("connected");
                 System.out.println("Kết Quả " + data);
-                if(data.equals("true"))
+                if(data.equals(true)) {
+                    System.out.println("Kết quả cuối cùng " + data);
                     return true;
+                }
             }
             catch (Exception e){
                 Object messageCode = jsonObject.get("code");

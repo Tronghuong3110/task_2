@@ -25,13 +25,14 @@ public interface ProbeRepository extends JpaRepository<ProbeEntity, Integer> {
                                                        @Param("area") String area,
                                                        @Param("vlan") String vlan);
 
-    @Query(value = "select * from probemodule.probe where deleted = :deleted ", nativeQuery = true)
-    List<ProbeEntity> findProbeByStatus(@Param("deleted") Integer deleted);
+//    @Query(value = "select * from probemodule.probe where deleted = :deleted ", nativeQuery = true)
+    List<ProbeEntity> findProbeByDeletedAndStatus(Integer deleted, String status);
 
     Integer countAllByStatus(String status);
     Optional<ProbeEntity> findByName(String name);
     Optional<ProbeEntity> findByIpAddress(String ipAddress);
     Optional<ProbeEntity> findByIdAndDeleted(Integer id, Integer deleted);
+    Optional<ProbeEntity> findByIdAndStatus(Integer id, String status);
 }
 
 

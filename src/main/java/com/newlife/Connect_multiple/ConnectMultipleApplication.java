@@ -15,18 +15,18 @@ public class ConnectMultipleApplication {
 	public static void main(String[] args) {
 		ApplicationContext applicationContext = SpringApplication.run(ConnectMultipleApplication.class, args);
 //		CompletableFuture.runAsync(() -> {
-//		while (true) {
-//			try {
-//				ProbeModuleService probeModuleService = applicationContext.getBean(ProbeModuleService.class);
-//				probeModuleService.getStatusModulePeriodically();
-//				System.out.println("Test");
-//				Thread.sleep(30000);
-//			}
-//			catch (Exception e) {
-//				System.out.println("Kiểm tra status theo chu kì lỗi rồi");
-//				e.printStackTrace();
-//			}
-//		}
+		while (true) {
+			try {
+				ProbeModuleService probeModuleService = applicationContext.getBean(ProbeModuleService.class);
+				probeModuleService.getStatusModulePeriodically();
+				System.out.println("Test");
+				Thread.sleep(30000);
+			}
+			catch (Exception e) {
+				System.out.println("Kiểm tra status theo chu kì lỗi rồi");
+				e.printStackTrace();
+			}
+		}
 //		}, executorService);
 	}
 }

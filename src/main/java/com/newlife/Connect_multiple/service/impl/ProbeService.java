@@ -269,16 +269,20 @@ public class ProbeService implements IProbeService {
                     return json;
                 }
             }
-            //phục vụ cho việc yêu cầu kết nối và ngắt kết nối tới broker
-            if(probeDto.getStatus() != null && probeDto.getStatus().equals("connected")) {
+
+            if(probeDto.getStatus() != null ) { // TH admin yêu cầu probe ngắt kết nối tới broker hoặc kết nối ới broker
+                // 3 trạng thái: error, connected, disconnect
+                // probeDto.getStatus().equals("connected")
                 Boolean checkConnectToBroker = ApiCheckConnect.checkExistClient(probeEntity.getClientId());
-                if(!checkConnectToBroker) {
+                System.out.println("Check connect " + checkConnectToBroker);
+                if(!checkConnectToBroker) { // TH probe chưa chạy ứng dụng ==> không thể yêucaaufu kết nối tới broker
                     probeEntity.setStatus("error");
                     probeEntity = probeRepository.save(probeEntity);
                     json.put("code", "0");
                     json.put("message", "Probe có IP là " + probeEntity.getIpAddress() + " chưa được cài đặt, không thể thực hiện connect");
                     return json;
                 }
+                probeEntity.setStatus(probeDto.getStatus());
             }
             // lưu thông tin lịch sử khi cập nhật probe
             try {

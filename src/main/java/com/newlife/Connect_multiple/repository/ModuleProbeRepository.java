@@ -1,5 +1,6 @@
 package com.newlife.Connect_multiple.repository;
 
+import com.newlife.Connect_multiple.entity.ProbeEntity;
 import com.newlife.Connect_multiple.entity.ProbeModuleEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

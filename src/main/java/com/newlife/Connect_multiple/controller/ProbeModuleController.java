@@ -2,15 +2,12 @@ package com.newlife.Connect_multiple.controller;
 
 import com.newlife.Connect_multiple.dto.ProbeModuleDto;
 import com.newlife.Connect_multiple.service.IProbeModuleService;
-import com.newlife.Connect_multiple.util.JsonUtil;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -54,37 +51,57 @@ public class ProbeModuleController {
 
     // chạy lại module (Hướng)
     @PostMapping("/probeModule/restart")
-    public CompletableFuture<ResponseEntity<?>> restartModule(@RequestParam("idProbeModule") Optional<Integer> idProbeModule){
+    public CompletableFuture<ResponseEntity<?>> restartModule(@RequestParam("idProbeModule") String idProbeModule){
         return CompletableFuture.supplyAsync(() -> {
-            JSONObject responseMessage = new JSONObject();
-            JSONObject responseStop = (JSONObject) probeModuleService.stopModule(idProbeModule.orElse(0));
-            if(responseStop.get("status").equals("Stopped")) { // TH stop module thành công
-                // Run module
-                return ResponseEntity.ok(probeModuleService.runModule(idProbeModule.orElse(0)));
+            ArrayList<String> listIpModule = new ArrayList<>(Arrays.asList(idProbeModule.split(" ")));
+            for(String id : listIpModule) {
+                try {
+                    Object responseStop = probeModuleService.stopModule(Integer.parseInt(id));
+                    Object runModule = probeModuleService.runModule(Integer.parseInt(id));
+//                    Thread.sleep(3000);
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-            // TH stop module thất bại
-            responseMessage.put("message", "Dừng module thất bại, không thể restart module");
-            responseMessage.put("status", 4);
-            return new ResponseEntity<>(responseMessage, HttpStatus.BAD_REQUEST);
+            return ResponseEntity.ok(1);
         }, executorService);
     }
 
-
     // chạy module (Hướng)
     @PostMapping("/probeModule/run")
-    public CompletableFuture<ResponseEntity<?>> runModule(@RequestParam("idProbeModule") Optional<Integer> idProbeModule) {
+    public CompletableFuture<ResponseEntity> runModule(@RequestParam("idProbeModule") String idProbeModule) {
         return CompletableFuture.supplyAsync(() -> {
-            Object jsonObject = probeModuleService.runModule(idProbeModule.orElse(0));
-            return ResponseEntity.ok(jsonObject);
+            ArrayList<String> listIpModule = new ArrayList<>(Arrays.asList(idProbeModule.split(" ")));
+            for(String id : listIpModule) {
+                try {
+                    Object jsonObject = probeModuleService.runModule(Integer.parseInt(id));
+//                    Thread.sleep(3000);
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            return ResponseEntity.ok(1);
         }, executorService);
     }
 
     // stop module (Hướng)
     @PostMapping("/probeModule/stop")
-    public CompletableFuture<ResponseEntity<?>> stopModule(@RequestParam("idProbeModule") Optional<Integer> idProbeModule) {
+    public CompletableFuture<ResponseEntity<?>> stopModule(@RequestParam("idProbeModule") String idProbeModule) {
         return CompletableFuture.supplyAsync(() -> {
-            Object jsonObject = probeModuleService.stopModule(idProbeModule.orElse(0));
-            return ResponseEntity.ok(jsonObject);
+            System.out.println("id " + idProbeModule);
+            ArrayList<String> listIpModule = new ArrayList<>(Arrays.asList(idProbeModule.split(" ")));
+            for(String id : listIpModule) {
+                try {
+                    Object jsonObject = probeModuleService.stopModule(Integer.parseInt(id));
+//                    Thread.sleep(3000);
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            return ResponseEntity.ok(1);
         }, executorService);
     }
 
@@ -117,5 +134,18 @@ public class ProbeModuleController {
             Integer module = probeModuleService.countModuleByStatus(status);
             return module;
         }, executorService);
+    }
+
+    @GetMapping("/probeModule/run")
+    public String runModuleResponse() {
+        return "1";
+    }
+    @GetMapping("/probeModule/stop")
+    public String stopModuleResponse() {
+        return "1";
+    }
+    @GetMapping("/probeModule/restart")
+    public String restartModuleResponse() {
+        return "1";
     }
 }

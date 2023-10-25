@@ -87,6 +87,8 @@ public class ProbeController {
     @PutMapping("/probe")
     public CompletableFuture<JSONObject> updateProbe(@RequestBody ProbeDto probeDto) {
         return CompletableFuture.supplyAsync(() -> {
+            System.out.println("ID probe" + probeDto.getId());
+            System.out.println("Status of controller " + probeDto.getStatus());
             JSONObject message = probeService.updateProbe(probeDto);
             return message;
         }, executorService);
