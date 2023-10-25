@@ -42,7 +42,7 @@ const Probe_Modules = ({ id }) => {
     const [doneAction,setDoneAction] = useState(true)
     useEffect(() => {
         getProbeModules()
-    }, [])
+    }, [doneAction])
     useEffect(() => {
         let name = conditions.name;
         let status = conditions.status;
@@ -126,9 +126,7 @@ const Probe_Modules = ({ id }) => {
     }
     /** Run or Restart or Stop module */
     const actionWithModule = (id, action) => {
-        let arrBtn = document.querySelectorAll(".actionBtn")
-        console.log(arrBtn)
-        arrBtn.forEach(btn => btn.setAttribute("disabled",true))
+        setDoneAction(false)
         fetch("http://" + IP + ":8081/api/v1/probeModule/" + action)
             .then(response => response.text())
             .then(data => {
@@ -150,14 +148,7 @@ const Probe_Modules = ({ id }) => {
                     .then(response => response.text())
                     .then(data => {
                         check = data
-                        // const updateProbeModules = setInterval(() => {
-                        //     getProbeModules()
-                        // }, 2000);
-                        // if (check == 1) {
-                        //     clearInterval(updateProbeModules())
-                        //     setSelectedProbeModules([])
-                        //     setCheckAllPages([])
-                        // }
+                        setDoneAction(true)
                     })
                     .catch(err => console.log(err))
                     setInterval(() => {
@@ -409,7 +400,7 @@ const Probe_Modules = ({ id }) => {
                                                     <div className='actions-container d-flex justify-content-between'>
                                                         <div className='action'>
                                                             <button className='actionBtn'
-                                                                disabled={module.loading}
+                                                                disabled={doneAction && module.loading}
                                                                 onClick={() => {
                                                                     actionWithModule(module.id, "run")
                                                                 }}
@@ -419,7 +410,7 @@ const Probe_Modules = ({ id }) => {
                                                         </div>
                                                         <div className='action'>
                                                             <button className='actionBtn'
-                                                                disabled={module.loading}
+                                                                disabled={doneAction && module.loading}
                                                                 onClick={() => {
                                                                     actionWithModule(module.id, "restart")
                                                                 }}
@@ -429,7 +420,7 @@ const Probe_Modules = ({ id }) => {
                                                         </div>
                                                         <div className='action'>
                                                             <button className='actionBtn'
-                                                                disabled={module.loading && (module.status=="Stopped"||module.status=="Failed")?false:true}
+                                                                disabled={doneAction &&module.loading && (module.status=="Stopped"||module.status=="Failed")?false:true}
                                                                 onClick={() => {
                                                                     actionWithModule(module.id, "stop")
                                                                 }}
