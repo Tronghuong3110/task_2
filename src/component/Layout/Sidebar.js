@@ -9,6 +9,7 @@ import {
     faDisplay,
     faHouse
 } from '@fortawesome/free-solid-svg-icons'
+import { Link } from 'react-router-dom';
 const Sidebar = () => {
     return (
         <div className="sidebar">
@@ -19,34 +20,44 @@ const Sidebar = () => {
             </div>
             <div className="sidebar-selections">
                 <div className="selection d-flex" id="dashboard">
-                    <div className="selection-symbol d-flex align-items-center">
-                        <FontAwesomeIcon icon={faHouse} style={{ color: "#ffffff", fontSize: "1em" }} />
-                    </div>
-                    <div className="selection-text d-flex align-items-center">Dashbroad</div>
+                    <Link>
+                        <div className="selection-symbol d-flex align-items-center">
+                            <FontAwesomeIcon icon={faHouse} style={{ color: "#ffffff", fontSize: "1em" }} />
+                        </div>
+                        <div className="selection-text d-flex align-items-center">Dashbroad</div>
+                    </Link>
                 </div>
                 <div className="selection d-flex" id="modules">
-                    <div className="selection-symbol d-flex align-items-center">
-                        <FontAwesomeIcon icon={faCube} style={{ color: "#ffffff", fontSize: "1em" }} />
-                    </div>
-                    <div className="selection-text d-flex align-items-center">Modules</div>
+                    <Link to={"/modules"}>
+                        <div className="selection-symbol d-flex align-items-center">
+                            <FontAwesomeIcon icon={faCube} style={{ color: "#ffffff", fontSize: "1em" }} />
+                        </div>
+                        <div className="selection-text d-flex align-items-center">Modules</div>
+                    </Link>
                 </div>
                 <div className="selection d-flex" id="probes">
-                    <div className="selection-symbol d-flex align-items-center">
-                        <FontAwesomeIcon icon={faDisplay} style={{ color: "#ffffff", fontSize: "1em" }} />
-                    </div>
-                    <div className="selection-text d-flex align-items-center">Probes</div>
+                    <Link to={"/"}>
+                        <div className="selection-symbol d-flex align-items-center">
+                            <FontAwesomeIcon icon={faDisplay} style={{ color: "#ffffff", fontSize: "1em" }} />
+                        </div>
+                        <div className="selection-text d-flex align-items-center">Probes</div>
+                    </Link>
                 </div>
                 <div className="selection d-flex" id="history">
-                    <div className="selection-symbol d-flex align-items-center">
-                        <FontAwesomeIcon icon={faClockRotateLeft} style={{ color: "#ffffff", fontSize: "1em" }} />
-                    </div>
-                    <div className="selection-text d-flex align-items-center">History</div>
+                    <Link>
+                        <div className="selection-symbol d-flex align-items-center">
+                            <FontAwesomeIcon icon={faClockRotateLeft} style={{ color: "#ffffff", fontSize: "1em" }} />
+                        </div>
+                        <div className="selection-text d-flex align-items-center">History</div>
+                    </Link>
                 </div>
                 <div className="selection d-flex" id="statistic">
-                    <div className="selection-symbol d-flex align-items-center">
-                        <FontAwesomeIcon icon={faChartLine} style={{ color: "#ffffff", fontSize: "1em" }} />
-                    </div>
-                    <div className="selection-text d-flex align-items-center">Statistic</div>
+                    <Link>
+                        <div className="selection-symbol d-flex align-items-center">
+                            <FontAwesomeIcon icon={faChartLine} style={{ color: "#ffffff", fontSize: "1em" }} />
+                        </div>
+                        <div className="selection-text d-flex align-items-center">Statistic</div>
+                    </Link>
                 </div>
             </div>
         </div>

@@ -1,0 +1,19 @@
+$primary: #0b0c24;
+$secondary: #27293d;
+$pink-color: #E14ECA;
+$blue-color: #1647F3;
+
+footer {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .company-tag {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: rgb(163, 163, 163);
+        font-size: 0.9em;
+    }
+}

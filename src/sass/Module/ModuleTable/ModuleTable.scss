@@ -2,13 +2,56 @@ $primary: #0b0c24;
 $secondary: #27293d;
 $pink-color: #E14ECA;
 $blue-color: #9747FF;
-
+$mixcolor: linear-gradient(90deg, $pink-color, $blue-color);
 .Module_Table {
     margin-top: 2em;
+    .searchBar {
+        width: 100%;
+        padding-bottom: 20px ;
+        .searchName {
+            width: 30%;
+            position: relative;
+
+            input {
+                width: 100%;
+                background-color: $primary;
+                outline: none;
+                border: 2px solid $pink-color;
+                border-radius: 10px;
+                padding: 5px 0;
+                padding-left: 8%;
+                color: white;
+                font-size: 0.8em;
+            }
+
+            svg {
+                position: absolute;
+                color: white;
+                top: 50%;
+                transform: translateY(-50%);
+                left: 3%;
+            }
+        }
+
+        .addModule {
+            .addModuleButton {
+                padding: 5px 10px;
+                background: $mixcolor;
+                border-radius: 5px;
+                color: white;
+
+                &-icon {
+                    padding: 0 5px;
+                }
+            }
+        }
+    }
+
     table {
         background-color: $primary;
         table-layout: fixed;
         border-radius: 10px;
+
         thead {
             tr {
                 th {
@@ -49,14 +92,15 @@ $blue-color: #9747FF;
 
         tbody {
             td {
-                font-size: 0.7rem ;
-                color: white ;
-                text-align: center ;
-                padding: 5px ;
+                font-size: 0.7rem;
+                color: white;
+                text-align: center;
+                padding: 5px;
                 height: fit-content;
-                border: none ;
+                border: none;
                 line-height: 1rem;
                 border-top: 2px white solid;
+
                 div {
                     white-space: nowrap;
                     overflow: hidden;
@@ -87,5 +131,27 @@ $blue-color: #9747FF;
             }
         }
 
+    }
+    .css-jtlhu6-MuiTablePagination-root {
+        position: absolute;
+        bottom: 0;
+        overflow: unset;
+        color: white;
+        font-size: 0.7em !important;
+        display: flex;
+        align-items: center;
+
+        p {
+            margin: 0;
+        }
+
+        .css-194a1fa-MuiSelect-select-MuiInputBase-input {
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+        }
+        svg{
+            color: white;
+        }
     }
 }

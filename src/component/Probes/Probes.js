@@ -16,6 +16,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { ProbesProvider, ProbesContext } from "./ProbesTable/ProbesContext";
 import Confirm from '../action/Confirm'
+import { IP } from "../Layout/constaints";
 
 const Probes = () => {
     const [isOpen, openCloseWindow] = useState(false);
@@ -26,7 +27,7 @@ const Probes = () => {
     const probesContext = useContext(ProbesContext)
     //Hàm hiển thị select location và area
     useEffect(() => {
-        fetch("http://localhost:8081/api/v1/locations")
+        fetch("http://"+IP+":8081/api/v1/locations")
             .then(response => response.json())
             .then(data => setLocation(data))
             .catch(err => console.log(err))
@@ -42,6 +43,9 @@ const Probes = () => {
             }
         }
     }, [selectedLocation])
+    useEffect(()=>{
+        document.querySelector(".header-name").textContent = "PROBES"
+    },[])
     const handleOptionSelectLocation = (selectedValue) => {
         setSelectedLocation(selectedValue);
         setSelectedArea(null)
@@ -67,7 +71,9 @@ const Probes = () => {
         console.log(conditions)
         probesContext.setConditions(conditions)
     }
-
+    // const getProbes = setInterval(()=>{
+    //     probesContext.probes
+    // })
     return (
         <div className="probes">
             <div className="probes-action-buttonAdd">

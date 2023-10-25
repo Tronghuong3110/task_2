@@ -7,7 +7,7 @@ $blue-color: #9747FF;
     table {
         margin-top: 20px !important;
         table-layout: fixed;
-
+        position: relative;
         tbody {
             tr {
                 td {
@@ -108,25 +108,25 @@ $blue-color: #9747FF;
             }
         }
 
-        .css-jtlhu6-MuiTablePagination-root {
-            position: absolute;
-            bottom: 0;
-            overflow: unset;
-            color: white;
-            font-size: 0.7em !important;
+        
+    }
+    .css-jtlhu6-MuiTablePagination-root {
+        position: absolute;
+        bottom: 0;
+        overflow: unset;
+        color: white;
+        font-size: 0.7em !important;
+        display: flex;
+        align-items: center;
+
+        p {
+            margin: 0;
+        }
+
+        .css-194a1fa-MuiSelect-select-MuiInputBase-input {
+            font-size: 1.5em;
             display: flex;
             align-items: center;
-
-            p {
-                margin: 0;
-            }
-
-            .css-194a1fa-MuiSelect-select-MuiInputBase-input {
-                font-size: 1.5em;
-                display: flex;
-                align-items: center;
-            }
-
         }
 
     }

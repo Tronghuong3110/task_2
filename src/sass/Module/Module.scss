@@ -5,57 +5,12 @@ $blue-color: #9747FF;
 $mixcolor: linear-gradient(90deg, $pink-color, $blue-color);
 
 .module {
-    height: 80%;
+    height: 78.5vh;
     padding: 20px;
     font-size: 0.8em !important;
     width: 100%;
     background-color: $secondary;
     border-radius: 30px;
     box-sizing: border-box;
-
-    .title {
-        color: white;
-        font-size: 1.1em;
-
-        &-icon {
-            padding: 5px;
-        }
-    }
-
-    .searchBar {
-        width: 100%;
-        .searchName {
-            width: 30%;
-            position: relative;
-            input {
-                width: 100%;
-                background-color: $primary;
-                outline: none;
-                border: 2px solid $pink-color;
-                border-radius: 10px;
-                padding: 5px 0;
-                padding-left: 8%;
-                color: white;
-                font-size: 0.8em;
-            }
-            svg{
-                position: absolute;
-                color: white;
-                top: 50%;
-                transform: translateY(-50%);
-                left: 3%;
-            }
-        }
-        .addModule{
-            .addModuleButton{
-                padding: 5px 10px;
-                background: $mixcolor;
-                border-radius: 5px;
-                color: white;
-                &-icon{
-                    padding : 0 5px;
-                }
-            }
-        }
-    }
+    position: relative;
 }

@@ -16,6 +16,7 @@ import { Routes, Route, Link } from 'react-router-dom';
 import Confirm from '../../action/Confirm';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { IP } from '../../Layout/constaints';
 const ProbesTable = () => {
     const probesContext = useContext(ProbesContext)
     const [probes, setProbes] = useState(probesContext.probes)
@@ -45,16 +46,19 @@ const ProbesTable = () => {
                     'Content-Type': 'application/json'
                 }
             };
-            fetch("http://localhost:8081/api/v1/probe?id=" + deletingProbe.id, options)
+            fetch("http://" + IP + ":8081/api/v1/probe?id=" + deletingProbe.id, options)
                 .then(response => response.json())
                 .then(data => {
                     const newArray = probes.filter(item => item.id !== deletingProbe.id);
                     setProbes(newArray);
-                    notify(data.message,data.code)
+                    notify(data.message, data.code)
                 })
                 .catch(err => console.log(err))
         }
     }, [userChoice, deletingProbe])
+    const getProbeContinues = () => {
+        setInterval(probesContext.getProbes(), 2000)
+    }
     /*Sắp xếp theo status*/
     const handleRequestSort = (event, property) => {
         const isAscending = (valueToOrderBy === property && orderDirection === 'asc')
@@ -93,6 +97,7 @@ const ProbesTable = () => {
         setPage(0)
     }
     const handleOnSwitch = (id, status) => {
+        console.log("PUT")
         const requestOptions = {
             method: 'PUT',
             headers: {
@@ -103,10 +108,11 @@ const ProbesTable = () => {
                 "status": status == 'connected' ? "disconnected" : "connected"
             })
         };
-        fetch("http://localhost:8081/api/v1/probe", requestOptions)
-            .then(respone => respone.text())
+        fetch("http://" + IP + ":8081/api/v1/probe", requestOptions)
+            .then(respone => respone.json())
             .then(data => {
-                if (data == "Update probe success") {
+                console.log(data)
+                if (data.code == "1") {
                     const updatedItems = probesContext.probes.map(item => {
                         if (item.id === id) {
                             return { ...item, status: status == 'connected' ? "disconnected" : "connected" };
@@ -114,10 +120,10 @@ const ProbesTable = () => {
                         return item;
                     })
                     probesContext.setProbes(updatedItems);
-                    alert("Thanh cong")
+                    notify(data.message, data.code)
                 }
                 else {
-                    alert("Loi")
+                    notify(data.message, data.code)
                 }
             })
             .catch(err => console.log(err))
@@ -183,6 +189,7 @@ const ProbesTable = () => {
     }
     return (
         <div className='Probe_Table'>
+            {getProbeContinues}
             <Table>
                 <TableHeader
                     orderDirection={orderDirection}
@@ -191,7 +198,7 @@ const ProbesTable = () => {
                 ></TableHeader>
                 <TableBody>
                     {
-                        sortedProbes(probes, getComparator(orderDirection, valueToOrderBy))
+                        probesContext.probes.length != 0 ? (sortedProbes(probes, getComparator(orderDirection, valueToOrderBy))
                             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                             .map((probe, index) => {
                                 return (
@@ -253,22 +260,26 @@ const ProbesTable = () => {
                                         </TableCell>
                                     </TableRow>
                                 )
-                            })
+                            })) : (
+                            <TableRow style={{ border: "none" }}>
+                                <TableCell colSpan={15} >There is no probe in the list</TableCell>
+                            </TableRow>
+                        )
+
                     }
                 </TableBody>
-                {
-                    probes.length == 0 ? false : true && <TablePagination
-                        rowsPerPageOptions={[7, 10]}
-                        component="div"
-                        count={probes.length}
-                        rowsPerPage={rowsPerPage}
-                        page={page}
-                        onPageChange={handleChangePage}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
-                    ></TablePagination>
-                }
             </Table>
-            <ToastContainer></ToastContainer>
+            {
+                probes.length == 0 ? false : true && <TablePagination
+                    rowsPerPageOptions={[7, 10]}
+                    component="div"
+                    count={probes.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                ></TablePagination>
+            }
             {isOpenDeleteScreen && <Confirm confirmContent={deletingProbe} setOpenDeleteScreen={setOpenDeleteScreen} onUserChoice={handleUserChoice} ></Confirm>}
         </div>
     )

@@ -8,6 +8,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
+import { IP } from '../Layout/constaints';
+import { ProbesContext } from '../Probes/ProbesTable/ProbesContext';
 
 const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
 
@@ -18,7 +20,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
     const [caption, setCaption] = useState("")
     const [arg, setArg] = useState("")
     useEffect(() => {
-        fetch("http://localhost:8081/api/v1/modules")
+        fetch("http://"+IP+":8081/api/v1/modules")
             .then(response => response.json())
             .then(data => {
                 setListSampleModule(data)
@@ -34,7 +36,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
     useEffect(() => {
         if (id != null) {
             console.log(1)
-            fetch("http://localhost:8081/api/v1/probe/module?idProbeModule=" + id)
+            fetch("http://"+IP+":8081/api/v1/probe/module?idProbeModule=" + id)
                 .then(response => response.json())
                 .then(data => {
                     setEditedModule(data)
@@ -44,7 +46,6 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
         }
 
     }, [])
-
     const addOrEditModule = (id) => {
         let inputData = getModuleInfo(id).inputValue
         let fullData = getModuleInfo(id).fullValue
@@ -64,6 +65,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
             notify(message, 2)
         }
         else {
+            console.log(fullData)
             let options = {
                 method: fullData.id != null ? "PUT" : "POST",
                 headers: {
@@ -73,7 +75,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
             }
             if (fullData.id == null) {
                 console.log("POST NOW")
-                fetch("http://localhost:8081/api/v1/probeModule/import", options)
+                fetch("http://"+IP+":8081/api/v1/probeModule/import", options)
                     .then(response => response.json())
                     .then(data => {
                         console.log(data)
@@ -92,7 +94,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
             }
             else {
                 console.log("PUT NOW")
-                fetch("http://localhost:8081/api/v1/probe/module", options)
+                fetch("http://"+IP+":8081/api/v1/probe/module", options)
                     .then(response => response.json())
                     .then(data => {
                         console.log(data)
@@ -236,9 +238,6 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                                 <textarea defaultValue={commandValue} disabled className='commandInput' id='command' ></textarea>
                             </div>
                             <div className='input_container-input'>
-                                <input className='commandInput inputModuleInfo' type='text' placeholder='Path...' id='path' defaultValue={isEditedModule.path} ></input>
-                            </div>
-                            <div className='input_container-input'>
                                 <input
                                     className='commandInput exception inputModuleInfo'
                                     type='text' placeholder='Your argument'
@@ -257,7 +256,10 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                         <div className='input_container'>
                             <div className='input_container-icon d-flex align-items-center'>
                                 <FontAwesomeIcon icon={faFolderOpen} />
-                                <div className='input_container-icon-text'>LOG PATH</div>
+                                <div className='input_container-icon-text'>PATH AND LOG PATH</div>
+                            </div>
+                            <div className='input_container-input'>
+                                <input className='commandInput inputModuleInfo' type='text' placeholder='Path...' id='path' defaultValue={isEditedModule.path} ></input>
                             </div>
                             <div className='input_container-input'>
                                 <input className='inputModuleInfo' type='text' placeholder='Log path here....' id='pathLog' defaultValue={isEditedModule.pathLog}></input>

@@ -6,7 +6,6 @@ $mixcolor: linear-gradient(90deg, $pink-color, $blue-color);
 .probeDetails {
     display: flex;
     flex-direction: column;
-    height: 80%;
     padding: 20px;
     font-size: 0.7em !important;
     width: 100%;
@@ -14,6 +13,7 @@ $mixcolor: linear-gradient(90deg, $pink-color, $blue-color);
     border-radius: 30px;
     box-sizing: border-box;
     color: white !important;
+    min-height: 78.5vh;
     .infos {
         .info {
             &-title {

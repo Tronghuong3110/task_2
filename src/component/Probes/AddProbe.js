@@ -10,6 +10,7 @@ import DropdownWithInput from '../action/DropdownWithInput';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { ProbesContext } from './ProbesTable/ProbesContext';
+import { IP } from '../Layout/constaints';
 
 const AddProbe = ({ handleCloseWindow }) => {
     const [isOpen, openCloseWindow] = useState(true)
@@ -29,7 +30,7 @@ const AddProbe = ({ handleCloseWindow }) => {
         setSelectedArea(selectedValue);
     };
     useEffect(() => {
-        fetch("http://localhost:8081/api/v1/locations")
+        fetch("http://"+IP+":8081/api/v1/locations")
             .then(response => response.json())
             .then(data => setLocation(data))
             .catch(err => console.log(err))
@@ -115,7 +116,7 @@ const AddProbe = ({ handleCloseWindow }) => {
                 },
                 body: JSON.stringify(formData)
             };
-            fetch("http://localhost:8081/api/v1/probe/import", requestOptions)
+            fetch("http://"+IP+":8081/api/v1/probe/import", requestOptions)
                 .then(response => response.json())
                 .then(response => {
                     let newData = [...probesContext.probes, response];

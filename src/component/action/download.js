@@ -3,6 +3,7 @@ import { saveAs } from 'file-saver';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
 import '../../sass/download.scss'
+import { IP } from '../Layout/constaints';
 
 const ConfigFileGenerator = (props) => {
     var configData =[]
@@ -34,7 +35,7 @@ const ConfigFileGenerator = (props) => {
     }
 
     const createConfigFile = () => {
-        fetch("http://localhost:8081/api/v1/downloadFile/"+props.id)
+        fetch("http://"+IP+":8081/api/v1/downloadFile/"+props.id)
             .then(response => response.json())
             .then(data => convertData(data))
             .catch(err => console.log(err))

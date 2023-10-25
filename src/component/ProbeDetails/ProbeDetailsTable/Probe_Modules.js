@@ -5,15 +5,16 @@ import Table from '@mui/material/Table';
 import '../../../sass/ProbeDetails/ProbeDetailsTable/Probe_Modules.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-    faTrashCan, faCircleRight, faXmarkCircle, faPenToSquare,faSquarePlus
+    faTrashCan, faCircleRight, faXmarkCircle, faPenToSquare, faSquarePlus
 } from '@fortawesome/free-regular-svg-icons'
-import { faPlay, faArrowRotateLeft, faClockRotateLeft,faCube, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import { faPlay, faArrowRotateLeft, faClockRotateLeft, faCube, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import Probe_Module_Header from './Probe_Module_Header';
 import loading from '../../../assets/pic/ZKZg.gif';
 import AddProbeModule from '../AddProbeModule';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Confirm from '../../action/Confirm';
+import { IP } from '../../Layout/constaints';
 const Probe_Modules = ({ id }) => {
     const [isOpen, setOpenWindow] = useState(false)
     const [probe_modules, setProbeModules] = useState([])
@@ -28,16 +29,16 @@ const Probe_Modules = ({ id }) => {
     const [orderDirection, setOrderDirection] = useState('asc')
     const [valueToOrderBy, setValueToOrderBy] = useState('epw')
     const [page, setPage] = useState(0)
-    const [rowsPerPage, setRowPerPage] = useState(7)
+    const [rowsPerPage, setRowPerPage] = useState(10)
     const [displayPagination, setDisplayPagination] = useState(false)
     const [isEditedModule, setEditedModule] = useState(null)
     const [fullModules, setFullModules] = useState([]);
     const [selectedProbeModules, setSelectedProbeModules] = useState([])
-    const [conditions,setConditions] = useState({
-        "name":"",
+    const [conditions, setConditions] = useState({
+        "name": "",
         "status": "All"
     })
-    const [checkAllPages,setCheckAllPages]= useState([])
+    const [checkAllPages, setCheckAllPages] = useState([])
     useEffect(() => {
         getProbeModules()
     }, [])
@@ -48,25 +49,8 @@ const Probe_Modules = ({ id }) => {
         // console.log(result)
         setProbeModules(result)
     }, [conditions])
-    useEffect(() => {
-        if (userChoice && deletingProbeModule) {
-            // Your deletion logic here
-            const options = {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            };
-
-            fetch("http://localhost:8081/api/v1/probeModule?id=" + deletingProbeModule.id, options)
-                .then(response => response.json())
-                .then(data => notify(data.message, data.code)
-                )
-                .catch(err => console.log(err));
-        }
-    }, [userChoice, deletingProbeModule]);
     const getProbeModules = () => {
-        fetch("http://localhost:8081/api/v1/probe/modules?idProbe=" + id + "&&name=&&status=")
+        fetch("http://" + IP + ":8081/api/v1/probe/modules?idProbe=" + id + "&&name=&&status=")
             .then(response => response.json())
             .then(data => {
                 setFullModules(data)
@@ -101,7 +85,7 @@ const Probe_Modules = ({ id }) => {
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
         console.log(checkAllPages.find(item => parseInt(item) == parseInt(newPage)))
-        if(checkAllPages.find(item => item == newPage)!=undefined) document.getElementById("main-tick").checked = true;
+        if (checkAllPages.find(item => item == newPage) != undefined) document.getElementById("main-tick").checked = true;
         else document.getElementById("main-tick").checked = false;
         console.log(checkAllPages)
     }
@@ -140,75 +124,49 @@ const Probe_Modules = ({ id }) => {
         return stablilizeRowArray.map((el) => el[0])
     }
     /** Run or Restart or Stop module */
-    const actionWithModule = async (id, action) => {
-        // console.log(id)
-        const options = {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            }
-        }
-        // fetch("http://localhost:8081/api/v1/probeModule/" + action + "?idProbeModule=" + id, options)
-        //     .then(respone => respone.json())
-        //     .then(data => {
-        //         console.log(data)
-        //         if (data.code == 1 || data.code == 2) {
-        //             notify(data.message, data.code)
-        //         }
-        //         else {
-        //             notify(data.message, 0)
-        //         }
-        //         let newArr = [...probe_modules]
-        //         newArr = newArr.map(probe_module => {
-        //             if (probe_module.id == id) {
-        //                 return {
-        //                     ...probe_module,
-        //                     status: data.status
-        //                 }
-        //             }
-        //             return probe_module
-        //         })
-        //         setProbeModules(newArr);
-        //     })
-        //     .catch(err => console.log(err))
-        let response;
-
-        // Bắt đầu hàm liên tục
-        const continuousFunctionInterval = setInterval(() => {
-            getProbeModules()
-            // Thực hiện hàm liên tục tại đây
-        }, 1000); // Gọi hàm mỗi giây
-
-        try {
-            response = await fetch("http://localhost:8081/api/v1/probeModule/" + action + "?idProbeModule=" + id, options);
-
-            if (response.status === 200) {
-                const data = await response.json();
-
-                console.log(data);
-
-                if (data.code == 1 || data.code == 2) {
-                    notify(data.message, data.code);
-                } else {
-                    notify(data.message, 0);
+    const actionWithModule = (id, action) => {
+        console.log(id)
+        fetch("http://" + IP + ":8081/api/v1/probeModule/" + action)
+            .then(response => response.text())
+            .then(data => {
+                notify("OK", 1)
+            })
+            .then(() => {
+                let check = 0;
+                let stringParam;
+                if (Array.isArray(id)) stringParam = id.join(" ")
+                else stringParam = id
+                const options = {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
                 }
-                getProbeModules()
-
-            } else {
-                console.error(`Unexpected status code: ${response.status}`);
-            }
-        } catch (err) {
-            console.error(`Error: ${err}`);
-        } finally {
-            // Kết thúc hàm liên tục sau khi nhận được phản hồi
-            clearInterval(continuousFunctionInterval);
-        }
+                console.log("http://" + IP + ":8081/api/v1/probeModule/" + action + "?idProbeModule=" + stringParam)
+                fetch("http://" + IP + ":8081/api/v1/probeModule/" + action + "?idProbeModule=" + stringParam, options)
+                    .then(response => response.text())
+                    .then(data => {
+                        check = data
+                        // const updateProbeModules = setInterval(() => {
+                        //     getProbeModules()
+                        // }, 2000);
+                        // if (check == 1) {
+                        //     clearInterval(updateProbeModules())
+                        //     setSelectedProbeModules([])
+                        //     setCheckAllPages([])
+                        // }
+                    })
+                    .catch(err => console.log(err))
+                    setInterval(() => {
+                        getProbeModules()
+                    }, 2000);
+            })
     }
-    /** Delete module */
+    /** Delete 1 module */
     const handleUserChoice = (choice) => {
         setUserChoice(choice);
     };
-    const deleteModule = (id, name) => {
+    const displayDeleteModule = (id, name) => {
         setOpenDeleteScreen(true)
         setDeletingProbeModule({
             ...deletingProbeModule,
@@ -216,11 +174,41 @@ const Probe_Modules = ({ id }) => {
             "name": "module " + name
         })
     }
+    const displayDeleteMultiModule = () => {
+        setOpenDeleteScreen(true)
+
+    }
+    const deleteModule = (id) => {
+        if (userChoice && deletingProbeModule) {
+            // Your deletion logic here
+            const options = {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                }
+            };
+            fetch("http://" + IP + ":8081/api/v1/probeModule?id=" + id, options)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data)
+                    notify(data.message, data.code)
+                    getProbeModules()
+                }
+                )
+                .catch(err => console.log(err));
+        }
+    }
+    /** Delete multi modules */
+    const deleteMultiModules = () => {
+        let stringParam = selectedProbeModules.join(",");
+        deleteModule(stringParam)
+
+    }
     /** Add to checked list */
     const addOrRemoveToCheckedList = (id) => {
         let checkedValue = document.getElementById(id).checked
         if (checkedValue == true) {
-            setSelectedProbeModules([...selectedProbeModules,id])
+            setSelectedProbeModules([...selectedProbeModules, id])
         }
         else {
             console.log(selectedProbeModules.filter(item => item != id))
@@ -228,15 +216,15 @@ const Probe_Modules = ({ id }) => {
         }
     }
     const selectOrRemoveALL = (value) => {
-        let arrNum=[];
+        let arrNum = [];
         let listCheckBox = document.querySelectorAll(".checkbox .checkbox-input")
         listCheckBox.forEach(node => {
-            if(!selectedProbeModules.find(item => item == node.id)) arrNum.push(parseInt(node.id))
+            if (!selectedProbeModules.find(item => item == node.id)) arrNum.push(parseInt(node.id))
         });
         if (value == true) {
             console.log(arrNum)
             setSelectedProbeModules(selectedProbeModules.concat(arrNum));
-            setCheckAllPages([...checkAllPages,page])
+            setCheckAllPages([...checkAllPages, page])
         }
         else {
             setSelectedProbeModules(selectedProbeModules.filter(item => arrNum.includes(item)))
@@ -279,23 +267,23 @@ const Probe_Modules = ({ id }) => {
         }
 
     }
-    const getKeyWord = (e)=>{
+    const getKeyWord = (e) => {
         setConditions({
             ...conditions,
             name: e.target.value
         })
     }
-    const getStatus =(e)=>{
+    const getStatus = (e) => {
         setConditions({
             ...conditions,
             status: e.target.value
         })
     }
-    const isSelected = (id)=>{
-        if(selectedProbeModules.find(num => num==id)==undefined) return false;
+    const isSelected = (id) => {
+        if (selectedProbeModules.find(num => num == id) == undefined) return false;
         else return true;
     }
-        
+
     return (
         <div className='Probe_Module'>
             <div className="infos">
@@ -326,7 +314,7 @@ const Probe_Modules = ({ id }) => {
                                 </select>
                             </div>
                         </div>
-                        <button className="addBtn d-flex align-items-center" onClick={()=>handleOpenWindow(null)}>
+                        <button className="addBtn d-flex align-items-center" onClick={() => handleOpenWindow(null)}>
                             <div className="addBtn-icon"><FontAwesomeIcon icon={faSquarePlus}></FontAwesomeIcon></div>
                             <div className="addBtn-text ">New module</div>
                         </button>
@@ -338,7 +326,7 @@ const Probe_Modules = ({ id }) => {
                     <Tooltip title="Run all selected modules">
                         <button
                             onClick={() => {
-                                actionWithModule(module.id, "run")
+                                actionWithModule(selectedProbeModules, "run")
                             }}
                         >
                             <FontAwesomeIcon icon={faPlay} style={{ color: "#00FF1A", }} />
@@ -348,9 +336,9 @@ const Probe_Modules = ({ id }) => {
                 <div className='action'>
                     <Tooltip title="Restart all selected modules">
                         <button
-                            disabled={module.loading}
+                            // disabled={module.loading}
                             onClick={() => {
-                                actionWithModule(module.id, "restart")
+                                actionWithModule(selectedProbeModules, "restart")
                             }}
                         >
                             <FontAwesomeIcon icon={faArrowRotateLeft} flip="horizontal" style={{ color: "#699BF7" }} />
@@ -360,9 +348,9 @@ const Probe_Modules = ({ id }) => {
                 <div className='action'>
                     <Tooltip title="Stop all selected modules">
                         <button
-                            disabled={module.loading}
+                            // disabled={module.loading}
                             onClick={() => {
-                                actionWithModule(module.id, "stop")
+                                actionWithModule(selectedProbeModules, "stop")
                             }}
                         >
                             <FontAwesomeIcon icon={faXmarkCircle} style={{ color: "#FF1C1C", }} />
@@ -372,9 +360,10 @@ const Probe_Modules = ({ id }) => {
                 <div className='action'>
                     <Tooltip title="Delete all selected modules">
                         <button
-                            disabled={module.loading}
+                            // disabled={module.loading}
                             onClick={() => {
-                                deleteModule(module.id, module.moduleName)
+                                // deleteMultiModules()
+                                displayDeleteMultiModule()
                             }}
                         >
                             <FontAwesomeIcon icon={faTrashCan} style={{ color: "#FFD233", }} />
@@ -417,6 +406,7 @@ const Probe_Modules = ({ id }) => {
                                                     <div className='actions-container d-flex justify-content-between'>
                                                         <div className='action'>
                                                             <button
+                                                                disabled={module.loading}
                                                                 onClick={() => {
                                                                     actionWithModule(module.id, "run")
                                                                 }}
@@ -457,7 +447,7 @@ const Probe_Modules = ({ id }) => {
                                                             <button
                                                                 disabled={module.loading}
                                                                 onClick={() => {
-                                                                    deleteModule(module.id, module.moduleName)
+                                                                    displayDeleteModule(module.id, module.moduleName)
                                                                 }}
                                                             >
                                                                 <FontAwesomeIcon icon={faTrashCan} style={{ color: "#FFD233", }} />
@@ -472,7 +462,7 @@ const Probe_Modules = ({ id }) => {
                                                 </TableCell>
                                                 <TableCell className='processStatus' >
                                                     <div>
-                                                        {module.loading == 1 ? 1 : "" && <img src={loading} ></img>}
+                                                        {(module.loading == 1 ? true : false) && <img src={loading} ></img>}
                                                     </div>
                                                 </TableCell>
                                             </TableRow>
@@ -488,7 +478,7 @@ const Probe_Modules = ({ id }) => {
                 </Table >
                 {
                     probe_modules.length == 0 ? false : true && <TablePagination
-                        rowsPerPageOptions={[7, 8]}
+                        rowsPerPageOptions={[10, 15, 20]}
                         component="div"
                         count={probe_modules.length}
                         rowsPerPage={rowsPerPage}
@@ -498,9 +488,9 @@ const Probe_Modules = ({ id }) => {
                     ></TablePagination>
                 }
             </TableContainer>
-            {isOpen && <AddProbeModule id={isEditedModule} handleCloseWindow={handleCloseWindow} ></AddProbeModule>}
+            {isOpen && <AddProbeModule id={isEditedModule} handleCloseWindow={handleCloseWindow} idProbe={id} ></AddProbeModule>}
             <ToastContainer></ToastContainer>
-            {isOpenDeleteScreen && <Confirm confirmContent={deletingProbeModule} setOpenDeleteScreen={setOpenDeleteScreen} onUserChoice={handleUserChoice} ></Confirm>}
+            {isOpenDeleteScreen && <Confirm confirmContent={deletingProbeModule} setOpenDeleteScreen={setOpenDeleteScreen} onUserChoice={handleUserChoice} deleteModule={deleteModule} ></Confirm>}
         </div>
     )
 }

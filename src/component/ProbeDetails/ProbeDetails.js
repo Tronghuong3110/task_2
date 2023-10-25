@@ -15,6 +15,7 @@ import AddProbeModule from './AddProbeModule';
 import {  toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useParams } from "react-router-dom";
+import { IP } from "../Layout/constaints";
 
 const ProbeDetails = () => {
     const { id } = useParams();
@@ -36,7 +37,7 @@ const ProbeDetails = () => {
         setSelectedArea(selectedValue);
     };
     useEffect(() => {
-        fetch("http://localhost:8081/api/v1/locations")
+        fetch("http://"+IP+":8081/api/v1/locations")
             .then(response => response.json())
             .then(data => setLocation(data))
             .catch(err => console.log(err))
@@ -62,7 +63,7 @@ const ProbeDetails = () => {
     }
     //Hàm hiển thị thông tin probe
     useEffect(() => {
-        fetch("http://localhost:8081/api/v1/probe?idProbe=" + id)
+        fetch("http://"+IP+":8081/api/v1/probe?idProbe=" + id)
             .then(response => response.json())
             .then(data => setProbeDetails(data))
             .catch(err => console.log(err))
@@ -148,7 +149,7 @@ const ProbeDetails = () => {
                 },
                 body: JSON.stringify(info)
             }
-            fetch("http://localhost:8081/api/v1/probe", options)
+            fetch("http://"+IP+":8081/api/v1/probe", options)
                 .then(response => response.json())
                 .then(data => {
                     if (data.code == 1) {

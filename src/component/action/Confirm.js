@@ -6,14 +6,15 @@ import {
 } from '@fortawesome/free-regular-svg-icons'
 import { faCheck, faQuestion, faX } from '@fortawesome/free-solid-svg-icons';
 const Confirm = (props) => {
-    const {confirmContent,setOpenDeleteScreen,onUserChoice} = props
+    const {confirmContent,setOpenDeleteScreen,onUserChoice,deleteModule} = props
     const handleCancel = () =>{
         setOpenDeleteScreen(false);
         onUserChoice(false)
     }
-    const handleOk = async ()=>{
+    const handleOk = ()=>{
         setOpenDeleteScreen(false);
         onUserChoice(true)
+        deleteModule(confirmContent.id)
     }
     return (
         <div className='confirmationScreen'>
