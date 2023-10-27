@@ -43,6 +43,7 @@ const ProbesProvider = ({ children }) => {
         fetch(url)
             .then(response => response.json())
             .then(data => {
+                console.log(data)
                 setProbes(data)
             })
             .catch(err => console.log(err))

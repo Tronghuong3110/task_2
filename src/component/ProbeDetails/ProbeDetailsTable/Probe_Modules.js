@@ -25,7 +25,6 @@ const Probe_Modules = ({ id }) => {
         "message": "Are you sure to remove",
         "note": "It will be removed permanently",
     })
-    const [userChoice, setUserChoice] = useState(null);
     const [orderDirection, setOrderDirection] = useState('asc')
     const [valueToOrderBy, setValueToOrderBy] = useState('epw')
     const [page, setPage] = useState(0)
@@ -39,23 +38,42 @@ const Probe_Modules = ({ id }) => {
         "status": "All"
     })
     const [checkAllPages, setCheckAllPages] = useState([])
-    const [doneAction,setDoneAction] = useState(true)
+    const [existRunningOrPending,setExistRunningOrPending] = useState([])
     useEffect(() => {
         getProbeModules()
-    }, [doneAction])
+    }, [])
     useEffect(() => {
         let name = conditions.name;
         let status = conditions.status;
         let result = fullModules.filter(modules => modules.moduleName.includes(name) && (modules.status == (status == "All" ? modules.status : status)))
-        // console.log(result)
         setProbeModules(result)
     }, [conditions])
     const getProbeModules = () => {
+        console.log("Hi")
         fetch("http://" + IP + ":8081/api/v1/probe/modules?idProbe=" + id + "&&name=&&status=")
             .then(response => response.json())
             .then(data => {
                 setFullModules(data)
                 setProbeModules(data)
+                setExistRunningOrPending(data.filter(item => item.status == "Running"|| item.status =="Pending"))
+            })
+            .catch(err => console.log(err))
+    }
+    const getProbeModulesByConditions = () => {
+        fetch("http://" + IP + ":8081/api/v1/probe/modules?idProbe=" + id + "&&name=&&status=")
+            .then(response => response.json())
+            .then(data => {
+                let name = document.getElementById("keyWordInput").value;
+                let status = document.getElementById("statusInput").value;
+                console.log(name, status)
+                // setConditions({
+                //     "name": name,
+                //     "status":status
+                // })
+                let result = data.filter(modules => modules.moduleName.includes(name) && (modules.status == (status == "All" ? modules.status : status)))
+                let check = result.filter(item => item.status == "Running"|| item.status =="Pending")
+                setExistRunningOrPending(check)
+                setProbeModules(result)
             })
             .catch(err => console.log(err))
     }
@@ -126,14 +144,20 @@ const Probe_Modules = ({ id }) => {
     }
     /** Run or Restart or Stop module */
     const actionWithModule = (id, action) => {
-        setDoneAction(false)
+        let nodes = document.querySelectorAll(".actionBtn")
+        nodes.forEach(node => {
+            node.setAttribute("disabled", true)
+            setTimeout(() => {
+                node.removeAttribute("disabled");
+            }, 1000);
+        })
+        let check = 0;
         fetch("http://" + IP + ":8081/api/v1/probeModule/" + action)
             .then(response => response.text())
             .then(data => {
-                notify("OK", 1)
+                notify("Received request succesfully", 1)
             })
             .then(() => {
-                let check = 0;
                 let stringParam;
                 if (Array.isArray(id)) stringParam = id.join(" ")
                 else stringParam = id
@@ -143,23 +167,23 @@ const Probe_Modules = ({ id }) => {
                         "Content-Type": "application/json"
                     }
                 }
-                console.log("http://" + IP + ":8081/api/v1/probeModule/" + action + "?idProbeModule=" + stringParam)
                 fetch("http://" + IP + ":8081/api/v1/probeModule/" + action + "?idProbeModule=" + stringParam, options)
                     .then(response => response.text())
                     .then(data => {
-                        check = data
-                        setDoneAction(true)
+                        setTimeout(() => { check = data }, 2000)
                     })
                     .catch(err => console.log(err))
-                    setInterval(() => {
-                        getProbeModules()
-                    }, 2000);
             })
+        setInterval(() => {
+            if (check == 1) {
+                return;
+            }
+            else {
+                getProbeModulesByConditions()
+            }
+        }, 2000);
     }
     /** Delete 1 module */
-    const handleUserChoice = (choice) => {
-        setUserChoice(choice);
-    };
     const displayDeleteModule = (id, name) => {
         setOpenDeleteScreen(true)
         setDeletingProbeModule({
@@ -172,16 +196,26 @@ const Probe_Modules = ({ id }) => {
         setOpenDeleteScreen(true)
 
     }
-    const deleteModule = (id) => {
-        if (userChoice && deletingProbeModule) {
-            // Your deletion logic here
+    const deleteModule = (id, userChoice) => {
+        if (userChoice) {
+            let stringParam =""
+            if (Array.isArray(id)) {
+                console.log(id, existRunningOrPending)
+                console.log(existRunningOrPending.some(item => id.includes(item.id)))
+                if(existRunningOrPending.some(item => id.includes(item.id))){
+                    notify("There are some modules running or pending, please stop before delete them",2)
+                    return;
+                }
+                stringParam = id.join(" ")
+            }
+            else stringParam = id
             const options = {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
                 }
             };
-            fetch("http://" + IP + ":8081/api/v1/probeModule?id=" + id, options)
+            fetch("http://" + IP + ":8081/api/v1/probeModule?id=" + stringParam, options)
                 .then(response => response.json())
                 .then(data => {
                     console.log(data)
@@ -191,12 +225,6 @@ const Probe_Modules = ({ id }) => {
                 )
                 .catch(err => console.log(err));
         }
-    }
-    /** Delete multi modules */
-    const deleteMultiModules = () => {
-        let stringParam = selectedProbeModules.join(",");
-        deleteModule(stringParam)
-
     }
     /** Add to checked list */
     const addOrRemoveToCheckedList = (id) => {
@@ -291,7 +319,7 @@ const Probe_Modules = ({ id }) => {
                     <div className="searchBar d-flex align-items-center">
                         <div className="searchBar-searchName">
                             <div className="searchBar-searchName-input">
-                                <input type="text" placeholder="Search "
+                                <input id='keyWordInput' type="text" placeholder="Search "
                                     onChange={getKeyWord}
                                 ></input>
                                 <FontAwesomeIcon icon={faMagnifyingGlass}></FontAwesomeIcon>
@@ -299,7 +327,7 @@ const Probe_Modules = ({ id }) => {
                         </div>
                         <div className="searchBar-searchStatus">
                             <div className="searchBar-searchStatus-select">
-                                <select onChange={getStatus}>
+                                <select id="statusInput" onChange={getStatus}>
                                     <option value="All" >All</option>
                                     <option value="Running">Running</option>
                                     <option value="Pending">Pending</option>
@@ -383,7 +411,7 @@ const Probe_Modules = ({ id }) => {
 
                                             <TableRow key={module.id} >
                                                 <TableCell className='checkbox'>
-                                                    <input defaultChecked={false} checked={isSelected(module.id)} className='checkbox-input' id={module.id} type='checkbox' onChange={() => {
+                                                    <input defaultChecked={false} disabled={module.loading} checked={isSelected(module.id)} className='checkbox-input' id={module.id} type='checkbox' onChange={() => {
                                                         addOrRemoveToCheckedList(module.id)
                                                     }}></input>
                                                 </TableCell>
@@ -399,8 +427,8 @@ const Probe_Modules = ({ id }) => {
                                                 <TableCell className='actions' >
                                                     <div className='actions-container d-flex justify-content-between'>
                                                         <div className='action'>
-                                                            <button className='actionBtn'
-                                                                disabled={doneAction && module.loading}
+                                                            <button className='actionBtn runBtn'
+                                                                disabled={module.loading}
                                                                 onClick={() => {
                                                                     actionWithModule(module.id, "run")
                                                                 }}
@@ -409,8 +437,8 @@ const Probe_Modules = ({ id }) => {
                                                             </button>
                                                         </div>
                                                         <div className='action'>
-                                                            <button className='actionBtn'
-                                                                disabled={doneAction && module.loading}
+                                                            <button className='actionBtn reStartBtn'
+                                                                disabled={module.loading}
                                                                 onClick={() => {
                                                                     actionWithModule(module.id, "restart")
                                                                 }}
@@ -419,8 +447,8 @@ const Probe_Modules = ({ id }) => {
                                                             </button>
                                                         </div>
                                                         <div className='action'>
-                                                            <button className='actionBtn'
-                                                                disabled={doneAction &&module.loading && (module.status=="Stopped"||module.status=="Failed")?false:true}
+                                                            <button className='actionBtn stopBtn'
+                                                                disabled={module.loading || (module.status == "Stopped" || module.status == "Failed") ? true : false}
                                                                 onClick={() => {
                                                                     actionWithModule(module.id, "stop")
                                                                 }}
@@ -430,7 +458,7 @@ const Probe_Modules = ({ id }) => {
                                                         </div>
                                                         <div className='action'>
                                                             <button
-                                                                disabled={module.loading}
+                                                                disabled={module.loading || (module.status == "Running" || module.status == "Pending") ? true : false}
                                                             >
                                                                 <FontAwesomeIcon icon={faPenToSquare} style={{ color: "powderblue", }} onClick={() => {
                                                                     handleOpenWindow(module.id)
@@ -439,7 +467,7 @@ const Probe_Modules = ({ id }) => {
                                                         </div>
                                                         <div className='action'>
                                                             <button
-                                                                disabled={module.loading}
+                                                                disabled={module.loading || (module.status == "Running" || module.status == "Pending") ? true : false}
                                                                 onClick={() => {
                                                                     displayDeleteModule(module.id, module.moduleName)
                                                                 }}
@@ -484,7 +512,7 @@ const Probe_Modules = ({ id }) => {
             </TableContainer>
             {isOpen && <AddProbeModule id={isEditedModule} handleCloseWindow={handleCloseWindow} idProbe={id} ></AddProbeModule>}
             <ToastContainer></ToastContainer>
-            {isOpenDeleteScreen && <Confirm confirmContent={deletingProbeModule} setOpenDeleteScreen={setOpenDeleteScreen} onUserChoice={handleUserChoice} deleteModule={deleteModule} ></Confirm>}
+            {isOpenDeleteScreen && <Confirm confirmContent={deletingProbeModule} listDelete={selectedProbeModules} setOpenDeleteScreen={setOpenDeleteScreen} handleFunction={deleteModule} ></Confirm>}
         </div>
     )
 }

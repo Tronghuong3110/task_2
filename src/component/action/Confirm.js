@@ -6,21 +6,20 @@ import {
 } from '@fortawesome/free-regular-svg-icons'
 import { faCheck, faQuestion, faX } from '@fortawesome/free-solid-svg-icons';
 const Confirm = (props) => {
-    const {confirmContent,setOpenDeleteScreen,onUserChoice,deleteModule} = props
+    const {confirmContent,listDelete,setOpenDeleteScreen,handleFunction} = props
     const handleCancel = () =>{
         setOpenDeleteScreen(false);
-        onUserChoice(false)
     }
     const handleOk = ()=>{
         setOpenDeleteScreen(false);
-        onUserChoice(true)
-        deleteModule(confirmContent.id)
+        if(listDelete.length != 0) handleFunction(listDelete,true)
+        else handleFunction(confirmContent.id,true)
     }
     return (
         <div className='confirmationScreen'>
             <div className="confirmation">
                 <div className='confirmation-content'>
-                    {confirmContent.message} <strong>{confirmContent.name}</strong> ?</div>
+                    {confirmContent.message} <strong>{listDelete.length==0?confirmContent.name:"all selected probe modules"}</strong> ?</div>
                 <div className='confirmation-note'>{confirmContent.note}</div>
                 <hr></hr>
                 <div className='confirmation-decision d-flex justify-content-between'>

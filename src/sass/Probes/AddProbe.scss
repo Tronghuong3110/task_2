@@ -6,12 +6,12 @@ $blue-color: #9747ff;
     height: 100vh;
     width: 100vw;
     background-color: rgba(48, 39, 39,0.8);
-    position: absolute;
+    position: fixed;
     top:0;
     left: 0;
     z-index: 2;
     .addProbe {
-        font-size: 0.7em;
+        font-size: 0.9em;
         width: 70%;
         position: absolute;
         top: 50%;
@@ -123,7 +123,7 @@ $blue-color: #9747ff;
                 background-color: transparent;
                 border: none;
                 svg {
-                    font-size: 1.7em !important;
+                    font-size: 2.7em !important;
                 }
             }
         }

@@ -27,7 +27,6 @@ const ProbesTable = () => {
         "message": "Are you sure to remove",
         "note": "You can recover it around 7 days or remove permanently in recycle bin",
     })
-    const [userChoice, setUserChoice] = useState(false);
     const [orderDirection, setOrderDirection] = useState('asc')
     const [valueToOrderBy, setValueToOrderBy] = useState('running')
     const [page, setPage] = useState(0)
@@ -38,7 +37,7 @@ const ProbesTable = () => {
     useEffect(() => {
         setProbes(probesContext.probes);
     }, [probesContext.probes]);
-    useEffect(() => {
+    const deletedProbe = (id,userChoice) => {
         if (userChoice && deletingProbe) {
             const options = {
                 method: 'DELETE',
@@ -46,16 +45,16 @@ const ProbesTable = () => {
                     'Content-Type': 'application/json'
                 }
             };
-            fetch("http://" + IP + ":8081/api/v1/probe?id=" + deletingProbe.id, options)
+            fetch("http://" + IP + ":8081/api/v1/probe?id=" + id, options)
                 .then(response => response.json())
                 .then(data => {
-                    const newArray = probes.filter(item => item.id !== deletingProbe.id);
+                    const newArray = probes.filter(item => item.id !== id);
                     setProbes(newArray);
                     notify(data.message, data.code)
                 })
                 .catch(err => console.log(err))
         }
-    }, [userChoice, deletingProbe])
+    }
     const getProbeContinues = () => {
         setInterval(probesContext.getProbes(), 2000)
     }
@@ -140,9 +139,6 @@ const ProbesTable = () => {
             )
         }
     }
-    const handleUserChoice = (choice) => {
-        setUserChoice(choice);
-    };
     const removeProbe = (id, name) => {
         setOpenDeleteScreen(true)
         setDeletingProbe({
@@ -280,7 +276,7 @@ const ProbesTable = () => {
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 ></TablePagination>
             }
-            {isOpenDeleteScreen && <Confirm confirmContent={deletingProbe} setOpenDeleteScreen={setOpenDeleteScreen} onUserChoice={handleUserChoice} ></Confirm>}
+            {isOpenDeleteScreen && <Confirm confirmContent={deletingProbe} listDelete={[]} setOpenDeleteScreen={setOpenDeleteScreen} handleFunction={deletedProbe} ></Confirm>}
         </div>
     )
 }
