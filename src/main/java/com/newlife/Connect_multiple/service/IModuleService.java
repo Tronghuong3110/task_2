@@ -11,6 +11,5 @@ public interface IModuleService {
     ModuleDto findOneModule(Integer id);
     JSONObject deleteModule(Integer id);
     JSONObject saveModule(ModuleDto moduleDto);
-
     JSONObject updateModule(ModuleDto moduleDto);
 }

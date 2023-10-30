@@ -41,4 +41,6 @@ public class ModuleHistoryEntity {
     @Column(name = "note", columnDefinition = "text")
     private String note;
 
+    @Column(name = "id_probe_module")
+    private Integer idProbeModule;
 }

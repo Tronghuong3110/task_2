@@ -194,25 +194,15 @@ public class ProbeService implements IProbeService {
         List<ProbeEntity> listProbe = probeRepository.findByNameOrLocationOrAreaOrVlan(name, location, area, vlan);
         List<JSONObject> countStatusOfModuleByProbe = countStatus();
         List<ProbeDto> listProbeDto = new ArrayList<>();
-        /*
-        * for(JSONObject json : result) {
-            System.out.println("ID_PROBE " + json.get("id_probe"));
-            System.out.println("STATUS " + json.get("status_counts"));
-            JSONObject status = JsonUtil.parseJson(json.get("status_counts").toString());
-            System.out.println("Stopped " + (status.containsKey("Stopped") ? status.get("Stopped") : null));
-            System.out.println("Running " + (status.containsKey("Running") ? status.get("Running") : null));
-            System.out.println("Pending " + (status.containsKey("Pending") ? status.get("Pending") : null));
-            System.out.println("Failed " + (status.containsKey("Failed") ? status.get("Failed") : null));
-            System.out.println("==========================================");
-        }
-        * */
         for(ProbeEntity entity : listProbe) {
             ProbeDto probe = ProbeConverter.toDto(entity);
             JSONObject json = findStatusByProbe(entity.getId(), countStatusOfModuleByProbe);
-            probe.setNumberFailedModule(json.containsKey("Failed") ? json.get("Failed").toString() : "0");
-            probe.setNumberPendingModule(json.containsKey("Pending") ? json.get("Pending").toString() : "0");
-            probe.setNumberStopedModule(json.containsKey("Stopped") ? json.get("Stopped").toString() : "0");
-            probe.setNumberRunningModule(json.containsKey("Running") ? json.get("Running").toString() : "0");
+            if(json != null) {
+                probe.setNumberFailedModule(json.containsKey("Failed") ? json.get("Failed").toString() : "0");
+                probe.setNumberPendingModule(json.containsKey("Pending") ? json.get("Pending").toString() : "0");
+                probe.setNumberStopedModule(json.containsKey("Stopped") ? json.get("Stopped").toString() : "0");
+                probe.setNumberRunningModule(json.containsKey("Running") ? json.get("Running").toString() : "0");
+            }
             listProbeDto.add(probe);
         }
         return listProbeDto;
@@ -221,6 +211,7 @@ public class ProbeService implements IProbeService {
     @Override
     public JSONObject delete(Integer id) {
         JSONObject json = new JSONObject();
+        System.out.println("ID probe delete " + id);
         try {
             ProbeEntity probeEntity = probeRepository.findByIdAndDeleted(id, 0)
                     .orElse(null);
@@ -459,17 +450,11 @@ public class ProbeService implements IProbeService {
     private JSONObject findStatusByProbe(Integer id, List<JSONObject> listStatusOfProbe) {
         for(JSONObject json : listStatusOfProbe) {
             Integer idProbe = Integer.parseInt(json.get("id_probe").toString());
+            System.out.println("id probe " + idProbe);
             if (id.equals(idProbe)) {
                 JSONObject status = JsonUtil.parseJson(json.get("status_counts").toString());
                 return status;
             }
-//            System.out.println("ID_PROBE " + json.get("id_probe"));
-//            System.out.println("STATUS " + json.get("status_counts"));
-//            System.out.println("Stopped " + (status.containsKey("Stopped") ? status.get("Stopped") : null));
-//            System.out.println("Running " + (status.containsKey("Running") ? status.get("Running") : null));
-//            System.out.println("Pending " + (status.containsKey("Pending") ? status.get("Pending") : null));
-//            System.out.println("Failed " + (status.containsKey("Failed") ? status.get("Failed") : null));
-//            System.out.println("==========================================");
         }
         return null;
     }

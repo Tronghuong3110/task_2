@@ -84,14 +84,14 @@ public class ModuleService implements IModuleService {
 
             ModuleEntity module = moduleRepository.findById(idModule).orElse(null);
             String oldName = module.getName();
-            String name = moduleEntity.getName();
-            if (oldName.equals(name)) {
+            String newName = moduleEntity.getName();
+            if (oldName.equals(newName)) {
                 moduleRepository.save(moduleEntity);
                 json.put("code", "1");
                 json.put("message", "Update module success");
                 return json;
             } else {
-                if (checkModuleName(name)) {
+                if (checkModuleName(newName)) {
                     json.put("code", "3");
                     json.put("message", "Trùng tên module");
                     return json;
@@ -102,7 +102,6 @@ public class ModuleService implements IModuleService {
                     return json;
                 }
             }
-
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -111,7 +110,6 @@ public class ModuleService implements IModuleService {
     private Boolean checkModuleName(String name) {
         return moduleRepository.existsByName(name);
     }
-
     private Boolean checkIdModule(Integer id) {
         return moduleRepository.existsById(id.toString());
     }

@@ -20,7 +20,7 @@ public class ConnectMultipleApplication {
 				ProbeModuleService probeModuleService = applicationContext.getBean(ProbeModuleService.class);
 				probeModuleService.getStatusModulePeriodically();
 				System.out.println("Test");
-				Thread.sleep(30000);
+				Thread.sleep(15000);
 			}
 			catch (Exception e) {
 				System.out.println("Kiểm tra status theo chu kì lỗi rồi");

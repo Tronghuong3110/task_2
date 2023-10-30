@@ -11,7 +11,7 @@ public interface IProbeModuleService {
     Object runModule(Integer idProbeModule);
     Object stopModule(Integer idProbeModule);
     void getStatusModulePeriodically();
-    JSONObject delete(Integer idProbeModule); // Han
+    JSONObject delete(List<String> ids); // Han
     JSONObject saveProbeModule(ProbeModuleDto probeModuleDto);
     Integer countModuleByStatus(String status);
     ProbeModuleDto findOneById(Integer idProbeModule);

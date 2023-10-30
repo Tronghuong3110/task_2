@@ -42,9 +42,13 @@ public class ProbeModuleController {
 
     // Xóa 1 probe Module (đã test thành công) (Han)
     @DeleteMapping("/probeModule")
-    public CompletableFuture<JSONObject> deleteModuleProbe(@RequestParam("id") Integer id) {
+    public CompletableFuture<JSONObject> deleteModuleProbe(@RequestParam("id") String id) {
         return CompletableFuture.supplyAsync(() -> {
-            JSONObject response = probeModuleService.delete(id);
+            if(id.equals("")) {
+                return new JSONObject();
+            }
+            List<String> ids = new ArrayList<>(Arrays.asList(id.split(" ")));
+            JSONObject response = probeModuleService.delete(ids);
             return response;
         }, executorService);
     }

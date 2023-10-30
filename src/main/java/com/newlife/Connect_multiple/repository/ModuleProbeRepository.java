@@ -29,4 +29,5 @@ public interface ModuleProbeRepository extends JpaRepository<ProbeModuleEntity, 
     Boolean existsByCommandAndIdProbe(String command, Integer idProbe);
     Integer countAllByStatus(String status);
     Optional<ProbeModuleEntity> findByCommandAndIdProbe(String commandLine, Integer idProbe);
+    Optional<ProbeModuleEntity> findByIdAndStatus(Integer id, String status);
 }
