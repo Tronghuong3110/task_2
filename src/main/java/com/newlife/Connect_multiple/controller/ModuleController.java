@@ -41,6 +41,7 @@ public class ModuleController {
         return CompletableFuture.supplyAsync(() -> {
             JSONObject mess = moduleService.saveModule(moduleDto);
             return mess;
+
         }, executorService);
     }
 
@@ -50,6 +51,7 @@ public class ModuleController {
     public CompletableFuture<JSONObject> deleteModule(@RequestParam("id") Integer id) {
         return CompletableFuture.supplyAsync(() -> {
             JSONObject mess = moduleService.deleteModule(id);
+
             return mess;
         }, executorService);
     }
@@ -59,6 +61,7 @@ public class ModuleController {
     public CompletableFuture<JSONObject> updateModule(@RequestBody ModuleDto moduleDto) {
         return CompletableFuture.supplyAsync(() -> {
             JSONObject mess = moduleService.updateModule(moduleDto);
+
             return mess;
         }, executorService);
     }

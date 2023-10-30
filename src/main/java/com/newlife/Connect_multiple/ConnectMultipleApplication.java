@@ -14,19 +14,22 @@ public class ConnectMultipleApplication {
 	private static ExecutorService executorService = Executors.newFixedThreadPool(1);
 	public static void main(String[] args) {
 		ApplicationContext applicationContext = SpringApplication.run(ConnectMultipleApplication.class, args);
-//		CompletableFuture.runAsync(() -> {
 		while (true) {
 			try {
 				ProbeModuleService probeModuleService = applicationContext.getBean(ProbeModuleService.class);
 				probeModuleService.getStatusModulePeriodically();
 				System.out.println("Test");
+
 				Thread.sleep(15000);
+
 			}
 			catch (Exception e) {
 				System.out.println("Kiểm tra status theo chu kì lỗi rồi");
 				e.printStackTrace();
 			}
 		}
+
 //		}, executorService);
+
 	}
 }

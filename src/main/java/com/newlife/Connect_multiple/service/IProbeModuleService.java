@@ -17,4 +17,5 @@ public interface IProbeModuleService {
     ProbeModuleDto findOneById(Integer idProbeModule);
     JSONObject updateProbeModule(ProbeModuleDto probeModuleDto);
 
+
 }

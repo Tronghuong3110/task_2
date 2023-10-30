@@ -1,5 +1,12 @@
 package com.newlife.Connect_multiple.api;
 
+import com.newlife.Connect_multiple.dto.DataObject;
+import com.newlife.Connect_multiple.dto.ProbeDto;
+import com.newlife.Connect_multiple.dto.Rules;
+import com.newlife.Connect_multiple.entity.ProbeEntity;
+import com.newlife.Connect_multiple.entity.ProbeOptionEntity;
+import com.newlife.Connect_multiple.entity.ServerEntity;
+
 import com.newlife.Connect_multiple.entity.SubtopicServerEntity;
 import com.squareup.okhttp.*;
 import org.json.simple.JSONArray;
@@ -45,6 +52,7 @@ public class ApiAddInfoToBroker {
         return null;
     }
     public static String addRuleToBroker(String username, List<SubtopicServerEntity> listSubTopic) {
+
         try {
             // xoá toàn bộ role của user trước khi thêm role mới cho user
             Boolean deleteRoleOfUser = deleteRuleOfUser(username);
@@ -53,7 +61,9 @@ public class ApiAddInfoToBroker {
                 return null;
             }
             MediaType type = MediaType.parse("application/json; charset=utf-8");
+
             String jsonData = createRule(username, listSubTopic);
+
             System.out.println(jsonData);
             OkHttpClient okHttpClient = new OkHttpClient();
             RequestBody body = RequestBody.create(type, jsonData);
@@ -78,11 +88,14 @@ public class ApiAddInfoToBroker {
         return null;
     }
     private static String createRule(String username, List<SubtopicServerEntity> listTopic) {
+
         // json chứa danh sách các rules và username cần thêm rule
+
         JSONObject dataObject = new JSONObject();
         dataObject.put("username", username);
         //chứa danh sách các rule
         JSONArray rulesArray = new JSONArray();
+
 
         // thêm rule vào danh sách
         for(SubtopicServerEntity topic : listTopic){
@@ -100,6 +113,7 @@ public class ApiAddInfoToBroker {
     private static Boolean deleteRuleOfUser(String username) {
         try {
             MediaType type = MediaType.parse("application/json; charset=utf-8");
+
             OkHttpClient okHttpClient = new OkHttpClient();
             Request request = new Request.Builder()
                     .url(urlApiAddRule + username)
@@ -109,14 +123,16 @@ public class ApiAddInfoToBroker {
                     .build();
             Response response = okHttpClient.newCall(request).execute();
             Integer responseCode = response.code();
-            // Th user chưa được cập quyền hoặc đã xóa quyền của user thành công
+
             if(responseCode == 404 || responseCode == 204) {
                 return true;
             }
             return false;
         }
         catch (Exception e) {
+
             System.out.print("Xóa quyền của user không thành công!(Line 105)");
+
             e.printStackTrace();
             return false;
         }

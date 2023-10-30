@@ -59,7 +59,6 @@ public class ProbeService implements IProbeService {
             return probeDto;
         }
     }
-
     // hướng
     @Override
     public ProbeDto saveProbe(ProbeDto probeDto, ProbeOptionDto probeOptionDto) {
@@ -144,6 +143,7 @@ public class ProbeService implements IProbeService {
                 ServerEntity server = serverRepository.findAll().get(0);
                 ProbeOptionEntity probeOptionOfServer = server.getProbeOptionEntity();
                 String responseAddRuleServer = ApiAddInfoToBroker.addRuleToBroker(probeOptionOfServer.getUserName(), listSubTopic);
+
                 // TH thêm role cho server lỗi
                 if(!responseAddRuleServer.equals("Create rule success")) {
                     responseProbe.setMessage(responseAddRuleServer);
@@ -157,10 +157,12 @@ public class ProbeService implements IProbeService {
             }
 
             // Thêm quyền cho client
+
             List<SubtopicServerEntity> listTopic = new ArrayList<>();
             // tạo ra danh sách các topic (chỉ có 1 topic của client)
             listTopic.add(subTopic);
             String responseAddRuleClient = ApiAddInfoToBroker.addRuleToBroker(probeOptionEntity.getUserName(), listTopic);
+
             // TH thêm quyền cho client lỗi
             if(!responseAddRuleClient.equals("Create rule success")) {
                 responseProbe.setMessage(responseAddRuleClient);
@@ -403,10 +405,6 @@ public class ProbeService implements IProbeService {
             return 0;
         }
     }
-    // Han
-    // Màn dashboard
-
-
     // hướng - xóa 1 probe từ thùng rác
     @Override
     public JSONObject deleteProbe(Integer id) {
@@ -458,6 +456,7 @@ public class ProbeService implements IProbeService {
         }
         return null;
     }
+
     //hướng
     private Boolean checkUsername(String username) {
         return probeOptionRepository.existsByUserName(username);
