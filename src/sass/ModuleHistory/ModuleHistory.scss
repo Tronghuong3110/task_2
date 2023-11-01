@@ -5,7 +5,7 @@ $blue-color: #9747FF;
 $mixcolor: linear-gradient(90deg, $pink-color, $blue-color);
 
 .modulesHistory {
-    height: 80%;
+    height: 78.5vh;
     padding: 20px;
     font-size: 0.8em !important;
     width: 100%;
@@ -40,7 +40,7 @@ $mixcolor: linear-gradient(90deg, $pink-color, $blue-color);
         }
 
         .searchDate {
-            width: 15%;
+            width: 10%;
             input {
                 width: 100%;
                 color-scheme: dark;
@@ -117,4 +117,5 @@ $mixcolor: linear-gradient(90deg, $pink-color, $blue-color);
             }
         }
     }
+    
 }

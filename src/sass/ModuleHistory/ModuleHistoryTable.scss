@@ -19,7 +19,6 @@ $blue-color: #9747FF;
                     border: none !important;
                     line-height: 1rem;
                 }
-
                 .checkbox {
                     width: 3%;
                 }
@@ -27,23 +26,18 @@ $blue-color: #9747FF;
                     width: 14%;
                 }
                 .probe_name {
-                    width: 20%;
+                    width: 18%;
                 }
 
                 .module_name {
-                    width: 15%;
+                    width: 25%;
                 }
-
-                .title {
-                    width: 15%;
-                }
-
                 .content {
-                    width: 30%;
+                    width: 33%;
                 }
 
                 .actions {
-                    width: 3%;
+                    width: 7%;
                 }
             }
         }
@@ -75,7 +69,7 @@ $blue-color: #9747FF;
                         outline: none;
                         border: none;
                         svg {
-                            font-size: 1.2em;
+                            font-size: 1.4em;
                         }
                     }
                 }
@@ -90,9 +84,6 @@ $blue-color: #9747FF;
                         width: 16px;
                     }
                 }
-            }
-            .content{
-                text-align: start;
             }
         }
 

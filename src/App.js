@@ -6,7 +6,8 @@ import Probes from './component/Probes/Probes';
 import ProbeDetails from './component/ProbeDetails/ProbeDetails';
 import Footer from './component/Layout/Footer';
 import Module from './component/Modules/Module';
-// import ModuleHistory from './component/ModuleHistory';
+import ModuleHistory from './component/ModuleHistory/ModuleHistory';
+import Dashboard from './component/Dashboard/Dashboard';
 import { ProbesProvider } from "./component/Probes/ProbesTable/ProbesContext";
 import {Routes,Route} from 'react-router-dom'
 function App() {
@@ -26,10 +27,11 @@ function App() {
           {/* <Module></Module> */}
           {/* <ModuleHistory></ModuleHistory> */}
           <Routes>
-            <Route path='/' element={<ProbesProvider><Probes></Probes></ProbesProvider>}></Route>
+            <Route path='/' element={<Dashboard></Dashboard>}></Route>
+            <Route path='/probe' element={<ProbesProvider><Probes></Probes></ProbesProvider>}></Route>
             <Route path='/details/:id' element={<ProbeDetails></ProbeDetails>}></Route>
             <Route path='/modules' element={<Module></Module>}></Route>
-            {/* <Route path='/process' element={<Process />}></Route> */}
+            <Route path='/module_history' element={<ModuleHistory></ModuleHistory>}></Route>
           </Routes>
         </div>
       </main>

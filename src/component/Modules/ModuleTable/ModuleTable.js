@@ -4,7 +4,7 @@ import '../../../sass/Module/ModuleTable/ModuleTable.scss'
 import AddModule from '../AddModule';
 import { faCube, faMagnifyingGlass, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { faPlusSquare } from '@fortawesome/free-regular-svg-icons';
-import { TableRow, Table, TableHead, TableCell, TableBody,TablePagination } from "@mui/material";
+import { TableRow, Table, TableHead, TableCell, TableBody, TablePagination } from "@mui/material";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPenToSquare, faTrashCan } from '@fortawesome/free-regular-svg-icons'
 import {
@@ -12,6 +12,7 @@ import {
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { IP } from '../../Layout/constaints';
+import Confirm from '../../action/Confirm';
 
 const ModuleTable = () => {
     const [modules, setModules] = useState([])
@@ -29,6 +30,13 @@ const ModuleTable = () => {
     )
     const [page, setPage] = useState(0)
     const [rowsPerPage, setRowPerPage] = useState(10)
+    const [deletingModule, setDeletingModule] = useState({
+        "id": null,
+        "name": "",
+        "message": "Are you sure to remove",
+        "note": "This module will be removed permanently",
+    })
+    const [isOpenDeleteScreen, setOpenDeleteScreen] = useState(false)
     useEffect(() => {
         getModules()
     }, [keyword])
@@ -45,26 +53,87 @@ const ModuleTable = () => {
         getModules()
     }
     const getModules = () => {
-        fetch("http://"+IP+":8081/api/v1/modules")
+        fetch("http://" + IP + ":8081/api/v1/modules")
             .then(respone => respone.json())
             .then(data => {
-                let renderData = data.filter(module => module.name.includes(keyword));
+                let renderData = data.filter(module => module.name.toLowerCase().includes(keyword.toLowerCase()));
                 setModules(renderData)
             })
             .catch(err => console.log(err))
     }
-        /*Phân trang*/
-        const handleChangePage = (event, newPage) => {
-            setPage(newPage);
-            // console.log(checkAllPages.find(item => parseInt(item) == parseInt(newPage)))
-            // if (checkAllPages.find(item => item == newPage) != undefined) document.getElementById("main-tick").checked = true;
-            // else document.getElementById("main-tick").checked = false;
-            // console.log(checkAllPages)
+    /*Phân trang*/
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    }
+    const handleChangeRowsPerPage = (event) => {
+        setRowPerPage(parseInt(event.target.value), 10)
+        setPage(0)
+    }
+
+    /**Xoa module */
+    const removeModule = (id, name) => {
+        setOpenDeleteScreen(true)
+        setDeletingModule({
+            ...deletingModule,
+            "id": id,
+            "name": name
+        })
+    }
+    const deleteModule = (id, userChoice) => {
+        if (userChoice) {
+            const options = {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                }
+            };
+            fetch("http://" + IP + ":8081/api/v1/module?id=" + id, options)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data)
+                    notify(data.message, data.code)
+                    getModules()
+                }
+                )
+                .catch(err => console.log(err));
         }
-        const handleChangeRowsPerPage = (event) => {
-            setRowPerPage(parseInt(event.target.value), 10)
-            setPage(0)
+    }
+    const notify = (message, status) => {
+        if (status == 1) {
+            toast.success(message, {
+                position: "top-center",
+                autoClose: 4000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+            })
         }
+        else if (status == 0) {
+            toast.error(message, {
+                position: "top-center",
+                autoClose: 4000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+            })
+        }
+        else {
+            toast.warn(message, {
+                position: "top-center",
+                autoClose: 4000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+            })
+        }
+
+    }
     return (
         <div className='Module_Table'>
             <div className='searchBar d-flex justify-content-between align-items-center'>
@@ -77,7 +146,7 @@ const ModuleTable = () => {
                     <FontAwesomeIcon icon={faMagnifyingGlass} flip="horizontal" ></FontAwesomeIcon>
                 </div>
                 <div className='addModule'>
-                    <button className='addModuleButton d-flex' onClick={()=>handleOpenWindow(null)}>
+                    <button className='addModuleButton d-flex' onClick={() => handleOpenWindow(null)}>
                         <div className='addModuleButton-icon'>
                             <FontAwesomeIcon icon={faPlusSquare}></FontAwesomeIcon>
                         </div>
@@ -110,7 +179,7 @@ const ModuleTable = () => {
                                         <div className='actions-container d-flex justify-content-around'>
                                             <div className='action'>
                                                 <button
-                                                    onClick={()=>{
+                                                    onClick={() => {
                                                         handleOpenWindow(module.id)
                                                     }}
                                                 >
@@ -118,7 +187,9 @@ const ModuleTable = () => {
                                                 </button>
                                             </div>
                                             <div className='action'>
-                                                <button>
+                                                <button onClick={() => {
+                                                    removeModule(module.id, module.name)
+                                                }}>
                                                     <FontAwesomeIcon icon={faTrashCan} style={{ color: "#FFD233" }} />
                                                 </button>
                                             </div>
@@ -131,17 +202,20 @@ const ModuleTable = () => {
                 </TableBody>
             </Table>
             {
-                    modules.length == 0 ? false : true && <TablePagination
-                        rowsPerPageOptions={[10, 15, 20]}
-                        component="div"
-                        count={modules.length}
-                        rowsPerPage={rowsPerPage}
-                        page={page}
-                        onPageChange={handleChangePage}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
-                    ></TablePagination>
-                }
-            {isOpen && <AddModule handleCloseWindow={handleCloseWindow} id={isEditModule.id}></AddModule>}
+                modules.length == 0 ? false : true && <TablePagination
+                    rowsPerPageOptions={[10, 15, 20]}
+                    component="div"
+                    count={modules.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                ></TablePagination>
+            }
+            {isOpen && <AddModule handleCloseWindow={handleCloseWindow} id={isEditModule.id}  ></AddModule>}
+            {
+               isOpenDeleteScreen &&<Confirm confirmContent={deletingModule} listDelete={[]} setOpenDeleteScreen={setOpenDeleteScreen} handleFunction={deleteModule} ></Confirm>
+            }
             <ToastContainer></ToastContainer>
         </div>
     )

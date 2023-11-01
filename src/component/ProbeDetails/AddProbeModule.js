@@ -4,7 +4,7 @@ import '../../sass/ProbeDetails/AddProbeModule.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBookmark, faCircleXmark, faFolderOpen, faNoteSticky } from '@fortawesome/free-regular-svg-icons'
 import {
-    faFloppyDisk, faCube, faTerminal
+    faFloppyDisk, faCube, faTerminal, faPlug, faArrowRightFromBracket, faArrowRightToBracket
 } from '@fortawesome/free-solid-svg-icons'
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
@@ -19,8 +19,10 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
     const [isEditedModule, setEditedModule] = useState({})
     const [caption, setCaption] = useState("")
     const [arg, setArg] = useState("")
+    const [path, setPath] = useState("")
+    const [logPath, setLogPath] = useState("")
     useEffect(() => {
-        fetch("http://"+IP+":8081/api/v1/modules")
+        fetch("http://" + IP + ":8081/api/v1/modules")
             .then(response => response.json())
             .then(data => {
                 setListSampleModule(data)
@@ -28,7 +30,8 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                     setCommandValue(data[0].caption + " " + data[0].argDefalt);
                     setCaption(data[0].caption)
                     setArg(data[0].argDefalt)
-                    console.log(arg)
+                    setPath(data[0].pathDefault)
+                    setLogPath(data[0].pathLogDefault)
                 }
             })
             .catch(err => console.log(err))
@@ -36,7 +39,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
     useEffect(() => {
         if (id != null) {
             console.log(1)
-            fetch("http://"+IP+":8081/api/v1/probe/module?idProbeModule=" + id)
+            fetch("http://" + IP + ":8081/api/v1/probe/module?idProbeModule=" + id)
                 .then(response => response.json())
                 .then(data => {
                     setEditedModule(data)
@@ -75,7 +78,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
             }
             if (fullData.id == null) {
                 console.log("POST NOW")
-                fetch("http://"+IP+":8081/api/v1/probeModule/import", options)
+                fetch("http://" + IP + ":8081/api/v1/probeModule/import", options)
                     .then(response => response.json())
                     .then(data => {
                         console.log(data)
@@ -94,7 +97,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
             }
             else {
                 console.log("PUT NOW")
-                fetch("http://"+IP+":8081/api/v1/probe/module", options)
+                fetch("http://" + IP + ":8081/api/v1/probe/module", options)
                     .then(response => response.json())
                     .then(data => {
                         console.log(data)
@@ -151,11 +154,14 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
     }
     const onChangeSampleModule = (event) => {
         const selectedOption = event.target.options[event.target.selectedIndex];
+        const selectedModule = selectedOption.getAttribute('module');
         const caption = selectedOption.getAttribute('caption');
         const argDefalt = selectedOption.getAttribute('argdefault');
         setCommandValue(caption + " " + argDefalt);
         setCaption(caption)
         setArg(argDefalt)
+        setPath(selectedModule.pathDefault)
+        setLogPath(selectedModule.pathLogDefault)
     }
     const getModuleInfo = (id) => {
         let idModule = document.querySelector("#idModule")
@@ -210,7 +216,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                                     {
                                         listSampleModule.map(modules => {
                                             return (
-                                                <option key={modules.id} caption={modules.caption} argdefault={modules.argDefalt} value={modules.id}>{modules.name}</option>
+                                                <option key={modules.id} module={modules} caption={modules.caption} argdefault={modules.argDefalt} value={modules.id}>{modules.name}</option>
                                             )
                                         })
                                     }
@@ -235,9 +241,13 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                                 <div className='input_container-icon-text'>COMMAND</div>
                             </div>
                             <div className='input_container-input'>
-                                <textarea defaultValue={commandValue} disabled className='commandInput' id='command' ></textarea>
+                                <textarea defaultValue={commandValue} disabled  id='command' ></textarea>
                             </div>
                             <div className='input_container-input'>
+                                <div className='input_container-icon d-flex align-items-center'>
+                                    <FontAwesomeIcon icon={faArrowRightToBracket} />
+                                    <div className='input_container-icon-text'>ARGUMENT</div>
+                                </div>
                                 <input
                                     className='commandInput exception inputModuleInfo'
                                     type='text' placeholder='Your argument'
@@ -259,10 +269,20 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                                 <div className='input_container-icon-text'>PATH AND LOG PATH</div>
                             </div>
                             <div className='input_container-input'>
-                                <input className='commandInput inputModuleInfo' type='text' placeholder='Path...' id='path' defaultValue={isEditedModule.path} ></input>
+                                <input className='commandInput inputModuleInfo' type='text' placeholder='Path...' id='path'
+                                    defaultValue={id == null ? path : isEditedModule.path}
+                                    onChange={(e) => {
+                                        setPath(e.target.value)
+                                    }}
+                                ></input>
                             </div>
                             <div className='input_container-input'>
-                                <input className='inputModuleInfo' type='text' placeholder='Log path here....' id='pathLog' defaultValue={isEditedModule.pathLog}></input>
+                                <input className='inputModuleInfo' type='text' placeholder='Log path here....' id='pathLog'
+                                    defaultValue={id == null ? logPath : isEditedModule.pathLog}
+                                    onChange={(e) => {
+                                        setLogPath(e.target.value)
+                                    }}
+                                ></input>
                             </div>
                         </div>
                     </div>

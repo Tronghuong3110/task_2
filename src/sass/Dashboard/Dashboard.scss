@@ -1,0 +1,21 @@
+$primary: #0b0c24;
+$secondary: #27293d;
+$pink-color: #E14ECA;
+$blue-color: #9747FF;
+$mixcolor: linear-gradient(90deg, $pink-color, $blue-color);
+.dashboard {
+    height: 78.5vh;
+    font-size: 0.8em ;
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    .ProbeAndModuleContainer{
+        width: 35%;
+        height: 100%;
+        position: relative;
+    }
+    .ProbeHistoryContainer{
+        width: 60%;
+        height: 100%;
+    }
+}

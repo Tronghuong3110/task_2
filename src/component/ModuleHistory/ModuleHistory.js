@@ -4,8 +4,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCube, faMagnifyingGlass, faClockRotateLeft, faArrowRotateBack } from '@fortawesome/free-solid-svg-icons';
 import { faPlusSquare, faTrashCan } from '@fortawesome/free-regular-svg-icons';
 import '../../sass/ModuleHistory/ModuleHistory.scss'
-import  CheckBox  from '../action/CheckBox.js';
 import ModuleHistoryTable from "./ModuleHistoryTable/ModuleHistoryTable";
+import DropdownWithInput from '../action/DropdownWithInput';
+import { Checkbox } from "@mui/material";
 
 
 
@@ -17,12 +18,7 @@ const ModuleHistory = () => {
                     <input type="date" placeholder="Choose date"></input>
                 </div>
                 <div className="searchProbe">
-                    <select>
-                        <option > Choose probe</option>
-                        <option>1</option>
-                        <option>2</option>
-                        <option>3</option>
-                    </select>
+                    {/* <DropdownWithInput></DropdownWithInput> */}
                 </div>
                 <div className="searchModule">
                     <select>
@@ -44,7 +40,16 @@ const ModuleHistory = () => {
             </div>
             <div className="actionBar d-flex align-items-center">
                 <div className="checkAll">
-                    <CheckBox></CheckBox>
+                    <Checkbox
+                        sx={{
+                            color: 'white',
+                            '&.Mui-checked': {
+                                color: 'white',
+                            },
+                        }}
+                    >
+
+                    </Checkbox>
                 </div>
                 <div className="refreshButton">
                     <button>

@@ -40,7 +40,8 @@ const Probe_Modules = ({ id }) => {
     const [checkAllPages, setCheckAllPages] = useState([])
     const [existRunningOrPending,setExistRunningOrPending] = useState([])
     useEffect(() => {
-        getProbeModules()
+        if(sessionStorage.getItem("check")==0) getModuleContinues()
+        else getProbeModules()
     }, [])
     useEffect(() => {
         let name = conditions.name;
@@ -49,7 +50,6 @@ const Probe_Modules = ({ id }) => {
         setProbeModules(result)
     }, [conditions])
     const getProbeModules = () => {
-        console.log("Hi")
         fetch("http://" + IP + ":8081/api/v1/probe/modules?idProbe=" + id + "&&name=&&status=")
             .then(response => response.json())
             .then(data => {
@@ -65,11 +65,6 @@ const Probe_Modules = ({ id }) => {
             .then(data => {
                 let name = document.getElementById("keyWordInput").value;
                 let status = document.getElementById("statusInput").value;
-                console.log(name, status)
-                // setConditions({
-                //     "name": name,
-                //     "status":status
-                // })
                 let result = data.filter(modules => modules.moduleName.includes(name) && (modules.status == (status == "All" ? modules.status : status)))
                 let check = result.filter(item => item.status == "Running"|| item.status =="Pending")
                 setExistRunningOrPending(check)
@@ -103,10 +98,8 @@ const Probe_Modules = ({ id }) => {
     /*Phân trang*/
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
-        console.log(checkAllPages.find(item => parseInt(item) == parseInt(newPage)))
         if (checkAllPages.find(item => item == newPage) != undefined) document.getElementById("main-tick").checked = true;
         else document.getElementById("main-tick").checked = false;
-        console.log(checkAllPages)
     }
     const handleChangeRowsPerPage = (event) => {
         setRowPerPage(parseInt(event.target.value), 10)
@@ -114,7 +107,6 @@ const Probe_Modules = ({ id }) => {
     }
     /* Sắp xếp theo điều kiện EPW */
     const handleRequestSort = (event, property) => {
-        console.log(property)
         const isAscending = (valueToOrderBy === property && orderDirection === 'asc')
         setValueToOrderBy(property)
         setOrderDirection(isAscending ? 'desc' : 'asc')
@@ -143,45 +135,65 @@ const Probe_Modules = ({ id }) => {
         return stablilizeRowArray.map((el) => el[0])
     }
     /** Run or Restart or Stop module */
+    const getModuleContinues = () => {
+        const interval = setInterval(() => {
+            const checkValue = sessionStorage.getItem("check");
+            if (checkValue == 1) {
+                setSelectedProbeModules([]);
+                sessionStorage.removeItem("check");
+            } else if (checkValue === null) {
+                clearInterval(interval); // Dừng interval khi checkValue là null
+            } else {
+                getProbeModulesByConditions();
+            }
+        }, 1000);
+    };
     const actionWithModule = (id, action) => {
         let nodes = document.querySelectorAll(".actionBtn")
+        if(action=="run"){
+            if(Array.isArray(id)){
+                if(id.length > 6) {
+                    notify("Please choose less than or equal to 6 modules running at the same time",2)
+                    return;
+                }
+            }
+        }
         nodes.forEach(node => {
             node.setAttribute("disabled", true)
             setTimeout(() => {
                 node.removeAttribute("disabled");
             }, 1000);
         })
-        let check = 0;
+        sessionStorage.setItem("check",0)
         fetch("http://" + IP + ":8081/api/v1/probeModule/" + action)
             .then(response => response.text())
             .then(data => {
                 notify("Received request succesfully", 1)
             })
             .then(() => {
-                let stringParam;
-                if (Array.isArray(id)) stringParam = id.join(" ")
-                else stringParam = id
+                let arr;
+                if(Array.isArray(id)) arr= id;
+                else arr = [id]
                 const options = {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
-                    }
+                    },
+                    body: JSON.stringify({
+                        "ids": arr
+                    })
                 }
-                fetch("http://" + IP + ":8081/api/v1/probeModule/" + action + "?idProbeModule=" + stringParam, options)
+                // console.log("http://" + IP + ":8081/api/v1/probeModule/" + action + "?idProbeModule=" + stringParam)
+                fetch("http://" + IP + ":8081/api/v1/probeModule/" + action, options)
                     .then(response => response.text())
                     .then(data => {
-                        setTimeout(() => { check = data }, 2000)
+                        console.log(data)
+                        setTimeout(() => { sessionStorage.setItem("check",1) }, 2000)
                     })
                     .catch(err => console.log(err))
             })
-        setInterval(() => {
-            if (check == 1) {
-                return;
-            }
-            else {
-                getProbeModulesByConditions()
-            }
-        }, 2000);
+            .catch(err => console.log)
+        getModuleContinues()
     }
     /** Delete 1 module */
     const displayDeleteModule = (id, name) => {
@@ -200,8 +212,6 @@ const Probe_Modules = ({ id }) => {
         if (userChoice) {
             let stringParam =""
             if (Array.isArray(id)) {
-                console.log(id, existRunningOrPending)
-                console.log(existRunningOrPending.some(item => id.includes(item.id)))
                 if(existRunningOrPending.some(item => id.includes(item.id))){
                     notify("There are some modules running or pending, please stop before delete them",2)
                     return;
@@ -218,7 +228,6 @@ const Probe_Modules = ({ id }) => {
             fetch("http://" + IP + ":8081/api/v1/probeModule?id=" + stringParam, options)
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data)
                     notify(data.message, data.code)
                     getProbeModules()
                 }
@@ -233,7 +242,6 @@ const Probe_Modules = ({ id }) => {
             setSelectedProbeModules([...selectedProbeModules, id])
         }
         else {
-            console.log(selectedProbeModules.filter(item => item != id))
             setSelectedProbeModules(selectedProbeModules.filter(item => item != id))
         }
     }
@@ -244,7 +252,6 @@ const Probe_Modules = ({ id }) => {
             if (!selectedProbeModules.find(item => item == node.id)) arrNum.push(parseInt(node.id))
         });
         if (value == true) {
-            console.log(arrNum)
             setSelectedProbeModules(selectedProbeModules.concat(arrNum));
             setCheckAllPages([...checkAllPages, page])
         }
@@ -403,7 +410,7 @@ const Probe_Modules = ({ id }) => {
                     ></Probe_Module_Header>
                     <TableBody>
                         {
-                            probe_modules.length != 0 ? (
+                            probe_modules.length != 0 || sessionStorage.getItem("check")==0 ? (
                                 sortedProbes(probe_modules, getComparator(orderDirection, valueToOrderBy))
                                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                     .map((module, index) => {
@@ -420,7 +427,11 @@ const Probe_Modules = ({ id }) => {
                                                 </TableCell>
                                                 <TableCell className='module_name' ><div>{module.moduleName}</div></TableCell>
                                                 <TableCell className='caption' ><div>{module.caption}</div></TableCell>
-                                                <TableCell className='argument' ><div>{module.arg}</div></TableCell>
+                                                <TableCell className='argument' ><div>
+                                                    <Tooltip title={module.arg}>
+                                                        {module.arg}
+                                                    </Tooltip>
+                                                </div></TableCell>
                                                 <TableCell className='errorPerWeek' ><div key="errorPerWeek">{module.errorPerWeek}</div></TableCell>
                                                 <TableCell className='status' ><div style={{ color: setStatusColor(module.status) }}>{module.status}</div></TableCell>
                                                 <TableCell className='note' ><div>{module.note}</div></TableCell>

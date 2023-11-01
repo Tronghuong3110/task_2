@@ -11,15 +11,17 @@ import { IP } from '../Layout/constaints';
 const AddModule = ({ handleCloseWindow, id }) => {
     const [isEditModule, setEditModule] = useState({
         "name": "",
-        "path": "",
+        "pathDefault": "",
         "caption": "",
         "argDefalt": "",
-        "note": ""
+        "note": "",
+        "pathLogDefault":"",
+        "id":id
     })
 
     useEffect(() => {
         if (id != null) {
-            fetch("http://"+IP+":8081/api/v1/module?idModule=" + id)
+            fetch("http://" + IP + ":8081/api/v1/module?idModule=" + id)
                 .then(response => response.json())
                 .then(data => setEditModule(data))
                 .catch(err => console.log(err))
@@ -27,9 +29,11 @@ const AddModule = ({ handleCloseWindow, id }) => {
     }, [])
 
     // Thêm mới một module mẫu
-    const addNewModule = (id) => {
+    const addOrEditModule = (id) => {
         let data = getModuleInfo();
+        console.log(id)
         if (findEmptyFields(data).length > 0) {
+            console.log(findEmptyFields(data))
             let message = "Field ";
             let arr = findEmptyFields(data);
             if (arr.length == 1) message += arr[0] + " is empty"
@@ -43,6 +47,7 @@ const AddModule = ({ handleCloseWindow, id }) => {
             notify(message, 2)
         }
         else {
+            console.log(data)
             let options = {
                 method: id == null ? "POST" : "PUT",
                 headers: {
@@ -51,26 +56,30 @@ const AddModule = ({ handleCloseWindow, id }) => {
                 body: JSON.stringify(data)
             }
             if (id == null) {
-                fetch("http://"+IP+":8081/api/v1/module/import", options)
+                fetch("http://" + IP + ":8081/api/v1/module/import", options)
                     .then(response => response.json())
                     .then(data => {
-                        if(data.code == 1){
+                        if (data.code == 1) {
                             notify(data.message, data.code)
                             handleCloseWindow();
                         }
-                        else notify(data.message,data.code)
+                        else notify(data.message, data.code)
                     })
                     .catch(err => console.log(err))
             }
             else {
-                fetch("http://"+IP+":8081/api/v1/module", options)
+                fetch("http://" + IP + ":8081/api/v1/module", options)
                     .then(response => response.json())
                     .then(data => {
-                        if(data.code == 1){
+                        console.log(data)
+                        if (data.code == 1) {
                             notify(data.message, data.code)
                             handleCloseWindow();
                         }
-                        else notify(data.message,data.code)
+                        else {
+            
+                            notify(data.message, data.code)
+                        }
                     })
                     .catch(err => console.log(err))
             }
@@ -78,12 +87,13 @@ const AddModule = ({ handleCloseWindow, id }) => {
     }
     const getModuleInfo = () => {
         return {
-            "name": document.getElementById("module_name").value,
-            "path": document.getElementById("path").value,
-            "pathLog": document.getElementById("pathLog").value,
+            "name": document.getElementById("name").value,
+            "pathDefault": document.getElementById("path").value,
+            "pathLogDefault": document.getElementById("pathLog").value,
             "caption": document.getElementById("caption").value,
             "argDefalt": document.getElementById("argument").value,
-            "note": document.getElementById("note").value
+            "note": document.getElementById("note").value,
+            "id":id
         }
     }
     const notify = (message, status) => {
@@ -126,8 +136,10 @@ const AddModule = ({ handleCloseWindow, id }) => {
         let emptyFields = [];
 
         for (let key in obj) {
-            if (!obj[key]) {
-                emptyFields.push(key);
+            if(key!="id"){
+                if (!obj[key]) {
+                    emptyFields.push(key);
+                }
             }
         }
 
@@ -149,7 +161,7 @@ const AddModule = ({ handleCloseWindow, id }) => {
                             <div className='input_container-icon-text'>MODULE</div>
                         </div>
                         <div className='input_container-input'>
-                            <input type='text' id="module_name" placeholder='Type module name...' value={isEditModule.name}></input>
+                            <input type='text' id="name" placeholder='Type module name...' defaultValue={isEditModule.name}></input>
                         </div>
                     </div>
                     <div className="field ">
@@ -159,10 +171,10 @@ const AddModule = ({ handleCloseWindow, id }) => {
                                 <div className='input_container-icon-text'>COMMAND</div>
                             </div>
                             <div className='input_container-input'>
-                                <input className='commandInput' type='text' placeholder='Caption...' id='caption' value={isEditModule.caption}></input>
+                                <input className='commandInput' type='text' placeholder='Caption...' id='caption' defaultValue={isEditModule.caption}></input>
                             </div>
                             <div className='input_container-input'>
-                                <input className='commandInput exception' type='text' placeholder='Default argument' id='argument' value={isEditModule.argDefalt}></input>
+                                <input className='commandInput exception' type='text' placeholder='Default argument' id='argument' defaultValue={isEditModule.argDefalt}></input>
                             </div>
                         </div>
                     </div>
@@ -189,13 +201,13 @@ const AddModule = ({ handleCloseWindow, id }) => {
                             <div className='input_container-icon-text'>NOTE</div>
                         </div>
                         <div className='input_container-input'>
-                            <textarea placeholder='Take note here...' id='note' value={isEditModule.note}></textarea>
+                            <textarea placeholder='Take note here...' id='note' defaultValue={isEditModule.note}></textarea>
                         </div>
                     </div>
                 </div>
                 {/* Button */}
                 <div className='btn-container d-flex justify-content-end'>
-                    <button className='btn btn-success d-flex align-items-center' onClick={addNewModule} >
+                    <button className='btn btn-success d-flex align-items-center' onClick={()=>addOrEditModule(id)} >
                         <div className='btn-icon d-flex align-items-center' >
                             <FontAwesomeIcon icon={faFloppyDisk} />
                         </div>

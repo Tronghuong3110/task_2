@@ -20,7 +20,7 @@ const Sidebar = () => {
             </div>
             <div className="sidebar-selections">
                 <div className="selection d-flex" id="dashboard">
-                    <Link>
+                    <Link to={"/"}>
                         <div className="selection-symbol d-flex align-items-center">
                             <FontAwesomeIcon icon={faHouse} style={{ color: "#ffffff", fontSize: "1em" }} />
                         </div>
@@ -36,7 +36,7 @@ const Sidebar = () => {
                     </Link>
                 </div>
                 <div className="selection d-flex" id="probes">
-                    <Link to={"/"}>
+                    <Link to={"/probe"}>
                         <div className="selection-symbol d-flex align-items-center">
                             <FontAwesomeIcon icon={faDisplay} style={{ color: "#ffffff", fontSize: "1em" }} />
                         </div>
@@ -44,7 +44,7 @@ const Sidebar = () => {
                     </Link>
                 </div>
                 <div className="selection d-flex" id="history">
-                    <Link>
+                    <Link to={"/module_history"}>
                         <div className="selection-symbol d-flex align-items-center">
                             <FontAwesomeIcon icon={faClockRotateLeft} style={{ color: "#ffffff", fontSize: "1em" }} />
                         </div>
