@@ -1,13 +1,9 @@
 package com.newlife.Connect_multiple.controller;
 
 import com.newlife.Connect_multiple.dto.ModuleDto;
-import com.newlife.Connect_multiple.dto.ProbeModuleDto;
 import com.newlife.Connect_multiple.service.IModuleService;
-import com.newlife.Connect_multiple.service.IProbeModuleService;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -62,4 +58,11 @@ public class ModuleController {
             return mess;
         }, executorService);
     }
+
+    @GetMapping("/module")
+    public ModuleDto getOneModule(@RequestParam("idModule") Integer idModule) {
+        ModuleDto moduleDto = moduleService.findOneModule(idModule);
+        return moduleDto;
+    }
+
 }

@@ -1,12 +1,16 @@
 package com.newlife.Connect_multiple.entity;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.sql.Date;
 
 @Entity
 @Data
+@Getter
+@Setter
 @Table(name = "module_history")
 public class ModuleHistoryEntity {
 
@@ -43,4 +47,10 @@ public class ModuleHistoryEntity {
 
     @Column(name = "id_probe_module")
     private Integer idProbeModule;
+
+    @Column(name = "probe_name")
+    private String probeName;
+
+    @Column(name = "ack")
+    private Integer ack;
 }

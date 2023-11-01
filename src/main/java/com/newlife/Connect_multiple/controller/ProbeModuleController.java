@@ -1,6 +1,7 @@
 package com.newlife.Connect_multiple.controller;
 
 import com.newlife.Connect_multiple.dto.ProbeModuleDto;
+import com.newlife.Connect_multiple.dto.ResquestModule;
 import com.newlife.Connect_multiple.service.IProbeModuleService;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,16 +56,16 @@ public class ProbeModuleController {
 
     // chạy lại module (Hướng)
     @PostMapping("/probeModule/restart")
-    public CompletableFuture<ResponseEntity<?>> restartModule(@RequestParam("idProbeModule") String idProbeModule){
+    public CompletableFuture<ResponseEntity<?>> restartModule(@RequestBody ResquestModule resquestModule){
         return CompletableFuture.supplyAsync(() -> {
-            if(idProbeModule.equals("")) {
+            List<Integer> listIpModule = resquestModule.getIds();
+            if(listIpModule.size() <= 0) {
                 return ResponseEntity.badRequest().body(0);
             }
-            ArrayList<String> listIpModule = new ArrayList<>(Arrays.asList(idProbeModule.split(" ")));
-            for(String id : listIpModule) {
+            for(Integer id : listIpModule) {
                 try {
-                    Object responseStop = probeModuleService.stopModule(Integer.parseInt(id));
-                    Object runModule = probeModuleService.runModule(Integer.parseInt(id));
+                    Object responseStop = probeModuleService.stopModule(id);
+                    Object runModule = probeModuleService.runModule(id);
 //                    Thread.sleep(3000);
                 }
                 catch (Exception e) {
@@ -77,19 +78,22 @@ public class ProbeModuleController {
 
     // chạy module (Hướng)
     @PostMapping("/probeModule/run")
-    public CompletableFuture<ResponseEntity> runModule(@RequestParam("idProbeModule") String idProbeModule) {
+    public CompletableFuture<ResponseEntity> runModule(@RequestBody ResquestModule resquestModule) {
         return CompletableFuture.supplyAsync(() -> {
-            if(idProbeModule.equals("")) {
-                return ResponseEntity.badRequest().body(0);
-            }
-            ArrayList<String> listIpModule = new ArrayList<>(Arrays.asList(idProbeModule.split(" ")));
-            for(String id : listIpModule) {
+//            if(idProbeModule.equals("")) {
+//                return ResponseEntity.badRequest().body(0);
+//            }
+//            ArrayList<String> listIpModule = new ArrayList<>(Arrays.asList(idProbeModule.split(",")));
+            List<Integer> listIpModule = resquestModule.getIds();
+//            ArrayList<Integer> ids = new ArrayList<>();
+            for(Integer id : listIpModule) {
                 try {
-                    Object jsonObject = probeModuleService.runModule(Integer.parseInt(id));
-//                    Thread.sleep(3000);
+                    Object jsonObject = probeModuleService.runModule(id);
+        //                    Thread.sleep(3000);
                 }
                 catch (Exception e) {
                     e.printStackTrace();
+                    return ResponseEntity.badRequest().body(0);
                 }
             }
             return ResponseEntity.ok(1);
@@ -98,16 +102,15 @@ public class ProbeModuleController {
 
     // stop module (Hướng)
     @PostMapping("/probeModule/stop")
-    public CompletableFuture<ResponseEntity<?>> stopModule(@RequestParam("idProbeModule") String idProbeModule) {
+    public CompletableFuture<ResponseEntity<?>> stopModule(@RequestBody ResquestModule resquestModule) {
         return CompletableFuture.supplyAsync(() -> {
-            if(idProbeModule.equals("")) {
+            List<Integer> listIpModule = resquestModule.getIds();
+            if(listIpModule.size() <= 0) {
                 return ResponseEntity.badRequest().body(0);
             }
-            System.out.println("id " + idProbeModule);
-            ArrayList<String> listIpModule = new ArrayList<>(Arrays.asList(idProbeModule.split(" ")));
-            for(String id : listIpModule) {
+            for(Integer id : listIpModule) {
                 try {
-                    Object jsonObject = probeModuleService.stopModule(Integer.parseInt(id));
+                    Object jsonObject = probeModuleService.stopModule(id);
 //                    Thread.sleep(3000);
                 }
                 catch (Exception e) {

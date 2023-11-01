@@ -30,7 +30,8 @@ public class ModuleService implements IModuleService {
 
     @Override
     public ModuleDto findOneModule(Integer id) {
-        return null;
+        ModuleEntity moduleEntity = moduleRepository.findById(id).orElse(new ModuleEntity());
+        return ModuleConverter.toDto(moduleEntity);
     }
 
     @Override
@@ -79,29 +80,51 @@ public class ModuleService implements IModuleService {
     public JSONObject updateModule(ModuleDto moduleDto) {
         JSONObject json = new JSONObject();
         try {
-            ModuleEntity moduleEntity = ModuleConverter.toEntity(moduleDto);
-            Integer idModule = moduleEntity.getId();
-
-            ModuleEntity module = moduleRepository.findById(idModule).orElse(null);
-            String oldName = module.getName();
-            String newName = moduleEntity.getName();
-            if (oldName.equals(newName)) {
+            // lấy ra module theo id từ database
+            ModuleEntity moduleEntity = moduleRepository.findById(moduleDto.getId()).orElse(null);
+            moduleEntity = ModuleConverter.toEntity(moduleEntity, moduleDto);
+            // Th không tồn tại module theo id
+            if(moduleEntity == null) {
+                json.put("code", "0");
+                json.put("message", "Update module fail");
+                return json;
+            }
+            // lấy module theo tên module
+            ModuleEntity module = moduleRepository.findByName(moduleDto.getName()).orElse(null);
+            // module mới có id trùng mới module cũ
+            // nếu khác ==> trùng tên ==> không cho cập nhật
+            if(module != null && module.getId() != moduleEntity.getId()) {
+                json.put("code", "3");
+                json.put("message", "Module name has been duplicated");
+                return json;
+            }
+            else {
+                moduleEntity.setName(moduleDto.getName());
                 moduleRepository.save(moduleEntity);
                 json.put("code", "1");
                 json.put("message", "Update module success");
                 return json;
-            } else {
-                if (checkModuleName(newName)) {
-                    json.put("code", "3");
-                    json.put("message", "Trùng tên module");
-                    return json;
-                } else {
-                    moduleRepository.save(moduleEntity);
-                    json.put("code", "1");
-                    json.put("message", "Update module success");
-                    return json;
-                }
             }
+//            Integer idModule = moduleEntity.getId();
+//            String oldName = module.getName();
+//            String newName = moduleEntity.getName();
+//            if (oldName.equals(newName)) {
+//                moduleRepository.save(moduleEntity);
+//                json.put("code", "1");
+//                json.put("message", "Update module success");
+//                return json;
+//            } else {
+//                if (checkModuleName(newName)) {
+//                    json.put("code", "3");
+//                    json.put("message", "Trùng tên module");
+//                    return json;
+//                } else {
+//                    moduleRepository.save(moduleEntity);
+//                    json.put("code", "1");
+//                    json.put("message", "Update module success");
+//                    return json;
+//                }
+//            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

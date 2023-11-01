@@ -1,9 +1,13 @@
 package com.newlife.Connect_multiple.dto;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.sql.Date;
 
 @Data
+@Getter
+@Setter
 public class ModuleHistoryDto {
     private String idModuleHistory;
     private Integer idProbe;
@@ -15,4 +19,6 @@ public class ModuleHistoryDto {
     private Date atTime;
     private String moduleName;
     private String note;
+    private String probeName;
+    private Integer ack;
 }

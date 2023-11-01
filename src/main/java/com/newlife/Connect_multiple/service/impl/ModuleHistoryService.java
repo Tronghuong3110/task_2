@@ -1,15 +1,21 @@
 package com.newlife.Connect_multiple.service.impl;
 
+import com.newlife.Connect_multiple.converter.ModuleHistoryConverter;
 import com.newlife.Connect_multiple.dto.ModuleHistoryDto;
+import com.newlife.Connect_multiple.entity.ModuleHistoryEntity;
 import com.newlife.Connect_multiple.repository.ModuleHistoryRepository;
 import com.newlife.Connect_multiple.repository.ModuleProbeRepository;
 import com.newlife.Connect_multiple.service.IModuleHistoryService;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,7 +23,7 @@ import java.util.Optional;
 public class ModuleHistoryService implements IModuleHistoryService {
 
     @Autowired
-    private static ModuleHistoryRepository moduleHistoryRepository;
+    private ModuleHistoryRepository moduleHistoryRepository;
 
     // HAN
     @Override
@@ -36,8 +42,14 @@ public class ModuleHistoryService implements IModuleHistoryService {
     }
 
     @Override
-    public List<ModuleHistoryDto> getModuleHistoryByWeek() {
-        return null;
+    public List<ModuleHistoryDto> findAllModuleHistoryByCondition(Integer idProbeModule, Integer idProbe, String time, Integer ack, Integer page) {
+        Pageable pageable = PageRequest.of(page, 10);
+        Page<ModuleHistoryEntity> listModuleHistories = moduleHistoryRepository.findAllByCondition(idProbeModule, idProbe, time, ack, pageable);
+        List<ModuleHistoryDto> listModuleHistoriesDto = new ArrayList<>();
+        for(ModuleHistoryEntity moduleHistory : listModuleHistories.toList()) {
+            listModuleHistoriesDto.add(ModuleHistoryConverter.toDto(moduleHistory));
+        }
+        return listModuleHistoriesDto;
     }
 
     @Override
@@ -56,6 +68,29 @@ public class ModuleHistoryService implements IModuleHistoryService {
             e.printStackTrace();
             System.out.println("Lỗi tính error (line 54) ");
             return "khong tinh dc";
+        }
+    }
+
+    @Override
+    public Integer updateAck(String id) {
+        try {
+            ModuleHistoryEntity moduleHistory = moduleHistoryRepository.findById(id).orElse(null);
+            if(moduleHistory == null) {
+                return 0;
+            }
+            // ack = 1: đã xác nhận xem
+            // ack = 0: chưa xác nhận xem
+            if(!moduleHistory.getAck().equals(1)) {
+                moduleHistory.setAck(0);
+                moduleHistoryRepository.save(moduleHistory);
+                return 1;
+            }
+            return 1;
+        }
+        catch (Exception e) {
+            System.out.println("Update ack error!");
+            e.printStackTrace();
+            return 0;
         }
     }
 

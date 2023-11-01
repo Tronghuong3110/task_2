@@ -34,19 +34,16 @@ public class ModuleConverter {
 
     public static ModuleEntity toEntity(ModuleEntity moduleEntity, ModuleDto moduleDto) {
         try {
-            if(!moduleDto.getName().equals(moduleEntity.getName())) {
-                moduleEntity.setName(moduleDto.getName());
-            }
-            if(!moduleDto.getPathDefault().equals(moduleEntity.getPathDefault())) {
+            if(moduleDto.getPathDefault() != null && !moduleDto.getPathDefault().equals(moduleEntity.getPathDefault())) {
                 moduleEntity.setPathDefault(moduleDto.getPathDefault());
             }
-            if(!moduleDto.getNote().equals(moduleEntity.getNote())) {
+            if(moduleDto.getNote() != null && !moduleDto.getNote().equals(moduleEntity.getNote())) {
                 moduleEntity.setNote(moduleDto.getNote());
             }
-            if(!moduleDto.getArgDefalt().equals(moduleEntity.getArgDefalt())) {
+            if(moduleDto.getArgDefalt() != null && !moduleDto.getArgDefalt().equals(moduleEntity.getArgDefalt())) {
                 moduleEntity.setArgDefalt(moduleDto.getArgDefalt());
             }
-            if(!moduleDto.getPathLogDefault().equals(moduleEntity.getPathLogDefault())) {
+            if(moduleDto.getPathLogDefault() != null && !moduleDto.getPathLogDefault().equals(moduleEntity.getPathLogDefault())) {
                 moduleEntity.setPathLogDefault(moduleDto.getPathLogDefault());
             }
             return moduleEntity;

@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public class JsonUtil {
     public static String createJson(ProbeModuleEntity probeModuleEntity, String idCmdHistory,
-                                    Optional<String> cmdWin, Optional<String> cmdLinux, String action) {
+                                    Optional<String> cmdWin, Optional<String> cmdLinux, String action, String probeName) {
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("idProbeModule", probeModuleEntity.getId().toString());
@@ -27,6 +27,7 @@ public class JsonUtil {
             jsonObject.put("CommandLine", probeModuleEntity.getCommand()); // câu lệnh dùng để dừng module
             jsonObject.put("nameProcess", probeModuleEntity.getProcessName()); // tên process để dừng
             jsonObject.put("action", action);
+            jsonObject.put("probeName", probeName);
             return jsonObject.toJSONString();
         }
         catch (NullPointerException e) {
@@ -65,7 +66,7 @@ public class JsonUtil {
         }
     }
 
-    public static String createJsonStatus(String action, List<ProbeModuleEntity> probeModuleEntities) {
+    public static String createJsonStatus(String action, List<ProbeModuleEntity> probeModuleEntities, String probeName) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("action", action);
         Integer idProbe = -1;
@@ -82,6 +83,7 @@ public class JsonUtil {
             jsonArray.put(jsonObject1);
         }
         jsonObject.put("id_probe", idProbe.toString());
+        jsonObject.put("probeName", probeName);
         jsonObject.put("listModule", jsonArray);
         return jsonObject.toJSONString();
     }

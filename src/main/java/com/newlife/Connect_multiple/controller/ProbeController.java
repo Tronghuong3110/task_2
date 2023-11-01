@@ -23,7 +23,7 @@ public class ProbeController {
 
     @Autowired
     private ILocationService locationService;
-    private ExecutorService executorService = Executors.newFixedThreadPool(10);
+    private ExecutorService executorService = Executors.newFixedThreadPool(15);
 
     // lấy ra 1 probe (đã test thành công) (Han)
     @GetMapping("/probe")
@@ -87,8 +87,8 @@ public class ProbeController {
     @PutMapping("/probe")
     public CompletableFuture<JSONObject> updateProbe(@RequestBody ProbeDto probeDto) {
         return CompletableFuture.supplyAsync(() -> {
-            System.out.println("ID probe" + probeDto.getId());
-            System.out.println("Status of controller " + probeDto.getStatus());
+//            System.out.println("ID probe" + probeDto.getId());
+//            System.out.println("Status of controller " + probeDto.getStatus());
             JSONObject message = probeService.updateProbe(probeDto);
             return message;
         }, executorService);

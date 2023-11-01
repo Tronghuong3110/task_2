@@ -1,6 +1,8 @@
 package com.newlife.Connect_multiple.entity;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.*;
 
@@ -9,6 +11,8 @@ import java.sql.Date;
 
 @Entity
 @Data
+@Getter
+@Setter
 @Table(name = "probe")
 public class ProbeEntity {
     @Id

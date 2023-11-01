@@ -119,7 +119,7 @@ public class ProbeModuleService implements IProbeModuleService {
                 // clientStatusMapRun = topic + "-" + idProbeModule
                 // checkErrorMapRun = topic + "- + idprobe, true(false)
                 String idCmd = saveCmd(probeModuleEntity); // Lưu thông tin lệnh vào database
-                String jsonObject = JsonUtil.createJson(probeModuleEntity, idCmd, Optional.ofNullable(null), Optional.ofNullable(null), "run");
+                String jsonObject = JsonUtil.createJson(probeModuleEntity, idCmd, Optional.ofNullable(null), Optional.ofNullable(null), "run", probe.getName());
                 messageToClientMap.put(probeModuleEntity.getId().toString(), jsonObject); // messageToClientMap = idProbeModule, json
                 topicCheckResultComandRun.add(idCmd + "-" + topicrequestRun.peek()); // topicCheckResultComandRun = idCmd + "-" + topic + "-" + idProbeModule
                 topicCheckResultRun.put(topicrequestRun.peek(), topicCheckResultComandRun.peek()); // topicCheckResultRun = topic+"-"+idProbeModule, idCmd + "-" + topic + "-" + idProbeModule
@@ -241,7 +241,7 @@ public class ProbeModuleService implements IProbeModuleService {
                 // topicrequestStop = topic + "-" + idProbeModule
                 topicCheckResultComandStop.add(idCmd + "-" + topicrequestStop.peek());
 
-                String jsonObject = JsonUtil.createJson(probeModuleEntity, idCmd, Optional.of("cmd /c taskkill /F /PID "), Optional.of("pkill -f "), "stop");
+                String jsonObject = JsonUtil.createJson(probeModuleEntity, idCmd, Optional.of("cmd /c taskkill /F /PID "), Optional.of("pkill -f "), "stop", probe.getName());
                 // messageToClientMapStop = idProbeModule, json
                 messageToClientStop.put(probeModuleEntity.getId().toString(), jsonObject);
 
@@ -336,7 +336,7 @@ public class ProbeModuleService implements IProbeModuleService {
                 }
                 List<ProbeModuleEntity> listProbeModule = moduleProbeRepository.findAllModuleByProbeIdAndStatus(probe.getId(), "Running", "Pending");
                 // không kiểm tra các client đang có yêu cầu thực hiện lệnh
-                String json = JsonUtil.createJsonStatus("getStatus", listProbeModule);
+                String json = JsonUtil.createJsonStatus("getStatus", listProbeModule, probe.getName());
                 System.out.println("Message to client " + json);
                 messageToClient.put(probe.getPubTopic(), json);
 //            if()
@@ -441,6 +441,8 @@ public class ProbeModuleService implements IProbeModuleService {
             moduleHistoryEntity.setStatus(statusResult);
             moduleHistoryEntity.setModuleName((String)responseMessage.get("moduleName"));
             moduleHistoryEntity.setIdProbeModule(probeModuleEntity.getId());
+            moduleHistoryEntity.setProbeName(responseMessage.get("probeName").toString());
+            moduleHistoryEntity.setAck(0);
             moduleHistoryRepository.save(moduleHistoryEntity);
 
 //            if(probeModuleEntity != null) {
@@ -504,21 +506,26 @@ public class ProbeModuleService implements IProbeModuleService {
         // TH module có thay đổi về trạng thái
         if(!probeModuleEntity.getStatus().equals(statusResult)) {
             String pId = null;
+            String content = "";
             // TH module không còn chạy nữa (lỗi) ==> set lại processId = 0 (đã dừng)
             if(statusResult.equals("Failed")) {
                 pId = "0";
+                content = probeModuleEntity.getModuleName() + " đã bị lỗi";
             }
             ModuleHistoryEntity moduleHistoryEntity = new ModuleHistoryEntity();
             String id = String.valueOf(System.nanoTime());
             moduleHistoryEntity.setIdModuleHistory(id);
+            moduleHistoryEntity.setIdProbeModule(probeModuleEntity.getId());
             moduleHistoryEntity.setIdProbe(probeModuleEntity.getIdProbe());
-            moduleHistoryEntity.setContent(null);
+            moduleHistoryEntity.setContent(content);
             moduleHistoryEntity.setTitle(null);
             moduleHistoryEntity.setAtTime(new Date(System.currentTimeMillis()));
             moduleHistoryEntity.setCaption(probeModuleEntity.getCaption());
             moduleHistoryEntity.setArg(probeModuleEntity.getArg());
             moduleHistoryEntity.setStatus(statusResult);
             moduleHistoryEntity.setModuleName(probeModuleEntity.getModuleName());
+            moduleHistoryEntity.setProbeName(jsonObject.get("probeName").toString());
+            moduleHistoryEntity.setAck(0);
             moduleHistoryRepository.save(moduleHistoryEntity);
 
             probeModuleEntity.setStatus(statusResult);

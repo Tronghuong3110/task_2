@@ -1,7 +1,14 @@
 package com.newlife.Connect_multiple.dto;
 
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.sql.Date;
 
+@Data
+@Getter
+@Setter
 public class ModuleDto {
     private Integer id;
     private String name;
