@@ -15,10 +15,12 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Confirm from '../../action/Confirm';
 import { IP } from '../../Layout/constaints';
+import SmallConfirm from '../../action/SmallConfirm';
 const Probe_Modules = ({ id }) => {
     const [isOpen, setOpenWindow] = useState(false)
     const [probe_modules, setProbeModules] = useState([])
     const [isOpenDeleteScreen, setOpenDeleteScreen] = useState(false)
+    const [isOpenConfirmScreen, setOpenConfirmScreen] = useState(false)
     const [deletingProbeModule, setDeletingProbeModule] = useState({
         "id": null,
         "name": "",
@@ -37,11 +39,15 @@ const Probe_Modules = ({ id }) => {
         "name": "",
         "status": "All"
     })
+    const [action,setAction] = useState({
+        "module":null,
+        "action": ""
+    })
     const [checkAllPages, setCheckAllPages] = useState([])
-    const [existRunningOrPending,setExistRunningOrPending] = useState([])
+    const [existRunningOrPending, setExistRunningOrPending] = useState([])
     useEffect(() => {
-        if(sessionStorage.getItem("check")==0) getModuleContinues()
-        else getProbeModules()
+        if (sessionStorage.getItem("check") == 0) getModuleContinues()
+        else getProbeModulesByConditions()
     }, [])
     useEffect(() => {
         let name = conditions.name;
@@ -55,7 +61,7 @@ const Probe_Modules = ({ id }) => {
             .then(data => {
                 setFullModules(data)
                 setProbeModules(data)
-                setExistRunningOrPending(data.filter(item => item.status == "Running"|| item.status =="Pending"))
+                setExistRunningOrPending(data.filter(item => item.status == "Running" || item.status == "Pending"))
             })
             .catch(err => console.log(err))
     }
@@ -66,7 +72,7 @@ const Probe_Modules = ({ id }) => {
                 let name = document.getElementById("keyWordInput").value;
                 let status = document.getElementById("statusInput").value;
                 let result = data.filter(modules => modules.moduleName.includes(name) && (modules.status == (status == "All" ? modules.status : status)))
-                let check = result.filter(item => item.status == "Running"|| item.status =="Pending")
+                let check = result.filter(item => item.status == "Running" || item.status == "Pending")
                 setExistRunningOrPending(check)
                 setProbeModules(result)
             })
@@ -138,62 +144,83 @@ const Probe_Modules = ({ id }) => {
     const getModuleContinues = () => {
         const interval = setInterval(() => {
             const checkValue = sessionStorage.getItem("check");
-            if (checkValue == 1) {
-                setSelectedProbeModules([]);
-                sessionStorage.removeItem("check");
-            } else if (checkValue === null) {
+            if (checkValue == null) {
                 clearInterval(interval); // Dừng interval khi checkValue là null
             } else {
                 getProbeModulesByConditions();
             }
         }, 1000);
     };
+    const checkDoneContinues =()=>{
+        const interval = setInterval(()=>{
+            const checkValue = sessionStorage.getItem("check");
+            if(checkValue == 1){
+                sessionStorage.removeItem("check");
+                setSelectedProbeModules([]);
+                clearInterval(interval)
+            }
+            else{
+                fetch("http://" + IP + ":8081/api/v1/probeModule/check")
+                    .then(response => response.text())
+                    .then(data => {
+                        if(data == 1){
+                            console.log(data)
+                            sessionStorage.setItem("check",1);
+                        }
+                    })
+                    .catch(err => console.log(err))
+            }
+        },2000)
+    }
     const actionWithModule = (id, action) => {
         let nodes = document.querySelectorAll(".actionBtn")
-        if(action=="run"){
-            if(Array.isArray(id)){
-                if(id.length > 6) {
-                    notify("Please choose less than or equal to 6 modules running at the same time",2)
-                    return;
-                }
-            }
-        }
         nodes.forEach(node => {
             node.setAttribute("disabled", true)
             setTimeout(() => {
                 node.removeAttribute("disabled");
             }, 1000);
         })
-        sessionStorage.setItem("check",0)
-        fetch("http://" + IP + ":8081/api/v1/probeModule/" + action)
+        let arr;
+        if (Array.isArray(id)) arr = id;
+        else arr = [id]
+        sessionStorage.setItem("check", 0)
+        if (action == "run") {
+            doActions(arr,action)
+        }
+        else {
+            setAction({
+                "module": arr,
+                "action": action
+            })
+            openConfirmWindow()
+        }
+    }
+    const doActions = (arr,action) => {
+        console.log(arr,action)
+        const options = {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                "ids": arr
+            })
+        }
+        console.log(options)
+        fetch("http://" + IP + ":8081/api/v1/probeModule/action/" + action, options)
             .then(response => response.text())
             .then(data => {
+                console.log(data)
                 notify("Received request succesfully", 1)
             })
-            .then(() => {
-                let arr;
-                if(Array.isArray(id)) arr= id;
-                else arr = [id]
-                const options = {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        "ids": arr
-                    })
-                }
-                // console.log("http://" + IP + ":8081/api/v1/probeModule/" + action + "?idProbeModule=" + stringParam)
-                fetch("http://" + IP + ":8081/api/v1/probeModule/" + action, options)
-                    .then(response => response.text())
-                    .then(data => {
-                        console.log(data)
-                        setTimeout(() => { sessionStorage.setItem("check",1) }, 2000)
-                    })
-                    .catch(err => console.log(err))
+            .then(()=>{
+                fetch("http://" + IP + ":8081/api/v1/probeModule/"+action,options)
             })
-            .catch(err => console.log)
+            .catch(err => console.log(err))
+        checkDoneContinues()
         getModuleContinues()
+
+        
     }
     /** Delete 1 module */
     const displayDeleteModule = (id, name) => {
@@ -208,12 +235,13 @@ const Probe_Modules = ({ id }) => {
         setOpenDeleteScreen(true)
 
     }
+
     const deleteModule = (id, userChoice) => {
         if (userChoice) {
-            let stringParam =""
+            let stringParam = ""
             if (Array.isArray(id)) {
-                if(existRunningOrPending.some(item => id.includes(item.id))){
-                    notify("There are some modules running or pending, please stop before delete them",2)
+                if (existRunningOrPending.some(item => id.includes(item.id))) {
+                    notify("There are some modules running or pending, please stop before delete them", 2)
                     return;
                 }
                 stringParam = id.join(" ")
@@ -234,6 +262,14 @@ const Probe_Modules = ({ id }) => {
                 )
                 .catch(err => console.log(err));
         }
+    }
+
+    /** Restart or stop module */
+    const openConfirmWindow = () => {
+        setOpenConfirmScreen(true)
+    }
+    const closeConfirmWindow = () => {
+        setOpenConfirmScreen(false)
     }
     /** Add to checked list */
     const addOrRemoveToCheckedList = (id) => {
@@ -410,7 +446,7 @@ const Probe_Modules = ({ id }) => {
                     ></Probe_Module_Header>
                     <TableBody>
                         {
-                            probe_modules.length != 0 || sessionStorage.getItem("check")==0 ? (
+                            probe_modules.length != 0 || sessionStorage.getItem("check") == 0 ? (
                                 sortedProbes(probe_modules, getComparator(orderDirection, valueToOrderBy))
                                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                     .map((module, index) => {
@@ -524,6 +560,7 @@ const Probe_Modules = ({ id }) => {
             {isOpen && <AddProbeModule id={isEditedModule} handleCloseWindow={handleCloseWindow} idProbe={id} ></AddProbeModule>}
             <ToastContainer></ToastContainer>
             {isOpenDeleteScreen && <Confirm confirmContent={deletingProbeModule} listDelete={selectedProbeModules} setOpenDeleteScreen={setOpenDeleteScreen} handleFunction={deleteModule} ></Confirm>}
+            {isOpenConfirmScreen && <SmallConfirm setOpenConfirmScreen={setOpenConfirmScreen} action={action} handleFunction={doActions} ></SmallConfirm>}
         </div>
     )
 }

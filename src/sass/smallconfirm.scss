@@ -1,0 +1,71 @@
+$primary: #0b0c24;
+$secondary: #27293d;
+$pink-color: #E14ECA;
+$blue-color: #1647F3;
+@keyframes animation {
+    from {
+      top: -60px
+    }
+    to {
+      top: 50px
+    }
+  }
+.smallConfirmScreen {
+    height: 100vh;
+    width: 100vw;
+    background-color: rgba(48, 39, 39, 0.7);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    .smallConfirm{
+        font-size: 1.3em;
+        background-color: white;
+        position: fixed;
+        color: black;
+        top: 50px;
+        left: 50%;
+        border-radius: 10px;
+        animation: 1s animation;
+        min-width: 250px;
+        max-width: 450px;
+        transform: translateX(-50%);
+        box-shadow: rgba(100, 153, 223, 0.25) 0px 50px 100px -20px, rgba(100, 153, 223, 0.3) 0px 30px 60px -30px, rgba(100, 153, 223, 0.35) 0px -2px 6px 0px inset;
+        .question{
+            padding: 7px 30px;
+            text-align: center;
+        }
+        .note{
+            font-size: 0.7em;
+            padding: 5px 30px;
+            color: rgb(107, 106, 106);
+        }
+        .confirmBtn{
+            display: flex;
+            &-cancel{
+                border: none;
+                width: 50%;
+                border-bottom-left-radius: 10px;
+                color: rgb(107, 106, 106);
+                background-color: rgb(230, 230, 230);
+                padding: 5px 0;
+                &:hover{
+                    background-color: rgb(14, 138, 99);
+                    color: white;
+                }
+            }
+            &-ok{
+                width: 50%;
+                border: none;
+                border-bottom-right-radius: 10px;
+                color: rgb(107, 106, 106);
+                background-color: rgb(230, 230, 230);
+                padding: 5px 0;
+                &:hover{
+                    background-color: rgb(14, 138, 99);
+                    color: white;
+                }
+            }
+        }
+}
+}
