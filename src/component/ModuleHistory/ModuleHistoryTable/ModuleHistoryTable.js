@@ -6,7 +6,8 @@ import { faPenToSquare, faTrashCan } from '@fortawesome/free-regular-svg-icons'
 import { faCircleCheck } from '@fortawesome/free-solid-svg-icons'
 import '../../../sass/ModuleHistory/ModuleHistoryTable.scss'
 import {IP} from '../../Layout/constaints'
-const ModuleHistoryTable = () => {
+const ModuleHistoryTable = (props) => {
+    const {condition} = props
     const [moduleHistories, setModuleHistories] = useState([])
     useEffect(() => {
         fetch("http://" + IP + ":8081/api/v1/moduleHistories")
@@ -15,7 +16,7 @@ const ModuleHistoryTable = () => {
                 setModuleHistories(data)
             })
             .catch(err => console.log(err))
-    },[])
+    },[condition])
     return (
         <div className='Module_History_Table'>
             <Table>

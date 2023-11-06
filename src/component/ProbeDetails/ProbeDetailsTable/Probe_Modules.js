@@ -74,6 +74,7 @@ const Probe_Modules = ({ id }) => {
                 let result = data.filter(modules => modules.moduleName.includes(name) && (modules.status == (status == "All" ? modules.status : status)))
                 let check = result.filter(item => item.status == "Running" || item.status == "Pending")
                 setExistRunningOrPending(check)
+                console.log(result)
                 setProbeModules(result)
             })
             .catch(err => console.log(err))
@@ -144,17 +145,19 @@ const Probe_Modules = ({ id }) => {
     const getModuleContinues = () => {
         const interval = setInterval(() => {
             const checkValue = sessionStorage.getItem("check");
-            if (checkValue == null) {
+            if (checkValue == null || checkValue ==1) {
                 clearInterval(interval); // Dừng interval khi checkValue là null
             } else {
                 getProbeModulesByConditions();
             }
-        }, 1000);
+        }, 2000);
     };
     const checkDoneContinues =()=>{
         const interval = setInterval(()=>{
             const checkValue = sessionStorage.getItem("check");
-            if(checkValue == 1){
+            if(checkValue == 1 || checkValue ==null){
+                console.log("Check value :", checkValue)
+                setTimeout(getProbeModulesByConditions(),5000);
                 sessionStorage.removeItem("check");
                 setSelectedProbeModules([]);
                 clearInterval(interval)
@@ -164,7 +167,7 @@ const Probe_Modules = ({ id }) => {
                     .then(response => response.text())
                     .then(data => {
                         if(data == 1){
-                            console.log(data)
+                            getProbeModulesByConditions();
                             sessionStorage.setItem("check",1);
                         }
                     })
@@ -206,11 +209,10 @@ const Probe_Modules = ({ id }) => {
                 "ids": arr
             })
         }
-        console.log(options)
+
         fetch("http://" + IP + ":8081/api/v1/probeModule/action/" + action, options)
             .then(response => response.text())
             .then(data => {
-                console.log(data)
                 notify("Received request succesfully", 1)
             })
             .then(()=>{

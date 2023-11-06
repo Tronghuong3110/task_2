@@ -4,7 +4,6 @@ $pink-color: #E14ECA;
 $blue-color: #9747FF;
 
 .Module_History_Table {
-    margin-top: 2em;
     table {
         table-layout: fixed;
         border-radius: 10px;
@@ -47,7 +46,7 @@ $blue-color: #9747FF;
                 font-size: 0.7rem ;
                 color: white ;
                 text-align: center ;
-                padding: 5px ;
+                padding:0;
                 height: fit-content;
                 border: none ;
                 line-height: 1rem;
@@ -87,5 +86,8 @@ $blue-color: #9747FF;
             }
         }
 
+    }
+    .pagination{
+        color: white !important;
     }
 }

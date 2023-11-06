@@ -15,10 +15,10 @@ const AddModule = ({ handleCloseWindow, id }) => {
         "caption": "",
         "argDefalt": "",
         "note": "",
-        "pathLogDefault":"",
-        "id":id
+        "pathLogDefault": "",
+        "id": id
     })
-
+    const [typeModule, setTypeModule] = useState([])
     useEffect(() => {
         if (id != null) {
             fetch("http://" + IP + ":8081/api/v1/module?idModule=" + id)
@@ -27,6 +27,12 @@ const AddModule = ({ handleCloseWindow, id }) => {
                 .catch(err => console.log(err))
         }
     }, [])
+    useEffect(()=>{
+        fetch("http://" + IP + ":8081/api/v1/typeModule")
+                .then(response => response.json())
+                .then(data => setTypeModule(data))
+                .catch(err => console.log(err))
+    },[])
 
     // Thêm mới một module mẫu
     const addOrEditModule = (id) => {
@@ -77,7 +83,7 @@ const AddModule = ({ handleCloseWindow, id }) => {
                             handleCloseWindow();
                         }
                         else {
-            
+
                             notify(data.message, data.code)
                         }
                     })
@@ -93,7 +99,7 @@ const AddModule = ({ handleCloseWindow, id }) => {
             "caption": document.getElementById("caption").value,
             "argDefalt": document.getElementById("argument").value,
             "note": document.getElementById("note").value,
-            "id":id
+            "id": id
         }
     }
     const notify = (message, status) => {
@@ -136,7 +142,7 @@ const AddModule = ({ handleCloseWindow, id }) => {
         let emptyFields = [];
 
         for (let key in obj) {
-            if(key!="id"){
+            if (key != "id") {
                 if (!obj[key]) {
                     emptyFields.push(key);
                 }
@@ -164,18 +170,35 @@ const AddModule = ({ handleCloseWindow, id }) => {
                             <input type='text' id="name" placeholder='Type module name...' defaultValue={isEditModule.name}></input>
                         </div>
                     </div>
-                    <div className="field ">
-                        <div className='input_container exception'>
-                            <div className='input_container-icon d-flex align-items-center'>
-                                <FontAwesomeIcon icon={faTerminal} />
-                                <div className='input_container-icon-text'>COMMAND</div>
-                            </div>
-                            <div className='input_container-input'>
-                                <input className='commandInput' type='text' placeholder='Caption...' id='caption' defaultValue={isEditModule.caption}></input>
-                            </div>
-                            <div className='input_container-input'>
-                                <input className='commandInput exception' type='text' placeholder='Default argument' id='argument' defaultValue={isEditModule.argDefalt}></input>
-                            </div>
+                </div>
+                <div className="field ">
+                    <div className='input_container'>
+                        <div className='input_container-icon d-flex align-items-center'>
+                            <FontAwesomeIcon icon={faCube} />
+                            <div className='input_container-icon-text'>MODULE TYPE</div>
+                        </div>
+                        {/* <div className='input_container-input'>
+                            <select id="moduleType">
+                                {typeModule.map(ele=>{
+                                    return(
+                                        <option value ={ele.code}>{ele.name}</option>
+                                    )
+                                })}
+                            </select>
+                        </div> */}
+                    </div>
+                </div>
+                <div className="field ">
+                    <div className='input_container exception'>
+                        <div className='input_container-icon d-flex align-items-center'>
+                            <FontAwesomeIcon icon={faTerminal} />
+                            <div className='input_container-icon-text'>COMMAND</div>
+                        </div>
+                        <div className='input_container-input'>
+                            <input className='commandInput' type='text' placeholder='Caption...' id='caption' defaultValue={isEditModule.caption}></input>
+                        </div>
+                        <div className='input_container-input'>
+                            <input className='commandInput exception' type='text' placeholder='Default argument' id='argument' defaultValue={isEditModule.argDefalt}></input>
                         </div>
                     </div>
                 </div>
@@ -207,7 +230,7 @@ const AddModule = ({ handleCloseWindow, id }) => {
                 </div>
                 {/* Button */}
                 <div className='btn-container d-flex justify-content-end'>
-                    <button className='btn btn-success d-flex align-items-center' onClick={()=>addOrEditModule(id)} >
+                    <button className='btn btn-success d-flex align-items-center' onClick={() => addOrEditModule(id)} >
                         <div className='btn-icon d-flex align-items-center' >
                             <FontAwesomeIcon icon={faFloppyDisk} />
                         </div>

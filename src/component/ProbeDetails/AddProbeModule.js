@@ -4,7 +4,7 @@ import '../../sass/ProbeDetails/AddProbeModule.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBookmark, faCircleXmark, faFolderOpen, faNoteSticky } from '@fortawesome/free-regular-svg-icons'
 import {
-    faFloppyDisk, faCube, faTerminal, faPlug, faArrowRightFromBracket, faArrowRightToBracket
+    faFloppyDisk, faCube, faTerminal, faPlug, faArrowRightFromBracket, faArrowRightToBracket, faList
 } from '@fortawesome/free-solid-svg-icons'
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
@@ -21,6 +21,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
     const [arg, setArg] = useState("")
     const [path, setPath] = useState("")
     const [logPath, setLogPath] = useState("")
+    const [typeModule, setTypeModule] = useState([])
     useEffect(() => {
         fetch("http://" + IP + ":8081/api/v1/modules")
             .then(response => response.json())
@@ -38,16 +39,22 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
     }, [])
     useEffect(() => {
         if (id != null) {
-            console.log(1)
             fetch("http://" + IP + ":8081/api/v1/probe/module?idProbeModule=" + id)
                 .then(response => response.json())
                 .then(data => {
+                    console.log(data)
                     setEditedModule(data)
                     setCommandValue(data.caption + " " + data.arg);
                 })
                 .catch(err => console.log(err))
         }
 
+    }, [])
+    useEffect(() => {
+        fetch("http://" + IP + ":8081/api/v1/typeModule")
+            .then(response => response.json())
+            .then(data => setTypeModule(data))
+            .catch(err => console.log(err))
     }, [])
     const addOrEditModule = (id) => {
         let inputData = getModuleInfo(id).inputValue
@@ -171,10 +178,13 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
         listInfo.forEach(element => {
             infoObject[element.id] = element.value;
         });
+        let moudleType = document.getElementById("moduleType")
         let probe_module = {
             fullValue: {
                 ...infoObject,
                 idModule: idModule.value,
+                codeTypeModule: moudleType.options[moudleType.selectedIndex].value,
+                nameTypeModule: moudleType.options[moudleType.selectedIndex].textContent,
                 idProbe: idProbe,
                 caption: caption,
                 id: id
@@ -233,6 +243,23 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                             </div>
                         </div>
                     </div>
+                    <div className="field ">
+                        <div className='input_container'>
+                            <div className='input_container-icon d-flex align-items-center'>
+                                <FontAwesomeIcon icon={faList} />
+                                <div className='input_container-icon-text'>MODULE TYPE</div>
+                            </div>
+                            <div className='input_container-input'>
+                                <select id="moduleType">
+                                    {typeModule.map(ele => {
+                                        return (
+                                            <option selected={isEditedModule.codeTypeModule==ele.code} value={ele.code}>{ele.name}</option>
+                                        )
+                                    })}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                     {/* Command */}
                     <div className="field ">
                         <div className='input_container exception'>
@@ -241,7 +268,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                                 <div className='input_container-icon-text'>COMMAND</div>
                             </div>
                             <div className='input_container-input'>
-                                <textarea defaultValue={commandValue} disabled  id='command' ></textarea>
+                                <textarea defaultValue={commandValue} disabled id='command' ></textarea>
                             </div>
                             <div className='input_container-input'>
                                 <div className='input_container-icon d-flex align-items-center'>
@@ -312,7 +339,6 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                 </div>
             </div>)
             }
-            <ToastContainer></ToastContainer>
         </div>
     )
 }

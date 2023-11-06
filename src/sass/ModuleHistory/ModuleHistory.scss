@@ -13,12 +13,13 @@ $mixcolor: linear-gradient(90deg, $pink-color, $blue-color);
     border-radius: 30px;
     box-sizing: border-box;
     .searchBar {
+        // height: 40px;
         width: 100%;
         font-size: 0.8em;
         .searchTitle {
             width: 30%;
             position: relative;
-
+            align-items: center;
             input {
                 width: 100%;
                 background-color: $primary;
@@ -37,6 +38,11 @@ $mixcolor: linear-gradient(90deg, $pink-color, $blue-color);
                 transform: translateY(-50%);
                 left: 3%;
             }
+            .conditionTitle{
+                font-size: 1.2em;
+                color: white;
+                padding: 5px ;   
+            }
         }
 
         .searchDate {
@@ -51,6 +57,11 @@ $mixcolor: linear-gradient(90deg, $pink-color, $blue-color);
                 border: 2px solid white;
                 border-radius: 20px;
                 appearance: none;
+            }
+            .conditionTitle{
+                font-size: 1.2em;
+                color: white;
+                padding: 5px ;    
             }
         }
 
@@ -72,6 +83,11 @@ $mixcolor: linear-gradient(90deg, $pink-color, $blue-color);
                 &:hover{
                     cursor: pointer;
                 }
+            }
+            .conditionTitle{
+                font-size: 1.2em;
+                color: white;
+                padding: 5px ;    
             }
         }
 

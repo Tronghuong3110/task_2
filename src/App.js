@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import Sidebar from './component/Layout/Sidebar';
 import Header from './component/Layout/Header';
@@ -11,16 +11,17 @@ import Dashboard from './component/Dashboard/Dashboard';
 import { ProbesProvider } from "./component/Probes/ProbesTable/ProbesContext";
 import {Routes,Route} from 'react-router-dom'
 function App() {
+  const [isHideSideBar, setHideSideBar] = useState(false)
   return (
     <div className="App" style={{ padding: 0, margin: 0, backgroundColor: "#0b0c24"}}>
       <div className='headerContainer' style={{ height: "80px" }}>
         <Header></Header>
       </div>
       <main className='mainContainer d-flex' style={{ backgroundColor: "#0b0c24" }} >
-        <div className='sidebarContainer' style={{ width: "10%", backgroundColor: "transparent", height: "100%" }}>
-          <Sidebar></Sidebar>
+        <div className='sidebarContainer' style={{ width: isHideSideBar==false?"10%":"5%", backgroundColor: "transparent", height: "100%",transition: "width 0.5s" }}>
+          <Sidebar isHide={isHideSideBar} setHideSideBar = {setHideSideBar} ></Sidebar>
         </div>
-        <div className='dataContainer' style={{ width: "90%", backgroundColor: "transparent", padding: "0 30px" }} >
+        <div className='dataContainer' style={{ width: isHideSideBar==true?"95%":"90%", backgroundColor: "transparent", padding: "0 30px",transition: "width 0.5s" }} >
           {/* <ProbesProvider>
             <Probes></Probes>
           </ProbesProvider> */}

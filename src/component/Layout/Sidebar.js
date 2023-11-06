@@ -7,24 +7,49 @@ import {
     faClockRotateLeft,
     faCube,
     faDisplay,
-    faHouse
+    faHouse,faBars
 } from '@fortawesome/free-solid-svg-icons'
 import { Link } from 'react-router-dom';
-const Sidebar = () => {
+const Sidebar = (props) => {
+    const {isHide,setHideSideBar} = props
+    // const [isSetScreen, setScreen] = useState("")
+    const hideOpenSideBar = ()=>{
+        let elements = document.querySelectorAll(".sidebar-text")
+        if(isHide){
+            elements.forEach(element => {
+                element.style.display = "block"
+            });
+            setHideSideBar(false)
+        }
+        else{
+            elements.forEach(element => {
+                element.style.display = "none"
+            });
+            setHideSideBar(true)
+        }
+    }
     return (
         <div className="sidebar">
             <div className="sidebar-title d-flex justify-content-center">
-                <div className='sidebar-title-text'>
-                    Modules Manager
+                <div className='sidebar-title-symbol'>
+                    <button className='hideSideBar'
+                    onClick={hideOpenSideBar}
+                    >
+                        <FontAwesomeIcon icon={faBars}></FontAwesomeIcon>
+                    </button>
+                </div>
+                <div className='sidebar-title-text sidebar-text'>
+                    MAIN MENU
                 </div>
             </div>
+            <hr></hr>
             <div className="sidebar-selections">
                 <div className="selection d-flex" id="dashboard">
                     <Link to={"/"}>
                         <div className="selection-symbol d-flex align-items-center">
                             <FontAwesomeIcon icon={faHouse} style={{ color: "#ffffff", fontSize: "1em" }} />
                         </div>
-                        <div className="selection-text d-flex align-items-center">Dashbroad</div>
+                        <div className="selection-text sidebar-text">Dashbroad</div>
                     </Link>
                 </div>
                 <div className="selection d-flex" id="modules">
@@ -32,7 +57,7 @@ const Sidebar = () => {
                         <div className="selection-symbol d-flex align-items-center">
                             <FontAwesomeIcon icon={faCube} style={{ color: "#ffffff", fontSize: "1em" }} />
                         </div>
-                        <div className="selection-text d-flex align-items-center">Modules</div>
+                        <div className="selection-text sidebar-text">Modules</div>
                     </Link>
                 </div>
                 <div className="selection d-flex" id="probes">
@@ -40,7 +65,7 @@ const Sidebar = () => {
                         <div className="selection-symbol d-flex align-items-center">
                             <FontAwesomeIcon icon={faDisplay} style={{ color: "#ffffff", fontSize: "1em" }} />
                         </div>
-                        <div className="selection-text d-flex align-items-center">Probes</div>
+                        <div className="selection-text sidebar-text">Probes</div>
                     </Link>
                 </div>
                 <div className="selection d-flex" id="history">
@@ -48,7 +73,7 @@ const Sidebar = () => {
                         <div className="selection-symbol d-flex align-items-center">
                             <FontAwesomeIcon icon={faClockRotateLeft} style={{ color: "#ffffff", fontSize: "1em" }} />
                         </div>
-                        <div className="selection-text d-flex align-items-center">History</div>
+                        <div className="selection-text sidebar-text">History</div>
                     </Link>
                 </div>
                 <div className="selection d-flex" id="statistic">
@@ -56,7 +81,7 @@ const Sidebar = () => {
                         <div className="selection-symbol d-flex align-items-center">
                             <FontAwesomeIcon icon={faChartLine} style={{ color: "#ffffff", fontSize: "1em" }} />
                         </div>
-                        <div className="selection-text d-flex align-items-center">Statistic</div>
+                        <div className="selection-text sidebar-text">Statistic</div>
                     </Link>
                 </div>
             </div>
