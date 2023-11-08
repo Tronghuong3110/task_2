@@ -9,6 +9,7 @@ import java.util.List;
 @Data
 @Setter
 @Getter
-public class ResquestModule {
+public class Ids {
     private List<Integer> ids;
+    private List<String> idsStr;
 }

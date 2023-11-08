@@ -48,6 +48,12 @@ public class ProbeModuleConverter {
             if(dto.getNote() != null) {
                 entity.setNote(dto.getNote());
             }
+            if(dto.getCodeTypeModule() != null) {
+                entity.setCodeTypeModule(dto.getCodeTypeModule());
+            }
+            if(dto.getNameTypeModule() != null) {
+                entity.setTypeModuleName(dto.getNameTypeModule());
+            }
             return entity;
         }
         catch (Exception e) {

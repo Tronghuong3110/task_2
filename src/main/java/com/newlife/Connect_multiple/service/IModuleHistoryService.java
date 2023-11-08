@@ -5,10 +5,7 @@ import org.json.simple.JSONObject;
 
 import java.util.List;
 public interface IModuleHistoryService {
-    JSONObject deleteModuleHistory(String idModuleHistory); // HAN
-    List<ModuleHistoryDto> findAllModuleHistoryByCondition(Integer idProbeModule, Integer idProbe, String time, Integer ack, Integer page);  // Tên module / tên probe / thời gian / đã được ACK hay chưa
-//    String solveErrorPerWeekOfModule(Integer idProbeModule, Date timeBefore, Date timeAfter, String status); // HAN
-    String solveEPW(Integer idProbeModule, String status);
+    JSONObject deleteModuleHistory(List<String> ids); // HAN
+    List<ModuleHistoryDto> findAllModuleHistoryByCondition(Integer idProbeModule, Integer idProbe, String timeStart, String timeEnd, Integer ack, String content, Integer page);  // Tên module / tên probe / thời gian / đã được ACK hay chưa
     Integer updateAck(String id);
-
 }

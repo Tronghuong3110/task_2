@@ -1,4 +1,5 @@
 package com.newlife.Connect_multiple.dto;
+import com.fasterxml.jackson.databind.node.LongNode;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,4 +22,5 @@ public class ModuleHistoryDto {
     private String note;
     private String probeName;
     private Integer ack;
+    private Long totalPage;
 }

@@ -21,7 +21,9 @@ public class ProbeModuleDto {
     private String processId;
     private String note;
     private String moduleName;
-    private Integer errorPerWeek;
+    private Long errorPerWeek;
     private Integer processStatus;
     private Integer loading;
+    private Integer codeTypeModule;
+    private String nameTypeModule;
 }

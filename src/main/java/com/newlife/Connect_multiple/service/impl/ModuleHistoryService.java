@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -27,48 +28,40 @@ public class ModuleHistoryService implements IModuleHistoryService {
 
     // HAN
     @Override
-    public JSONObject deleteModuleHistory(String idModuleHistory) {
+    public JSONObject deleteModuleHistory(List<String> ids) {
         JSONObject jsonObject = new JSONObject();
         try {
+            for(String id : ids) {
+                moduleHistoryRepository.deleteById(id);
+            }
+
             jsonObject.put("code", "1");
-            jsonObject.put("message", "Xóa thành công module history");
-            moduleHistoryRepository.deleteById(idModuleHistory);
+            jsonObject.put("message", "Delete module history success");
             return jsonObject;
         } catch (Exception e) {
             jsonObject.put("code", "0");
-            jsonObject.put("message", "xoa that bai");
+            jsonObject.put("message", "Delete fail");
             return jsonObject;
         }
     }
 
     @Override
-    public List<ModuleHistoryDto> findAllModuleHistoryByCondition(Integer idProbeModule, Integer idProbe, String time, Integer ack, Integer page) {
-        Pageable pageable = PageRequest.of(page, 10);
-        Page<ModuleHistoryEntity> listModuleHistories = moduleHistoryRepository.findAllByCondition(idProbeModule, idProbe, time, ack, pageable);
+    public List<ModuleHistoryDto> findAllModuleHistoryByCondition(Integer idProbeModule, Integer idProbe, String timeStart, String timeEnd, Integer ack, String content, Integer page) {
+        Sort sort = Sort.by("at_time").descending();
+        Pageable pageable = PageRequest.of(page, 10, sort);
+        Page<ModuleHistoryEntity> listModuleHistories = moduleHistoryRepository.findAllByCondition(idProbeModule, idProbe, timeStart, timeEnd, content, ack, pageable);
         List<ModuleHistoryDto> listModuleHistoriesDto = new ArrayList<>();
+        Long totalRow = moduleHistoryRepository.count(idProbeModule, idProbe, timeStart, timeEnd, content, ack);
+        Long totalPage = Math.round(((double)totalRow) / 10);
+        if(totalPage < totalRow / 10) {
+            totalPage += 1;
+        }
         for(ModuleHistoryEntity moduleHistory : listModuleHistories.toList()) {
-            listModuleHistoriesDto.add(ModuleHistoryConverter.toDto(moduleHistory));
+            ModuleHistoryDto dto = ModuleHistoryConverter.toDto(moduleHistory);
+            dto.setTotalPage(totalPage);
+            listModuleHistoriesDto.add(dto);
         }
         return listModuleHistoriesDto;
-    }
-
-    @Override
-    public String solveEPW(Integer idProbeModule, String status) {
-        try {
-            String timeBefore = getTimeBefore();
-            String timeAfter = getTimeAfter();
-            if(timeBefore == null || timeAfter == null) {
-                System.out.println("Đếm lỗi module lồi rồi (line 50) !!!");
-                return null;
-            }
-            Optional<Long> error = moduleHistoryRepository.solveErrorPerWeekOfModule(idProbeModule, timeBefore, timeAfter, status);
-            return "so loi = " + error.toString();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Lỗi tính error (line 54) ");
-            return "khong tinh dc";
-        }
     }
 
     @Override
@@ -80,9 +73,11 @@ public class ModuleHistoryService implements IModuleHistoryService {
             }
             // ack = 1: đã xác nhận xem
             // ack = 0: chưa xác nhận xem
+            System.out.println("ACK trước khi cập nhật " + moduleHistory.getAck());
             if(!moduleHistory.getAck().equals(1)) {
-                moduleHistory.setAck(0);
-                moduleHistoryRepository.save(moduleHistory);
+                moduleHistory.setAck(1);
+                moduleHistory = moduleHistoryRepository.save(moduleHistory);
+                System.out.println("ACK sau khi cập nhật" + moduleHistory.getAck());
                 return 1;
             }
             return 1;
@@ -109,31 +104,4 @@ public class ModuleHistoryService implements IModuleHistoryService {
 //            return "chua tinh dc loi";
 //        }
 //    }
-
-    // Hướng
-    private String getTimeBefore() {
-        try {
-            LocalDate currentDate = LocalDate.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            return currentDate.format(formatter);
-        }
-        catch (Exception e) {
-            System.out.println("Lấy ngày hiêện tại lỗi rồi line 77");
-            e.printStackTrace();
-            return null;
-        }
-    }
-    private String getTimeAfter() {
-        try {
-            LocalDate currentDate = LocalDate.now();
-            LocalDate sevenDateFromCurrent = currentDate.plusDays(7);
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            return sevenDateFromCurrent.format(formatter);
-        }
-        catch (Exception e) {
-            System.out.println("Tính thời gian sau 7 ngày từ ngày hiện tại lỗi rồi");
-            e.printStackTrace();
-            return null;
-        }
-    }
 }

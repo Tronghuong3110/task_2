@@ -37,10 +37,23 @@ public interface ModuleHistoryRepository extends JpaRepository<ModuleHistoryEnti
 
     // Tên module / tên probe / thời gian / đã được ACK hay chưa
     @Query(value = "select * from probemodule.module_history where (:idProbeModule is null or id_probe_module = :idProbeModule) " +
-                    "and (:idProbe is null or id_probe = :idProbe) and at_time like %:time% and (:ack is null or ack = :ack )", nativeQuery = true)
+                    "and (:idProbe is null or id_probe = :idProbe) and ((at_time between :timeStart and :timeEnd ) or (:timeStart is null and :timeEnd is null) )" +
+                    "and (:ack is null or ack = :ack ) and (:content is null or content like %:content%) ", nativeQuery = true)
     Page<ModuleHistoryEntity> findAllByCondition(@Param("idProbeModule") Integer idProbeModule,
                                                  @Param("idProbe") Integer idProbe,
-                                                 @Param("time") String time,
+                                                 @Param("timeStart") String timeStart,
+                                                 @Param("timeEnd") String timeEnd,
+                                                 @Param("content") String content,
                                                  @Param("ack") Integer ack,
-                                                 Pageable pageable); // idProbeModule, idProbe, time, ack, pageable
+                                                 Pageable pageable);
+
+    @Query(value = "select count(*) from probemodule.module_history where (:idProbeModule is null or id_probe_module = :idProbeModule) " +
+            "and (:idProbe is null or id_probe = :idProbe) and ((at_time between :timeStart and :timeEnd ) or (:timeStart is null and :timeEnd is null) )" +
+            "and (:ack is null or ack = :ack ) and (:content is null or content like %:content%) ", nativeQuery = true)
+    Long count(@Param("idProbeModule") Integer idProbeModule,
+                            @Param("idProbe") Integer idProbe,
+                            @Param("timeStart") String timeStart,
+                            @Param("timeEnd") String timeEnd,
+                            @Param("content") String content,
+                            @Param("ack") Integer ack);
 }

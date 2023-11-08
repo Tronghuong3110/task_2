@@ -1,8 +1,10 @@
 package com.newlife.Connect_multiple.controller;
 
 import com.newlife.Connect_multiple.dto.ProbeModuleDto;
-import com.newlife.Connect_multiple.dto.ResquestModule;
+import com.newlife.Connect_multiple.dto.Ids;
+import com.newlife.Connect_multiple.dto.TypeModuleDto;
 import com.newlife.Connect_multiple.service.IProbeModuleService;
+import com.newlife.Connect_multiple.service.ITypeModuleService;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +22,12 @@ public class ProbeModuleController {
 
     @Autowired
     private IProbeModuleService probeModuleService;
-
+    @Autowired
+    private ITypeModuleService typeModuleService;
     private ExecutorService executorService = Executors.newFixedThreadPool(10);
+    private Boolean checkProcessRun = false;
+    private Boolean checkProcessStop = false;
+    private Boolean checkProcessRestart = false;
 
     // Thêm mới 1 probe Module (đã test thành công) (Han)
     @PostMapping("/probeModule/import")
@@ -31,7 +37,6 @@ public class ProbeModuleController {
             return response;
         }, executorService);
     }
-
     // Cập nhật probeModule Hướng
     @PutMapping("/probe/module")
     public CompletableFuture<JSONObject> updateProbeModule(@RequestBody ProbeModuleDto probeModuleDto) {
@@ -40,7 +45,6 @@ public class ProbeModuleController {
             return message;
         }, executorService);
     }
-
     // Xóa 1 probe Module (đã test thành công) (Han)
     @DeleteMapping("/probeModule")
     public CompletableFuture<JSONObject> deleteModuleProbe(@RequestParam("id") String id) {
@@ -53,63 +57,75 @@ public class ProbeModuleController {
             return response;
         }, executorService);
     }
-
     // chạy lại module (Hướng)
     @PostMapping("/probeModule/restart")
-    public CompletableFuture<ResponseEntity<?>> restartModule(@RequestBody ResquestModule resquestModule){
+    public CompletableFuture<ResponseEntity<?>> restartModule(@RequestBody Ids ids){
         return CompletableFuture.supplyAsync(() -> {
-            List<Integer> listIpModule = resquestModule.getIds();
-            if(listIpModule.size() <= 0) {
-                return ResponseEntity.badRequest().body(0);
-            }
+            checkProcessRestart = false;
+            List<Integer> listIpModule = ids.getIds();
+//            if(listIpModule.size() <= 0) {
+//                return ResponseEntity.badRequest().body(0);
+//            }
             for(Integer id : listIpModule) {
                 try {
                     Object responseStop = probeModuleService.stopModule(id);
                     Object runModule = probeModuleService.runModule(id);
-//                    Thread.sleep(3000);
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            return ResponseEntity.ok(1);
-        }, executorService);
-    }
-
-    // chạy module (Hướng)
-    @PostMapping("/probeModule/run")
-    public CompletableFuture<ResponseEntity> runModule(@RequestBody ResquestModule resquestModule) {
-        return CompletableFuture.supplyAsync(() -> {
-//            if(idProbeModule.equals("")) {
-//                return ResponseEntity.badRequest().body(0);
-//            }
-//            ArrayList<String> listIpModule = new ArrayList<>(Arrays.asList(idProbeModule.split(",")));
-            List<Integer> listIpModule = resquestModule.getIds();
-//            ArrayList<Integer> ids = new ArrayList<>();
-            for(Integer id : listIpModule) {
-                try {
-                    Object jsonObject = probeModuleService.runModule(id);
-        //                    Thread.sleep(3000);
                 }
                 catch (Exception e) {
                     e.printStackTrace();
                     return ResponseEntity.badRequest().body(0);
                 }
             }
+            try {
+                Thread.sleep(2000);
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            checkProcessRestart = true;
             return ResponseEntity.ok(1);
         }, executorService);
     }
-
-    // stop module (Hướng)
-    @PostMapping("/probeModule/stop")
-    public CompletableFuture<ResponseEntity<?>> stopModule(@RequestBody ResquestModule resquestModule) {
+    // chạy module (Hướng)
+    @PostMapping("/probeModule/run")
+    public CompletableFuture<ResponseEntity> runModule(@RequestBody Ids ids) {
         return CompletableFuture.supplyAsync(() -> {
-            List<Integer> listIpModule = resquestModule.getIds();
-            if(listIpModule.size() <= 0) {
-                return ResponseEntity.badRequest().body(0);
-            }
+//            if(idProbeModule.equals("")) {
+//                return ResponseEntity.badRequest().body(0);
+//            }
+            checkProcessRun = false;
+            List<Integer> listIpModule = ids.getIds();
             for(Integer id : listIpModule) {
                 try {
+                    Object jsonObject = probeModuleService.runModule(id);
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                    return ResponseEntity.badRequest().body(0);
+                }
+            }
+            try {
+                Thread.sleep(2000);
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            checkProcessRun = true;
+            return ResponseEntity.ok(1);
+        }, executorService);
+    }
+    // stop module (Hướng)
+    @PostMapping("/probeModule/stop")
+    public CompletableFuture<ResponseEntity<?>> stopModule(@RequestBody Ids ids) {
+        return CompletableFuture.supplyAsync(() -> {
+            checkProcessStop = false;
+            List<Integer> listIpModule = ids.getIds();
+//            if(listIpModule.size() <= 0) {
+//                return ResponseEntity.badRequest().body(0);
+//            }
+            for(Integer id : listIpModule) {
+                try {
+                    System.out.println("id " + id);
                     Object jsonObject = probeModuleService.stopModule(id);
 //                    Thread.sleep(3000);
                 }
@@ -117,10 +133,16 @@ public class ProbeModuleController {
                     e.printStackTrace();
                 }
             }
+            try {
+                Thread.sleep(2000);
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            checkProcessStop = true;
             return ResponseEntity.ok(1);
         }, executorService);
     }
-
     // Lấy ra 1 probeModule theo id (hướng)
     @GetMapping("/probe/module")
     public CompletableFuture<ProbeModuleDto> findOneById(@RequestParam("idProbeModule") Integer idProbeModule) {
@@ -129,7 +151,6 @@ public class ProbeModuleController {
             return probeModuleDto;
         },executorService);
     }
-
     // lấy ra toàn bộ module theo probe (hân)
     @GetMapping("/probe/modules")
     public CompletableFuture<List<ProbeModuleDto>> findAllProbeModule(@RequestParam("name") Optional<String> name,
@@ -151,17 +172,38 @@ public class ProbeModuleController {
             return module;
         }, executorService);
     }
+    @PostMapping("/probeModule/action/run")
+    public ResponseEntity<?> runModuleResponse(@RequestBody Ids ids) {
+        if(ids.getIds().size() <= 0) return ResponseEntity.badRequest().body(0);
+        return ResponseEntity.ok(1);
+    }
+    @PostMapping("/probeModule/action/stop")
+    public ResponseEntity<?> stopModuleResponse(@RequestBody Ids ids) {
+        if(ids.getIds().size() <= 0) return ResponseEntity.badRequest().body(0);
+        return ResponseEntity.ok(1);
+    }
+    @PostMapping("/probeModule/action/restart")
+    public ResponseEntity<?> restartModuleResponse(@RequestBody Ids ids) {
+        if(ids.getIds().size() <= 0) return ResponseEntity.badRequest().body(0);
+        return ResponseEntity.ok(1);
+    }
+    @GetMapping("/probeModule/check")
+    public Integer checkProcessFinish() {
+        if(checkProcessStop || checkProcessRestart || checkProcessRun) {
+            checkProcessRun = false;
+            checkProcessStop = false;
+            checkProcessRestart = false;
+            return 1;
+        }
+        return 0;
+    }
 
-    @GetMapping("/probeModule/run")
-    public String runModuleResponse() {
-        return "1";
-    }
-    @GetMapping("/probeModule/stop")
-    public String stopModuleResponse() {
-        return "1";
-    }
-    @GetMapping("/probeModule/restart")
-    public String restartModuleResponse() {
-        return "1";
+    @GetMapping("/typeModule")
+    public ResponseEntity<?> findAllTypeModule() {
+        List<TypeModuleDto> moduleDtoList = typeModuleService.findAll();
+        if(moduleDtoList == null) {
+            return ResponseEntity.badRequest().body("Get all type module error");
+        }
+        return ResponseEntity.ok(moduleDtoList);
     }
 }

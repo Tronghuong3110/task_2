@@ -66,4 +66,10 @@ public class ProbeModuleEntity {
 
     @Column(name = "loading")
     private Integer loading;
+
+    @Column(name = "type_module_name")
+    private String typeModuleName;
+
+    @Column(name = "code_type_module")
+    private Integer codeTypeModule;
 }
