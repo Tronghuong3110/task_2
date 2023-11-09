@@ -66,12 +66,13 @@ $mixcolor: linear-gradient(90deg, $pink-color, $blue-color);
                     pointer-events: none;
                 }
                 .dropdown {
-                    padding: 5px 10px;
-                    border: 2px solid $pink-color;
-                    border-radius: 5px;
-                    background: $primary;
+                    // padding: 5px 10px;
+                    // border-radius: 5px;
+                    // background: $primary;
                     .select {
-                        background-color: transparent;
+                        border: 2px solid $pink-color;
+                        // border: 2px solid gray ;
+                        background-color: $primary;
                         svg {
                             display: none;
                         }

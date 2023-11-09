@@ -8,6 +8,7 @@ import Footer from './component/Layout/Footer';
 import Module from './component/Modules/Module';
 import ModuleHistory from './component/ModuleHistory/ModuleHistory';
 import Dashboard from './component/Dashboard/Dashboard';
+import Statistic from './component/Statistic/Statistic'
 import { ProbesProvider } from "./component/Probes/ProbesTable/ProbesContext";
 import {Routes,Route} from 'react-router-dom'
 function App() {
@@ -33,6 +34,7 @@ function App() {
             <Route path='/details/:id' element={<ProbeDetails></ProbeDetails>}></Route>
             <Route path='/modules' element={<Module></Module>}></Route>
             <Route path='/module_history' element={<ModuleHistory></ModuleHistory>}></Route>
+            <Route path='/statistic' element={<Statistic></Statistic>}></Route>
           </Routes>
         </div>
       </main>

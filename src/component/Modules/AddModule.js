@@ -144,7 +144,7 @@ const AddModule = ({ handleCloseWindow, id }) => {
         for (let key in obj) {
             if (key != "id") {
                 if (!obj[key]) {
-                    emptyFields.push(key);
+                    if(key!="note") emptyFields.push(key);
                 }
             }
         }

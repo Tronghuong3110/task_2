@@ -68,7 +68,7 @@ const Probes = () => {
             "area": (document.querySelector("#area .dropdown .select").textContent === 'Search area' || document.querySelector("#area .dropdown .select").textContent === '---.---') ? '' : document.querySelector("#area .dropdown .select").textContent,
             "vlan": document.querySelector("#vlan .dropdown .select").textContent==='Search VLAN'||'---.---'?'':document.querySelector("#vlan .dropdown .select").textContent
         }
-        console.log(conditions)
+        // console.log(conditions)
         probesContext.setConditions(conditions)
     }
     // const getProbes = setInterval(()=>{

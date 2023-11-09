@@ -8,6 +8,7 @@ $blue-color: #9747FF;
         table-layout: fixed;
         border-radius: 10px;
         thead {
+            border-bottom: 2px white solid;
             tr {
                 th {
                     font-size: 0.8rem !important;
@@ -86,8 +87,5 @@ $blue-color: #9747FF;
             }
         }
 
-    }
-    .pagination{
-        color: white !important;
     }
 }

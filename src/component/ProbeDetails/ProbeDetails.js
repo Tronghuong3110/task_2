@@ -80,7 +80,7 @@ const ProbeDetails = () => {
         infoInput.push(document.getElementById('ip_address').value);
         elements.push(document.getElementById('note'));
         infoInput.push(document.getElementById('note').value);
-        document.querySelectorAll('.probeDetails .infos .info .select_container .dropdown').forEach(ele => {
+        document.querySelectorAll('.probeDetails .infos .info .select_container .dropdown .select').forEach(ele => {
             elements.push(ele)
             infoInput.push(ele.textContent)
         });

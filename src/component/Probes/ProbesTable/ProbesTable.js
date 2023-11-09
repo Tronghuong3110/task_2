@@ -55,9 +55,6 @@ const ProbesTable = () => {
                 .catch(err => console.log(err))
         }
     }
-    const getProbeContinues = () => {
-        setInterval(probesContext.getProbes(), 2000)
-    }
     /*Sắp xếp theo status*/
     const handleRequestSort = (event, property) => {
         const isAscending = (valueToOrderBy === property && orderDirection === 'asc')
@@ -185,7 +182,6 @@ const ProbesTable = () => {
     }
     return (
         <div className='Probe_Table'>
-            {getProbeContinues}
             <Table>
                 <TableHeader
                     orderDirection={orderDirection}
@@ -258,7 +254,7 @@ const ProbesTable = () => {
                                 )
                             })) : (
                             <TableRow style={{ border: "none" }}>
-                                <TableCell colSpan={15} >There is no probe in the list</TableCell>
+                                <TableCell colSpan={15} style={{padding:"20px", fontWeight:"500", fontSize:"1.2em"}} >There is no probe in the list</TableCell>
                             </TableRow>
                         )
 

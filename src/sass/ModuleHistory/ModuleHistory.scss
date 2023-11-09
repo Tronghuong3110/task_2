@@ -12,12 +12,13 @@ $mixcolor: linear-gradient(90deg, $pink-color, $blue-color);
     background-color: $secondary;
     border-radius: 30px;
     box-sizing: border-box;
+    position: relative;
     .searchBar {
         // height: 40px;
         width: 100%;
         font-size: 0.8em;
         .searchTitle {
-            width: 30%;
+            width: 20%;
             position: relative;
             align-items: center;
             input {
@@ -66,7 +67,8 @@ $mixcolor: linear-gradient(90deg, $pink-color, $blue-color);
         }
 
         .searchProbe,
-        .searchModule {
+        .searchModule,
+        .searchAck {
             width: 15%;
             select {
                 width: 100%;
@@ -133,5 +135,20 @@ $mixcolor: linear-gradient(90deg, $pink-color, $blue-color);
             }
         }
     }
-    
+    .pagination{
+        margin-top: 20px;
+        position: absolute;
+        bottom: 5%;
+        left: 50%;
+        transform: translateX(-50%);
+        nav{
+            ul{
+                li{
+                    .MuiPaginationItem-root{
+                        color :white;
+                    }
+                }
+            }
+        }
+    }
 }

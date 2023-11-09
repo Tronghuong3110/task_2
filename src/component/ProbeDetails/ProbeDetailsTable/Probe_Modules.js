@@ -50,10 +50,13 @@ const Probe_Modules = ({ id }) => {
         else getProbeModulesByConditions()
     }, [])
     useEffect(() => {
-        let name = conditions.name;
-        let status = conditions.status;
-        let result = fullModules.filter(modules => modules.moduleName.includes(name) && (modules.status == (status == "All" ? modules.status : status)))
-        setProbeModules(result)
+        console.log(conditions)
+        // let name = conditions.name;
+        // let status = conditions.status;
+        // let result = fullModules.filter(modules => modules.moduleName.includes(name) && (modules.status == (status == "All" ? modules.status : status)))
+
+        // setProbeModules(result)
+        getProbeModulesByConditions()
     }, [conditions])
     const getProbeModules = () => {
         fetch("http://" + IP + ":8081/api/v1/probe/modules?idProbe=" + id + "&&name=&&status=")
@@ -497,7 +500,7 @@ const Probe_Modules = ({ id }) => {
                                                         </div>
                                                         <div className='action'>
                                                             <button className='actionBtn stopBtn'
-                                                                disabled={module.loading || (module.status == "Stopped" || module.status == "Failed") ? true : false}
+                                                                disabled={module.loading || (module.status == "Stopped") ? true : false}
                                                                 onClick={() => {
                                                                     actionWithModule(module.id, "stop")
                                                                 }}

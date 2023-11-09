@@ -2,34 +2,23 @@ import { useState, useEffect } from "react";
 import 'bootstrap/dist/css/bootstrap.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCube, faMagnifyingGlass, faClockRotateLeft, faArrowRotateBack } from '@fortawesome/free-solid-svg-icons';
-import { faPlusSquare, faTrashCan } from '@fortawesome/free-regular-svg-icons';
 import '../../sass/ModuleHistory/ModuleHistory.scss'
-import ModuleHistoryTable from "./ModuleHistoryTable/ModuleHistoryTable";
 import { Checkbox, Pagination } from "@mui/material";
 import DropDownInput from "../action/DropDownInput";
 import { IP } from "../Layout/constaints";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import StatisticTable from "./StastiticTable/StatisticTable";
 
 const ModuleHistory = () => {
     const [probes, setProbes] = useState([])
-    const [modules, setProbeModules] = useState([])
+    const [probe_modules, setProbeModules] = useState([])
     const [selectedProbe, setSelectedProbe] = useState("")
     const [selectedProbeModule, setSelectedProbeModule] = useState("")
-    const [selectedAck,setSelectedAck] = useState("")
-    const [ack,setAck] = useState([
-        {
-            label: "Confirmed",
-            value:"1"
-        },
-        {
-            label: "Not confirmed",
-            value:"0"
-        }
-    ])
+
     const [page, setPage] = useState(1)
     const [totalPage, setTotalPage] = useState(0)
-    const [moduleHistories, setModuleHistories] = useState([])
+    const [modules, setModules] = useState([])
     const [conditions,setConditions] = useState(null)
     useEffect(() => {
         fetch("http://" + IP + ":8081/api/v1/probes?name=&location=&area=&vlan=")
@@ -63,7 +52,6 @@ const ModuleHistory = () => {
         else setProbeModules([])
     }, [selectedProbe])
     useEffect(() => {
-        console.log(conditions)
         getModuleHistory(conditions)
     }, [page])
     const getModuleHistory = (conditions) =>{
@@ -81,30 +69,15 @@ const ModuleHistory = () => {
                 setTotalPage(0)
             }
             else setTotalPage(data[0].totalPage==0?1:data[0].totalPage)
-            setModuleHistories(data)
+            // setModuleHistories(data)
         })
         .catch(err => console.log(err))
     }
-    function formatDate(date = new Date()) {
-        const year = date.toLocaleString('default', { year: 'numeric' });
-        const month = date.toLocaleString('default', {
-            month: '2-digit',
-        });
-        const day = date.toLocaleString('default', { day: '2-digit' });
 
-        return [year, month, day].join('-');
-    }
     const getByCondition = () => {
-        let startDate = document.getElementById("startDate").value
-        let endDate = document.getElementById("endDate").value
-        let content = document.getElementById("content").value
         let tmp = {
-            timeStart: startDate,
-            timeEnd: endDate,
             idProbe: selectedProbe,
             idProbeModule: selectedProbeModule,
-            content: content,
-            ack: selectedAck
         }
         setConditions(tmp)
         getModuleHistory(tmp)
@@ -113,31 +86,15 @@ const ModuleHistory = () => {
         setPage(newPage)
     }
     return (
-        <div className="modulesHistory">
+        <div className="statistic">
             <div className='searchBar d-flex justify-content-between align-items-end'>
-                <div className="searchDate">
-                    <div className="conditionTitle">Start date</div>
-                    <input type="date" placeholder="Choose date" id="startDate" defaultValue={formatDate(new Date())} ></input>
-                </div>
-                <div className="searchDate">
-                    <div className="conditionTitle">End date</div>
-                    <input type="date" placeholder="Choose date" id="endDate" defaultValue={formatDate(new Date())} max={formatDate(new Date())} ></input>
-                </div>
                 <div className="searchProbe">
                     <div className="conditionTitle">Probe name</div>
                     <DropDownInput defaultContent="Search probe" inputOptions={probes} handleSelect={setSelectedProbe} ></DropDownInput>
                 </div>
                 <div className="searchModule">
                     <div className="conditionTitle">Module name</div>
-                    <DropDownInput defaultContent="Search module" inputOptions={modules} handleSelect={setSelectedProbeModule} ></DropDownInput>
-                </div>
-                <div className="searchAck">
-                    <div className="conditionTitle">Confirm status</div>
-                    <DropDownInput defaultContent="Search comfirm status" inputOptions={ack} handleSelect={setSelectedAck} ></DropDownInput>
-                </div>
-                <div className='searchTitle'>
-                    <div className="conditionTitle">Content</div>
-                    <input type='text' placeholder='Search by name...' id="content"></input>
+                    <DropDownInput defaultContent="Search module" inputOptions={probe_modules} handleSelect={setSelectedProbeModule} ></DropDownInput>
                 </div>
                 <button className='searchButton d-flex'
                     onClick={getByCondition}>
@@ -148,8 +105,9 @@ const ModuleHistory = () => {
                 </button>
             </div>
 
-            <ModuleHistoryTable moduleHistories={moduleHistories} getModuleHistory={getModuleHistory} ></ModuleHistoryTable>
-            <div className='pagination d-flex justify-content-center'>
+            {/* <ModuleHistoryTable moduleHistories={moduleHistories} getModuleHistory={getModuleHistory} ></ModuleHistoryTable> */}
+            <StatisticTable ></StatisticTable>
+            {/* <div className='pagination d-flex justify-content-center'>
                 <Pagination count={totalPage}
                     siblingCount={1}
                     color="secondary" 
@@ -158,7 +116,7 @@ const ModuleHistory = () => {
                     showFirstButton showLastButton
                     boundaryCount={2}
                 ></Pagination>
-            </div>
+            </div> */}
             <ToastContainer></ToastContainer>
         </div>
     )

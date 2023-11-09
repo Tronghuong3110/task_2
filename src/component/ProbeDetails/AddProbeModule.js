@@ -61,11 +61,10 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
         let fullData = getModuleInfo(id).fullValue
         if (findEmptyFields(inputData).length != 0) {
             let message = "Field ";
-            let arrOption = findEmptyFields(inputData)
             let arr = findEmptyFields(inputData);
-            arr = arr.concat(arrOption)
             if (arr.length == 1) message += arr[0] + " is empty"
             else {
+
                 for (let i = 0; i < arr.length; i++) {
                     if (i != arr.length - 1) message += arr[i] + ", "
                     else message += arr[i]
@@ -199,7 +198,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
 
         for (let key in obj) {
             if (!obj[key]) {
-                emptyFields.push(key);
+                if(key!="note") emptyFields.push(key);
             }
         }
 

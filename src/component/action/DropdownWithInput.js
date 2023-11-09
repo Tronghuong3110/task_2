@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect ,useRef} from 'react';
 import '../../sass/DropdownWithInput.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -15,6 +15,20 @@ const DropdownWithInput = (props) => {
     'Search area': faChartArea,
     'Search VLAN': faNetworkWired
   }
+  const dropdownRef = useRef(null)
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsPopupOpen(false);
+      }
+    }
+
+    document.addEventListener('click', handleOutsideClick);
+
+    return () => {
+      document.removeEventListener('click', handleOutsideClick);
+    }
+  }, []);
   useEffect(() => {
     const updatedOptions = props.options.map(element => ({
       value: element.code,
@@ -38,15 +52,15 @@ const DropdownWithInput = (props) => {
     setRenderInputValue(value)
     setCustomInputValue("");
     setIsPopupOpen(false);
-    if(props.type!='Search VLAN') props.onOptionSelect(value);
+    if (props.type != 'Search VLAN') props.onOptionSelect(value);
 
   }
 
   return (
-    <div className="dropdown">
+    <div className="dropdown" ref={dropdownRef}>
       <div className="select" onClick={togglePopup}>
         <FontAwesomeIcon icon={typeSelect[props.type]} style={{ color: "#ffffff", padding: "0 10px" }} />
-        { renderInputValue ||props.defaultValue|| props.type}
+        {renderInputValue || props.defaultValue || props.type}
       </div>
       {isPopupOpen && (
         <div className="popup" style={{ zIndex: "2" }}>
@@ -60,7 +74,7 @@ const DropdownWithInput = (props) => {
             />
           </div>
           <div className="options">
-            { !props.edit && (<div
+            {!props.edit && (<div
               key={"---.---"}
               className="option"
               onClick={() => handleOptionSelect("---.---")}

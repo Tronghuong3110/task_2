@@ -30,12 +30,12 @@ $mixcolor: linear-gradient(90deg,$pink-color,$blue-color);
             position: relative;
             width: 25%;
             input{
+                border: 2px solid white;
                 width: 100%;
                 border-radius: 20px;
                 background-color: $primary;
                 color: white;
                 outline: none;
-                border: none;
                 height: 100%;
                 padding-left: 14%;
                 padding-top: 5px;
