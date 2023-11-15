@@ -177,7 +177,7 @@ const AddModule = ({ handleCloseWindow, id }) => {
                             <FontAwesomeIcon icon={faCube} />
                             <div className='input_container-icon-text'>MODULE TYPE</div>
                         </div>
-                        {/* <div className='input_container-input'>
+                        <div className='input_container-input'>
                             <select id="moduleType">
                                 {typeModule.map(ele=>{
                                     return(
@@ -185,7 +185,7 @@ const AddModule = ({ handleCloseWindow, id }) => {
                                     )
                                 })}
                             </select>
-                        </div> */}
+                        </div>
                     </div>
                 </div>
                 <div className="field ">

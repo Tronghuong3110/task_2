@@ -23,17 +23,12 @@ function App() {
           <Sidebar isHide={isHideSideBar} setHideSideBar = {setHideSideBar} ></Sidebar>
         </div>
         <div className='dataContainer' style={{ width: isHideSideBar==true?"95%":"90%", backgroundColor: "transparent", padding: "0 30px",transition: "width 0.5s" }} >
-          {/* <ProbesProvider>
-            <Probes></Probes>
-          </ProbesProvider> */}
-          {/* <Module></Module> */}
-          {/* <ModuleHistory></ModuleHistory> */}
           <Routes>
             <Route path='/' element={<Dashboard></Dashboard>}></Route>
             <Route path='/probe' element={<ProbesProvider><Probes></Probes></ProbesProvider>}></Route>
             <Route path='/details/:id' element={<ProbeDetails></ProbeDetails>}></Route>
             <Route path='/modules' element={<Module></Module>}></Route>
-            <Route path='/module_history' element={<ModuleHistory></ModuleHistory>}></Route>
+            <Route path='/module_history/:id' element={<ModuleHistory></ModuleHistory>}></Route>
             <Route path='/statistic' element={<Statistic></Statistic>}></Route>
           </Routes>
         </div>

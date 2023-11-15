@@ -1,5 +1,6 @@
 import { React, useState, useEffect } from 'react';
 import { TableCell, Tooltip, TableSortLabel } from '@mui/material';
+import '../../../sass/Statistic/StatisticTable/StatisticHeader.scss'
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 
@@ -21,10 +22,8 @@ const StatisticTableHeader = (props) => {
                         active={valueToOrderBy === "errorPerWeek"}
                         direction={valueToOrderBy === "errorPerWeek" ? orderDirection : 'asc'}
                         onClick={createSortHandler('errorPerWeek')}
-                    ><Tooltip title="Error Per Week"><div key="errorPerWeek">EPW</div></Tooltip></TableSortLabel></TableCell>
+                    ><Tooltip title="Error around time range"><div key="errorPerWeek">Error</div></Tooltip></TableSortLabel></TableCell>
                 <TableCell className='note'>Note</TableCell>
-                <TableCell className='actions'>Action</TableCell>
-                <TableCell className='processStatus'></TableCell>
             </TableRow>
         </TableHead>
     )

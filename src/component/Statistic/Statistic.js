@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import 'bootstrap/dist/css/bootstrap.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCube, faMagnifyingGlass, faClockRotateLeft, faArrowRotateBack } from '@fortawesome/free-solid-svg-icons';
-import '../../sass/ModuleHistory/ModuleHistory.scss'
+import '../../sass/Statistic/Statistic.scss'
 import { Checkbox, Pagination } from "@mui/material";
 import DropDownInput from "../action/DropDownInput";
 import { IP } from "../Layout/constaints";
@@ -10,11 +10,10 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import StatisticTable from "./StastiticTable/StatisticTable";
 
-const ModuleHistory = () => {
+const Statistic = () => {
     const [probes, setProbes] = useState([])
-    const [probe_modules, setProbeModules] = useState([])
     const [selectedProbe, setSelectedProbe] = useState("")
-    const [selectedProbeModule, setSelectedProbeModule] = useState("")
+    const [selectedModule, setSelectedModule] = useState("")
 
     const [page, setPage] = useState(1)
     const [totalPage, setTotalPage] = useState(0)
@@ -35,22 +34,19 @@ const ModuleHistory = () => {
             })
     }, [])
     useEffect(() => {
-        if (selectedProbe != "" && selectedProbe != null) {
-            fetch("http://" + IP + ":8081/api/v1/probe/modules?idProbe=" + selectedProbe + "&&name=&&status=")
-                .then(response => response.json())
-                .then(data => {
-                    let arr = []
-                    data.map(ele => {
-                        arr.push({
-                            label: ele.moduleName,
-                            value: ele.id
-                        })
+        fetch("http://" + IP + ":8081/api/v1/modules")
+            .then(response => response.json())
+            .then(data => {
+                let arr = []
+                data.map(ele => {
+                    arr.push({
+                        label: ele.name,
+                        value: ele.id
                     })
-                    setProbeModules(arr)
                 })
-        }
-        else setProbeModules([])
-    }, [selectedProbe])
+                setModules(arr)
+            })
+    }, [])
     useEffect(() => {
         getModuleHistory(conditions)
     }, [page])
@@ -77,7 +73,7 @@ const ModuleHistory = () => {
     const getByCondition = () => {
         let tmp = {
             idProbe: selectedProbe,
-            idProbeModule: selectedProbeModule,
+            idProbeModule: selectedModule,
         }
         setConditions(tmp)
         getModuleHistory(tmp)
@@ -93,8 +89,26 @@ const ModuleHistory = () => {
                     <DropDownInput defaultContent="Search probe" inputOptions={probes} handleSelect={setSelectedProbe} ></DropDownInput>
                 </div>
                 <div className="searchModule">
+                    <div className="conditionTitle">Sample module</div>
+                    <DropDownInput defaultContent="Search module" inputOptions={modules} handleSelect={setSelectedModule} ></DropDownInput>
+                </div>
+                <div className='searchTitle'>
                     <div className="conditionTitle">Module name</div>
-                    <DropDownInput defaultContent="Search module" inputOptions={probe_modules} handleSelect={setSelectedProbeModule} ></DropDownInput>
+                    <input type='text' placeholder="Search by probe's modules name..." id="content"></input>
+                </div>
+                <div className='chooseTimeRange'>
+                    <div className="conditionTitle">Time range</div>
+                    <select>
+                        <option>1 day</option>
+                        <option>3 days</option>
+                        <option>1 week </option>
+                        <option>2 weeks</option>
+                        <option>1 month</option>
+                        <option>2 months</option>
+                        <option>6 months</option>
+                        <option>1 year</option>
+                    </select>
+                    
                 </div>
                 <button className='searchButton d-flex'
                     onClick={getByCondition}>
@@ -104,8 +118,6 @@ const ModuleHistory = () => {
                     <div className='searchButton-text'>Search</div>
                 </button>
             </div>
-
-            {/* <ModuleHistoryTable moduleHistories={moduleHistories} getModuleHistory={getModuleHistory} ></ModuleHistoryTable> */}
             <StatisticTable ></StatisticTable>
             {/* <div className='pagination d-flex justify-content-center'>
                 <Pagination count={totalPage}
@@ -121,4 +133,4 @@ const ModuleHistory = () => {
         </div>
     )
 }
-export default ModuleHistory;
+export default Statistic;

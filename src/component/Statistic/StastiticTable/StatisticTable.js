@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
-import { TableRow, Table, TableHead, TableCell, TableBody,TableContainer,Tooltip } from "@mui/material";
+import { TableRow, Table, TableHead, TableCell, TableBody,TableContainer,Tooltip,TablePagination } from "@mui/material";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import '../../../sass//StatisticTable.scss'
+import '../../../sass/Statistic/StatisticTable/StatisticTable.scss'
 import { IP } from '../../Layout/constaints'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -42,6 +42,13 @@ const StatisticTable = (props) => {
             return a[1] - b[1]
         })
         return stablilizeRowArray.map((el) => el[0])
+    }
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    }
+    const handleChangeRowsPerPage = (event) => {
+        setRowPerPage(parseInt(event.target.value), 10)
+        setPage(0)
     }
     const notify = (message, status) => {
         if (status == 1) {

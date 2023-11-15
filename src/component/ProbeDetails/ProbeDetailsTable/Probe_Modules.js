@@ -16,6 +16,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Confirm from '../../action/Confirm';
 import { IP } from '../../Layout/constaints';
 import SmallConfirm from '../../action/SmallConfirm';
+import { Link } from 'react-router-dom';
 const Probe_Modules = ({ id }) => {
     const [isOpen, setOpenWindow] = useState(false)
     const [probe_modules, setProbeModules] = useState([])
@@ -528,9 +529,11 @@ const Probe_Modules = ({ id }) => {
                                                             </button>
                                                         </div>
                                                         <div className='action'>
-                                                            <button >
-                                                                <FontAwesomeIcon icon={faClockRotateLeft} style={{ color: "#FF1CE8", }} />
-                                                            </button>
+                                                            <Link to={`/module_history/${module.id}`}>
+                                                                <button >
+                                                                    <FontAwesomeIcon icon={faClockRotateLeft} style={{ color: "#FF1CE8", }} />
+                                                                </button>
+                                                            </Link>
                                                         </div>
                                                     </div>
                                                 </TableCell>

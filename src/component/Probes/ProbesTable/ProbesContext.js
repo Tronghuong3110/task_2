@@ -50,7 +50,7 @@ const ProbesProvider = ({ children }) => {
         // Fetch data immediately
         fetchData();
 
-        // Fetch data every 5 seconds
+        // Fetch data every 15 seconds
         intervalRef.current = setInterval(fetchData, 15000);
     };
 

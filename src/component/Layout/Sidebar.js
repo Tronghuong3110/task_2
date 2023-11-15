@@ -69,7 +69,7 @@ const Sidebar = (props) => {
                     </Link>
                 </div>
                 <div className="selection d-flex" id="history">
-                    <Link to={"/module_history"}>
+                    <Link to={"/module_history/0"}>
                         <div className="selection-symbol d-flex align-items-center">
                             <FontAwesomeIcon icon={faClockRotateLeft} style={{ color: "#ffffff", fontSize: "1em" }} />
                         </div>
@@ -77,7 +77,7 @@ const Sidebar = (props) => {
                     </Link>
                 </div>
                 <div className="selection d-flex" id="statistic">
-                    <Link>
+                    <Link to={"/statistic"}>
                         <div className="selection-symbol d-flex align-items-center">
                             <FontAwesomeIcon icon={faChartLine} style={{ color: "#ffffff", fontSize: "1em" }} />
                         </div>

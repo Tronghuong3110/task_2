@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import 'bootstrap/dist/css/bootstrap.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCube, faMagnifyingGlass, faClockRotateLeft, faArrowRotateBack } from '@fortawesome/free-solid-svg-icons';
@@ -10,27 +10,49 @@ import DropDownInput from "../action/DropDownInput";
 import { IP } from "../Layout/constaints";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import { useParams } from "react-router-dom";
 const ModuleHistory = () => {
+    const {id} = useParams()
     const [probes, setProbes] = useState([])
     const [modules, setProbeModules] = useState([])
     const [selectedProbe, setSelectedProbe] = useState("")
     const [selectedProbeModule, setSelectedProbeModule] = useState("")
-    const [selectedAck,setSelectedAck] = useState("")
-    const [ack,setAck] = useState([
+    const [selectedAck, setSelectedAck] = useState("")
+    const [ack, setAck] = useState([
         {
             label: "Confirmed",
-            value:"1"
+            value: "1"
         },
         {
             label: "Not confirmed",
-            value:"0"
+            value: "0"
         }
     ])
     const [page, setPage] = useState(1)
     const [totalPage, setTotalPage] = useState(0)
     const [moduleHistories, setModuleHistories] = useState([])
-    const [conditions,setConditions] = useState(null)
+    const [conditions, setConditions] = useState(()=>{
+        if(id!=0){
+            return {
+                timeStart: null,
+                timeEnd: null,
+                idProbe: null,
+                idProbeModule: id,
+                content: null,
+                ack: null
+            }
+        }
+        else return{
+            timeStart: null,
+            timeEnd: null,
+            idProbe: null,
+            idProbeModule: null,
+            content: null,
+            ack: null
+        }
+    })
+    const intervalRef = useRef(null);
+    
     useEffect(() => {
         fetch("http://" + IP + ":8081/api/v1/probes?name=&location=&area=&vlan=")
             .then(response => response.json())
@@ -63,28 +85,49 @@ const ModuleHistory = () => {
         else setProbeModules([])
     }, [selectedProbe])
     useEffect(() => {
-        console.log(conditions)
+        // console.log(conditions)
         getModuleHistory(conditions)
-    }, [page])
-    const getModuleHistory = (conditions) =>{
-        let api = "http://" + IP + ":8081/api/v1/moduleHistories?page="+(page-1);
-        if(conditions!=null){
-            for(let key in conditions){
-                if(conditions[key]!=""&&conditions[key]!=null) api+= "&"+key+"="+conditions[key]
+    }, [page,conditions])
+    const getModuleHistory = (conditions) => {
+        const fetchData = async () => {
+            let api = "http://" + IP + ":8081/api/v1/moduleHistories?page=" + (page - 1);
+            if (conditions != null) {
+                for (let key in conditions) {
+                    if (conditions[key] != "" && conditions[key] != null) api += "&" + key + "=" + conditions[key]
+                }
+                console.log(api)
             }
-            console.log(api)
+            fetch(api)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data)
+                    if (data.length === 0) {
+                        setTotalPage(0)
+                    }
+                    else setTotalPage(data[0].totalPage+1)
+                    setModuleHistories(data)
+                })
+                .catch(err => console.log(err))
         }
-        fetch(api)
-        .then(response => response.json())
-        .then(data => {
-            if(data.length===0){
-                setTotalPage(0)
-            }
-            else setTotalPage(data[0].totalPage==0?1:data[0].totalPage)
-            setModuleHistories(data)
-        })
-        .catch(err => console.log(err))
+        // Clear previous interval
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+        }
+
+        // Fetch data immediately
+        fetchData();
+
+        // Fetch data every 5 seconds
+        intervalRef.current = setInterval(fetchData, 5000);
     }
+    useEffect(() => {
+        return () => {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+            }
+        };
+    }, []);
+
     function formatDate(date = new Date()) {
         const year = date.toLocaleString('default', { year: 'numeric' });
         const month = date.toLocaleString('default', {
@@ -107,6 +150,7 @@ const ModuleHistory = () => {
             ack: selectedAck
         }
         setConditions(tmp)
+        setPage(1)
         getModuleHistory(tmp)
     }
     const handleChangePage = (event, newPage) => {
@@ -152,9 +196,9 @@ const ModuleHistory = () => {
             <div className='pagination d-flex justify-content-center'>
                 <Pagination count={totalPage}
                     siblingCount={1}
-                    color="secondary" 
-                    onChange={handleChangePage} 
-                    page={page} 
+                    color="secondary"
+                    onChange={handleChangePage}
+                    page={page}
                     showFirstButton showLastButton
                     boundaryCount={2}
                 ></Pagination>
