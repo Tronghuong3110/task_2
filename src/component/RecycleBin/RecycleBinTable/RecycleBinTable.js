@@ -2,24 +2,17 @@ import { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import { TableRow, Table, TableHead, TableCell, TableBody, Checkbox } from "@mui/material";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleCheck as regularFaCircleCheck, faTrashCan } from '@fortawesome/free-regular-svg-icons'
-import { faCircleCheck as solidFaCircleCheck, faClockRotateLeft, faArrowRotateBack } from '@fortawesome/free-solid-svg-icons'
-import '../../../sass/ModuleHistory/ModuleHistoryTable.scss'
+import {  faTrashCan } from '@fortawesome/free-regular-svg-icons'
+import {  faArrowRotateLeft, faArrowRotateBack } from '@fortawesome/free-solid-svg-icons'
+import '../../../sass/RecycleBin/RecycleBinTable.scss'
 import { IP } from '../../Layout/constaints'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-const ModuleHistoryTable = (props) => {
-    const { moduleHistories, getModuleHistory,conditions } = props
-    const [selectedModuleHistory, setSelectedModuleHistory] = useState([])
-    const updateACK = (id) => {
-        let options = {
-            method: "PUT"
-        }
-        fetch("http://" + IP + ":8081/api/v1//moduleHistory?idModuleHistory=" + id, options)
-            .then(respose => respose.text())
-            .then(data => {
-                getModuleHistory(conditions)
-            })
+const RecycleBinTable = (props) => {
+    const { probes, getProbes } = props
+    const [selectedProbes, setSelectedProbes] = useState([])
+    const recoverProbe = (id) => {
+
     }
     const tickAllDisplay = (event, checked) => {
         let nodes = document.querySelectorAll("table tbody tr td input[type ='checkbox']")
@@ -28,49 +21,49 @@ const ModuleHistoryTable = (props) => {
             nodes.forEach(ele => {
                 arr.push(ele.id)
             })
-            setSelectedModuleHistory(arr)
+            setSelectedProbes(arr)
         }
-        else setSelectedModuleHistory([])
+        else setSelectedProbes([])
     }
     const isSelected = (id) => {
-        if (selectedModuleHistory.find(num => num == id) == undefined) return false;
+        if (selectedProbes.find(num => num == id) == undefined) return false;
         else return true;
     }
     const addOrRemoveToSelectedList = (event, checked, id) => {
         if (checked === true) {
-            setSelectedModuleHistory([...selectedModuleHistory, id])
-            console.log([...selectedModuleHistory, id])
+            setSelectedProbes([...selectedProbes, id])
+            console.log([...selectedProbes, id])
         }
         else {
-            setSelectedModuleHistory(selectedModuleHistory.filter(item => item != id))
-            console.log(selectedModuleHistory.filter(item => item != id))
+            setSelectedProbes(selectedProbes.filter(item => item != id))
+            console.log(selectedProbes.filter(item => item != id))
         }
     }
-    const removeModuleHistory = (id) => {
-        let param = []
-        if (!Array.isArray(id)) {
-            param = [id]
-        }
-        else param = id
-        console.log(param)
-        let options = {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                idsStr: param
-            })
-        }
-        fetch("http://" + IP + ":8081/api/v1/module/history", options)
-            .then(response => response.json())
-            .then(data => {
-                console.log(data)
-                notify(data.message, data.code)
-                getModuleHistory()
-            })
-            .catch(err => console.log(err))
-    }
+    // const removeProbe = (id) => {
+    //     let param = []
+    //     if (!Array.isArray(id)) {
+    //         param = [id]
+    //     }
+    //     else param = id
+    //     console.log(param)
+    //     let options = {
+    //         method: "DELETE",
+    //         headers: {
+    //             "Content-Type": "application/json"
+    //         },
+    //         body: JSON.stringify({
+    //             idsStr: param
+    //         })
+    //     }
+    //     fetch("http://" + IP + ":8081/api/v1/module/history", options)
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             console.log(data)
+    //             notify(data.message, data.code)
+    //             getModuleHistory()
+    //         })
+    //         .catch(err => console.log(err))
+    // }
     const notify = (message, status) => {
         if (status == 1) {
             toast.success(message, {
@@ -108,7 +101,7 @@ const ModuleHistoryTable = (props) => {
 
     }
     return (
-        <div className='Module_History_Table'>
+        <div className='RecycleBinTable'>
             <div className="actionBar d-flex align-items-center">
                 <div className="checkAll">
                     <Checkbox
@@ -120,7 +113,6 @@ const ModuleHistoryTable = (props) => {
                         }}
                         onChange={tickAllDisplay}
                     >
-
                     </Checkbox>
                 </div>
                 <div className="refreshButton">
@@ -130,7 +122,7 @@ const ModuleHistoryTable = (props) => {
                 </div>
                 <div className="deleteButton">
                     <button onClick={() => {
-                        removeModuleHistory(selectedModuleHistory)
+                        // removeProbe(selectedProbes)
                     }}>
                         <FontAwesomeIcon icon={faTrashCan}></FontAwesomeIcon>
                     </button>
@@ -140,18 +132,20 @@ const ModuleHistoryTable = (props) => {
                 <TableHead>
                     <TableRow>
                         <TableCell className="checkbox"></TableCell>
-                        <TableCell className='time'>TIME</TableCell>
-                        <TableCell className="probe_name">PROBE</TableCell>
-                        <TableCell className="module_name">MODULE</TableCell>
-                        <TableCell className='content'>CONTENT</TableCell>
-                        <TableCell className='actions'></TableCell>
+                        <TableCell className='id'>ID</TableCell>
+                        <TableCell className="name">PROBE NAME</TableCell>
+                        <TableCell className="ip_address">IP ADDRESS</TableCell>
+                        <TableCell className='location'>LOCATION</TableCell>
+                        <TableCell className='area'>AREA</TableCell>
+                        <TableCell className='description'>DESCRIPTION</TableCell>
+                        <TableCell className='action'>ACTION</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
                     {
-                        moduleHistories.length !== 0 ? (moduleHistories.map(item => {
+                        probes.length !== 0 ? (probes.map(item => {
                             return (
-                                <TableRow key={item.idModuleHistory}>
+                                <TableRow key={item.id}>
                                     <TableCell className="checkbox">
                                         <Checkbox
                                             sx={{
@@ -160,27 +154,29 @@ const ModuleHistoryTable = (props) => {
                                                     color: 'white',
                                                 },
                                             }}
-                                            id={item.idModuleHistory}
-                                            checked={isSelected(item.idModuleHistory)}
-                                            onChange={(event, checked) => addOrRemoveToSelectedList(event, checked, item.idModuleHistory)}
+                                            id={item.id}
+                                            checked={isSelected(item.id)}
+                                            onChange={(event, checked) => addOrRemoveToSelectedList(event, checked, item.id)}
                                         ></Checkbox>
                                     </TableCell>
-                                    <TableCell className='time'>{item.atTime}</TableCell>
-                                    <TableCell className="probe_name">{item.probeName}</TableCell>
-                                    <TableCell className="module_name">{item.moduleName}</TableCell>
-                                    <TableCell className='content'>{item.content}</TableCell>
+                                    <TableCell className='id'>{item.id}</TableCell>
+                                    <TableCell className="name">{item.name}</TableCell>
+                                    <TableCell className="ip_address">{item.ipAddress}</TableCell>
+                                    <TableCell className='location'>{item.location}</TableCell>
+                                    <TableCell className='area'>{item.area}</TableCell>
+                                    <TableCell className='description'>{item.description}</TableCell>
                                     <TableCell className='actions'>
                                         <div className='actions-container d-flex justify-content-around'>
                                             <div className='action'>
                                                 <button disabled={item.ack} onClick={() => {
-                                                    updateACK(item.idModuleHistory)
+                                                    recoverProbe(item.id)
                                                 }}>
-                                                    {item.ack === 0 ? (<FontAwesomeIcon icon={regularFaCircleCheck} style={{ color: "#c1c3cf", }} />) : (<FontAwesomeIcon icon={solidFaCircleCheck} style={{ color: "#0FA958" }} />)}
+                                                    <FontAwesomeIcon icon={faArrowRotateLeft} style={{color: "#1ae6ea",}} />
                                                 </button>
                                             </div>
                                             <div className='action'>
                                                 <button onClick={() => {
-                                                    removeModuleHistory(item.idModuleHistory)
+                                                    // removeProbe(item.idModuleHistory)
                                                 }}>
                                                     <FontAwesomeIcon icon={faTrashCan} style={{ color: "white" }} />
                                                 </button>
@@ -192,7 +188,7 @@ const ModuleHistoryTable = (props) => {
                             )
                         })) : (
                             <TableRow style={{ border: "none" }}>
-                                <TableCell colSpan={15} style={{padding:"20px", fontWeight:"500", fontSize:"1.2em" }} >There is no history in the list pass the conditions</TableCell>
+                                <TableCell colSpan={15} style={{ padding: "20px", fontWeight: "500", fontSize: "1.2em" }} >There is no history in the list pass the conditions</TableCell>
                             </TableRow>
                         )
                     }
@@ -201,4 +197,4 @@ const ModuleHistoryTable = (props) => {
         </div>
     )
 }
-export default ModuleHistoryTable
+export default RecycleBinTable

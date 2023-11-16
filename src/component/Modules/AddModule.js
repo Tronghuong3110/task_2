@@ -164,7 +164,7 @@ const AddModule = ({ handleCloseWindow, id }) => {
                     <div className='input_container'>
                         <div className='input_container-icon d-flex align-items-center'>
                             <FontAwesomeIcon icon={faCube} />
-                            <div className='input_container-icon-text'>MODULE</div>
+                            <div className='input_container-icon-text'>MODULE NAME</div>
                         </div>
                         <div className='input_container-input'>
                             <input type='text' id="name" placeholder='Type module name...' defaultValue={isEditModule.name}></input>

@@ -7,7 +7,7 @@ import {
     faClockRotateLeft,
     faCube,
     faDisplay,
-    faHouse,faBars
+    faHouse,faBars, faRecycle
 } from '@fortawesome/free-solid-svg-icons'
 import { Link } from 'react-router-dom';
 const Sidebar = (props) => {
@@ -82,6 +82,14 @@ const Sidebar = (props) => {
                             <FontAwesomeIcon icon={faChartLine} style={{ color: "#ffffff", fontSize: "1em" }} />
                         </div>
                         <div className="selection-text sidebar-text">Statistic</div>
+                    </Link>
+                </div>
+                <div className="selection d-flex" id="recycleBin">
+                    <Link to={"/bin"}>
+                        <div className="selection-symbol d-flex align-items-center">
+                            <FontAwesomeIcon icon={faRecycle} style={{ color: "#ffffff", fontSize: "1em" }} />
+                        </div>
+                        <div className="selection-text sidebar-text">Recycle Bin</div>
                     </Link>
                 </div>
             </div>

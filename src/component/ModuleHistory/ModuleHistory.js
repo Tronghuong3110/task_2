@@ -104,7 +104,7 @@ const ModuleHistory = () => {
                     if (data.length === 0) {
                         setTotalPage(0)
                     }
-                    else setTotalPage(data[0].totalPage+1)
+                    else setTotalPage(data[0].totalPage)
                     setModuleHistories(data)
                 })
                 .catch(err => console.log(err))
@@ -192,7 +192,7 @@ const ModuleHistory = () => {
                 </button>
             </div>
 
-            <ModuleHistoryTable moduleHistories={moduleHistories} getModuleHistory={getModuleHistory} ></ModuleHistoryTable>
+            <ModuleHistoryTable moduleHistories={moduleHistories} getModuleHistory={getModuleHistory} conditions={conditions} ></ModuleHistoryTable>
             <div className='pagination d-flex justify-content-center'>
                 <Pagination count={totalPage}
                     siblingCount={1}

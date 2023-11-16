@@ -11,6 +11,7 @@ import Dashboard from './component/Dashboard/Dashboard';
 import Statistic from './component/Statistic/Statistic'
 import { ProbesProvider } from "./component/Probes/ProbesTable/ProbesContext";
 import {Routes,Route} from 'react-router-dom'
+import RecycleBin from './component/RecycleBin/RecycleBin';
 function App() {
   const [isHideSideBar, setHideSideBar] = useState(false)
   return (
@@ -30,6 +31,7 @@ function App() {
             <Route path='/modules' element={<Module></Module>}></Route>
             <Route path='/module_history/:id' element={<ModuleHistory></ModuleHistory>}></Route>
             <Route path='/statistic' element={<Statistic></Statistic>}></Route>
+            <Route path='/bin' element={<RecycleBin></RecycleBin>}></Route>
           </Routes>
         </div>
       </main>
