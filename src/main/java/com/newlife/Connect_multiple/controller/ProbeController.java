@@ -3,6 +3,7 @@ package com.newlife.Connect_multiple.controller;
 import com.newlife.Connect_multiple.dto.*;
 import com.newlife.Connect_multiple.service.ILocationService;
 import com.newlife.Connect_multiple.service.IProbeService;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -76,10 +77,17 @@ public class ProbeController {
 
     // xóa 1 probe (xóa vĩnh viễn probe từ probe) - Hướng
     @DeleteMapping("/probe/remove")
-    public CompletableFuture<JSONObject> deleteProbeFromTrash(@RequestParam("id") Integer id) {
+    public CompletableFuture<JSONArray> deleteProbeFromTrash(@RequestBody Ids ids) {
         return CompletableFuture.supplyAsync(() -> {
-            JSONObject messageDelete = probeService.deleteProbe(id);
+            JSONArray messageDelete = probeService.deleteProbe(ids.getIds());
             return messageDelete;
+        }, executorService);
+    }
+    @GetMapping("/probes/recycle") // lấy ra danh sách các probe cho màn thùng rác
+    public CompletableFuture<List<ProbeDto>> findAllProbeInRecycle(@RequestParam("name") Optional<String> name, @RequestParam("page") Optional<Integer> page) {
+        return CompletableFuture.supplyAsync(() -> {
+            List<ProbeDto> probeDtoList = probeService.findAllProbeByDeleted(name.orElse(""), page.orElse(0));
+            return probeDtoList;
         }, executorService);
     }
 
@@ -94,11 +102,11 @@ public class ProbeController {
         }, executorService);
     }
 
-    //khôi phục probe từ thùng rác
-    @PostMapping("/probe")
-    public CompletableFuture<JSONObject> backUpProbe(@RequestParam("id") Integer id) {
+
+    @PostMapping("/probe") //khôi phục probe từ thùng rác
+    public CompletableFuture<JSONArray> backUpProbe(@RequestBody Ids ids) {
         return CompletableFuture.supplyAsync(() -> {
-            JSONObject message = probeService.backUpProbe(id);
+            JSONArray message = probeService.backUpProbe(ids.getIds());
             return message;
         }, executorService);
     }
@@ -107,7 +115,7 @@ public class ProbeController {
     @GetMapping("/downloadFile/{probeId}")
     public CompletableFuture<ResponseEntity<?>> downloadFile(@PathVariable("probeId") Integer probeId) {
         return CompletableFuture.supplyAsync(() -> {
-            InfoLogin info = probeService.downlodFile(probeId);
+            InfoLogin info = probeService.downloadFile(probeId);
             return ResponseEntity.ok(info);
         }, executorService);
     }

@@ -33,6 +33,9 @@ public class ProbeOptionEntity {
     @Column(name = "password")
     private String password;
 
+    @Column(name = "deleted")
+    private Integer deleted;
+
     @OneToOne(mappedBy = "probeOptionEntity")
     private ServerEntity serverEntity;
 

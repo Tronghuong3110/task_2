@@ -16,7 +16,7 @@ import java.util.Optional;
 public interface ModuleProbeRepository extends JpaRepository<ProbeModuleEntity, Integer> {
 
     @Query(value = "select * from probemodule.probe_module where module_name  like %:name% " + // COLLATE Latin1_General_CI_AI
-                    "and status like %:status% and id_probe = :idProbe", nativeQuery = true)
+                    "and status like %:status% and (id_probe = :idProbe or id_probe is null)", nativeQuery = true)
     List<ProbeModuleEntity> findAllByProbeNameOrStatusAndIdProbe(@Param("name") String name,
                                                                  @Param("status") String status,
                                                                  @Param("idProbe") Integer idProbe);

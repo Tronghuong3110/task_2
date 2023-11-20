@@ -9,7 +9,6 @@ import java.util.Optional;
 @Repository
 public interface ProbeOptionRepository extends JpaRepository<ProbeOptionEntity, Integer> {
 
-    Boolean existsByUserName(String username);
-
+    Boolean existsByUserNameAndDeleted(String username, Integer deleted);
     Optional<ProbeOptionEntity> findByUserName(String username);
 }

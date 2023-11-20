@@ -26,4 +26,5 @@ public class ProbeDto {
     private String description;
     private Integer totalModule;
     private String message;
+    private Long totalPage;
 }

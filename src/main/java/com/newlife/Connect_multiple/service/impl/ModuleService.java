@@ -55,7 +55,6 @@ public class ModuleService implements IModuleService {
         try {
             ModuleEntity moduleEntity = ModuleConverter.toEntity(moduleDto);
             String name = moduleEntity.getName();
-            List<String> listModuleName = moduleRepository.getAllName();
 
             // check trùng module name
             if (checkModuleName(name)) {

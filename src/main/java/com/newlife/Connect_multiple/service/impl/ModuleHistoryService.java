@@ -53,9 +53,12 @@ public class ModuleHistoryService implements IModuleHistoryService {
         List<ModuleHistoryDto> listModuleHistoriesDto = new ArrayList<>();
         Long totalRow = moduleHistoryRepository.count(idProbeModule, idProbe, timeStart, timeEnd, content, ack);
         Long totalPage = Math.round(((double)totalRow) / 10);
-        if(totalPage < totalRow / 10) {
+        if(totalPage < (double)totalRow / 10) {
             totalPage += 1;
         }
+        System.out.println("totalPage " + totalPage);
+        System.out.println("totalRow / 10 " + (double)totalRow / 10);
+        System.out.println("totalRow " + totalRow);
         for(ModuleHistoryEntity moduleHistory : listModuleHistories.toList()) {
             ModuleHistoryDto dto = ModuleHistoryConverter.toDto(moduleHistory);
             dto.setTotalPage(totalPage);

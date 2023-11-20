@@ -676,6 +676,12 @@ public class ProbeModuleService implements IProbeModuleService {
             return json;
         }
     }
+
+    @Override
+    public List<ProbeModuleDto> findAllProbeModuleAndError(Integer probeId, Integer mooduleId) {
+        return null;
+    }
+
     // lấy ra id của probeModule theo command từ database để check có trùng không
     private Integer getIdOfProbeModuleInDatabase(String commandLine, Integer idProbe) {
         try {
@@ -1014,8 +1020,8 @@ public class ProbeModuleService implements IProbeModuleService {
                 System.out.println("Đếm lỗi module lồi rồi (line 50) !!!");
                 return null;
             }
-            Optional<Long> error = moduleHistoryRepository.solveErrorPerWeekOfModule(idProbeModule, timeAfter, timeBefore, "Failed");
-            return error.orElse(0L);
+            JSONObject jsonError = moduleHistoryRepository.solveErrorPerWeekOfModule(idProbeModule, timeAfter, timeBefore, "Failed");
+            return jsonError.containsKey("epw") ? Long.parseLong(jsonError.get("epw").toString()) : 0;
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -1023,7 +1029,6 @@ public class ProbeModuleService implements IProbeModuleService {
             return null;
         }
     }
-
     private String getTimeBefore() {
         try {
             LocalDate currentDate = LocalDate.now();

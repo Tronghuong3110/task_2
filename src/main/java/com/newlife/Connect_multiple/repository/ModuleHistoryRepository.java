@@ -1,6 +1,7 @@
 package com.newlife.Connect_multiple.repository;
 
 import com.newlife.Connect_multiple.entity.ModuleHistoryEntity;
+import org.json.simple.JSONObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,12 +15,12 @@ import java.util.Optional;
 
 @Repository
 public interface ModuleHistoryRepository extends JpaRepository<ModuleHistoryEntity, String> {
-    @Query(value = "SELECT COUNT(status) as epw FROM module_history WHERE id_probe_module = :idProbeModule " +
-            "AND at_time between :timeBefore AND :timeAfter AND status = :status", nativeQuery = true)
-    Optional<Long> solveErrorPerWeekOfModule(@Param("idProbeModule") Integer idProbeModule,
-                                                @Param("timeBefore") String timeBefore,
-                                                @Param("timeAfter") String timeAfter,
-                                                @Param("status") String status);
+    @Query(value = "SELECT id_probe_module, COUNT(status) as epw FROM module_history WHERE id_probe_module = :idProbeModule " +
+            "AND at_time between :timeBefore AND :timeAfter AND status = :status group by (id_probe_module)", nativeQuery = true)
+    JSONObject solveErrorPerWeekOfModule(@Param("idProbeModule") Integer idProbeModule,
+                                         @Param("timeBefore") String timeBefore,
+                                         @Param("timeAfter") String timeAfter,
+                                         @Param("status") String status);
     @Query(value = "SELECT * FROM module_history WHERE id_probe = :idProbe", nativeQuery =  true)
     List<ModuleHistoryEntity> getAllByProbe(@Param("idProbe") Integer idProbe);
 
@@ -38,7 +39,7 @@ public interface ModuleHistoryRepository extends JpaRepository<ModuleHistoryEnti
     // Tên module / tên probe / thời gian / đã được ACK hay chưa
     @Query(value = "select * from probemodule.module_history where (:idProbeModule is null or id_probe_module = :idProbeModule) " +
                     "and (:idProbe is null or id_probe = :idProbe) and ((at_time between :timeStart and :timeEnd ) or (:timeStart is null and :timeEnd is null) )" +
-                    "and (:ack is null or ack = :ack ) and (:content is null or content like %:content%) ", nativeQuery = true)
+                    "and (:ack is null or ack = :ack ) and (:content is null or content like %:content%) and status = 'Failed' ", nativeQuery = true)
     Page<ModuleHistoryEntity> findAllByCondition(@Param("idProbeModule") Integer idProbeModule,
                                                  @Param("idProbe") Integer idProbe,
                                                  @Param("timeStart") String timeStart,
@@ -49,7 +50,7 @@ public interface ModuleHistoryRepository extends JpaRepository<ModuleHistoryEnti
 
     @Query(value = "select count(*) from probemodule.module_history where (:idProbeModule is null or id_probe_module = :idProbeModule) " +
             "and (:idProbe is null or id_probe = :idProbe) and ((at_time between :timeStart and :timeEnd ) or (:timeStart is null and :timeEnd is null) )" +
-            "and (:ack is null or ack = :ack ) and (:content is null or content like %:content%) ", nativeQuery = true)
+            "and (:ack is null or ack = :ack ) and (:content is null or content like %:content%) and status = 'Failed'", nativeQuery = true)
     Long count(@Param("idProbeModule") Integer idProbeModule,
                             @Param("idProbe") Integer idProbe,
                             @Param("timeStart") String timeStart,

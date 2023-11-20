@@ -13,6 +13,8 @@ import com.newlife.Connect_multiple.service.IProbeService;
 import com.newlife.Connect_multiple.util.CreateTokenUtil;
 import com.newlife.Connect_multiple.util.JsonUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -100,6 +102,7 @@ public class ProbeService implements IProbeService {
             }
 
             // thêm option vào database
+            probeOptionEntity.setDeleted(0);
             probeOptionEntity = probeOptionRepository.save(probeOptionEntity);
             probeEntity.setProbeOptionEntity(probeOptionEntity);
 
@@ -189,9 +192,10 @@ public class ProbeService implements IProbeService {
         }
     }
     // hướng
+    // lấy ra toàn bộ probe không có trong thùng rác
     @Override
     public List<ProbeDto> findAllProbe(String name, String location, String area, String vlan) {
-        List<ProbeEntity> listProbe = probeRepository.findByNameOrLocationOrAreaOrVlan(name, location, area, vlan);
+        List<ProbeEntity> listProbe = probeRepository.findByNameOrLocationOrAreaOrVlan(name, location, area, vlan, 0);
         List<JSONObject> countStatusOfModuleByProbe = countStatus();
         List<ProbeDto> listProbeDto = new ArrayList<>();
         for(ProbeEntity entity : listProbe) {
@@ -207,9 +211,9 @@ public class ProbeService implements IProbeService {
         }
         return listProbeDto;
     }
-    // hướng (Đưa probe vào thùng rác)
+
     @Override
-    public JSONObject delete(Integer id) {
+    public JSONObject delete(Integer id) { // hướng (Đưa probe vào thùng rác)
         JSONObject json = new JSONObject();
         System.out.println("ID probe delete " + id);
         try {
@@ -220,27 +224,30 @@ public class ProbeService implements IProbeService {
                 json.put("message", "Can not found probe with id = " + id);
                 return json;
             }
+            ProbeOptionEntity probeOption = probeEntity.getProbeOptionEntity();
+            probeOption.setDeleted(1);
             ProbeHistoryEntity probeHistoryEntity = new ProbeHistoryEntity();
             probeHistoryEntity.setProbeName(probeEntity.getName());
-            probeHistoryEntity.setAction("Moved to the trash");
+            probeHistoryEntity.setAction("Moved to the recycle");
             probeHistoryEntity.setAtTime(new Date(System.currentTimeMillis()));
             probeEntity.setDeleted(1);
             probeEntity = probeRepository.save(probeEntity);
+            probeOptionRepository.save(probeOption);
             probeHistoryRepository.save(probeHistoryEntity);
             json.put("code", "1");
-            json.put("message", "Probe with id " + id + " is moved to the trash");
+            json.put("message", "Probe with id " + id + " is moved to the recycle");
             return json;
         }
         catch (Exception e) {
             System.out.println("Delete probe error(Di chuyển probe tới thùng rác)");
             e.printStackTrace();
             json.put("code", "0");
-            json.put("message", "Can not delete probe with " + id);
+            json.put("message", "Can not remove probe with " + id);
             return json;
         }
     }
     // hướng
-    @Override
+    @Override // cập nhật thông tin probe
     public JSONObject updateProbe(ProbeDto probeDto) {
         JSONObject json = new JSONObject();
         try {
@@ -324,40 +331,56 @@ public class ProbeService implements IProbeService {
         }
     }
     // hướng
-    @Override
-    public JSONObject backUpProbe(Integer id) {
-        JSONObject json = new JSONObject();
-        try {
-            // lấy probe từ database theo id và trạng thái đã đưa vào thùng rác
-            ProbeEntity probeEntity = probeRepository.findByIdAndDeleted(id, 1)
-                    .orElse(null);
-            if(probeEntity == null) {
-                json.put("code", "3");
-                json.put("message", "Can not found probe with id = " + id);
-                return json;
+    @Override // khôi phục probe từ thùng rác
+    public JSONArray backUpProbe(List<Integer> ids) {
+        JSONArray jsonArray = new JSONArray();
+        for(Integer id : ids) {
+            JSONObject json = new JSONObject();
+            try {
+                // lấy probe từ database theo id và trạng thái đã đưa vào thùng rác
+                // deleted = 1 ==> probe được đưa vào thùng rác
+                ProbeEntity probeEntity = probeRepository.findByIdAndDeleted(id, 1)
+                        .orElse(null);
+                if(probeEntity == null) {
+                    json.put("code", "3");
+                    json.put("message", "Can not found probe with id = " + id);
+                    jsonArray.add(json);
+                    continue;
+                }
+                ProbeHistoryEntity probeHistoryEntity = new ProbeHistoryEntity();
+                probeHistoryEntity.setProbeName(probeEntity.getName());
+                probeHistoryEntity.setAction("Permanently Deleted");
+                probeHistoryEntity.setAtTime(new Date(System.currentTimeMillis()));
+                probeEntity.setDeleted(0);
+                // username, name, ip
+                if(checkProbeName(probeEntity.getName()) || checkIpAddress(probeEntity.getIpAddress()) || checkUsername(probeEntity.getProbeOptionEntity().getUserName())) {
+                    json.put("code", "0");
+                    json.put("message", "Can not backup probe with name " + probeEntity.getName());
+                    jsonArray.add(json);
+                    continue;
+                }
+                ProbeOptionEntity probeOption = probeEntity.getProbeOptionEntity();
+                probeOption.setDeleted(0);
+                probeOptionRepository.save(probeOption);
+                probeEntity = probeRepository.save(probeEntity);
+                probeHistoryRepository.save(probeHistoryEntity);
+                json.put("code", "1");
+                json.put("message", "Back up probe with id = " + id + " success");
+                jsonArray.add(json);
             }
-            ProbeHistoryEntity probeHistoryEntity = new ProbeHistoryEntity();
-            probeHistoryEntity.setProbeName(probeEntity.getName());
-            probeHistoryEntity.setAction("Permanently Deleted");
-            probeHistoryEntity.setAtTime(new Date(System.currentTimeMillis()));
-            probeEntity.setDeleted(0);
-            probeEntity = probeRepository.save(probeEntity);
-            probeHistoryRepository.save(probeHistoryEntity);
-            json.put("code", "1");
-            json.put("message", "Back up probe with id = " + id + " success");
-            return json;
+            catch (Exception e) {
+                System.out.println("Back up probe error");
+                e.printStackTrace();
+                json.put("code", "0");
+                json.put("message", "Can not back up probe with id = " + id);
+                jsonArray.add(json);
+            }
         }
-        catch (Exception e) {
-            System.out.println("Back up probe error");
-            e.printStackTrace();
-            json.put("code", "0");
-            json.put("message", "Can not back up probe with id = " + id);
-            return json;
-        }
+        return jsonArray;
     }
     // hướng
     @Override
-    public InfoLogin downlodFile(Integer idProbe) {
+    public InfoLogin downloadFile(Integer idProbe) {
         try {
             InfoLogin info = new InfoLogin();
             ProbeEntity probe = probeRepository.findByIdAndDeleted(idProbe, 0).orElse(null);
@@ -393,52 +416,74 @@ public class ProbeService implements IProbeService {
     }
     // Han
     // màn dashboard
-    @Override
+    @Override // xem lại
     public Integer countProbeByStatus(String status) {
         try {
-            Integer tmp = probeRepository.countAllByStatus(status);
+            Integer tmp = probeRepository.countAllByStatusAndDeleted(status, 0);
             return tmp;
         } catch (Exception e) {
             e.printStackTrace();
             return 0;
         }
     }
-    // Han
-    // Màn dashboard
-
 
     // hướng - xóa 1 probe từ thùng rác
-    @Override
-    public JSONObject deleteProbe(Integer id) {
-        JSONObject json = new JSONObject();
-        // tìm probe theo id có trong thùng rác(deleted = 1)
-        ProbeEntity probe = probeRepository.findByIdAndDeleted(id, 1).orElse(null);
-        if(probe == null) {
-            json.put("code", "3");
-            json.put("message", "Probe đã bị xóa vĩnh viễn không còn tồn tại");
-            return json;
+    @Override // xóa probe từ thùng rác (xóa vĩnh viễn)
+    public JSONArray deleteProbe(List<Integer> ids) {
+        JSONArray jsonArray = new JSONArray();
+        for(Integer id : ids) {
+            JSONObject json = new JSONObject();
+            // tìm probe theo id có trong thùng rác(deleted = 1)
+            ProbeEntity probe = probeRepository.findByIdAndDeleted(id, 1).orElse(null);
+            if(probe == null) {
+                json.put("code", "3");
+                json.put("message", "Probe đã bị xóa vĩnh viễn không còn tồn tại");
+                jsonArray.add(json);
+                continue;
+            }
+            // thêm lịch sử vào bảng probebHistory
+            try {
+                ProbeHistoryEntity probeHistoryEntity = new ProbeHistoryEntity();
+                probeHistoryEntity.setProbeName(probe.getName());
+                probeHistoryEntity.setAction("Permanently Deleted");
+                probeHistoryEntity.setAtTime(new Date(System.currentTimeMillis()));
+                // xóa probe
+                probeRepository.deleteById(id);
+                // Lưu thông tin vào lịch sử
+                probeHistoryRepository.save(probeHistoryEntity);
+                json.put("code", "1");
+                json.put("message", "Delete probe success");
+                jsonArray.add(json);
+            }
+            catch (Exception e) {
+                System.out.println("Lưu lịch sử probe lỗi rồi(Xóa vĩnh viễn probe từ thùng rác Line 338)");
+                e.printStackTrace();
+                json.put("code", "0");
+                json.put("message", "Delete failed");
+                jsonArray.add(json);
+            }
         }
-        // thêm lịch sử vào bảng probebHistory
-        try {
-            ProbeHistoryEntity probeHistoryEntity = new ProbeHistoryEntity();
-            probeHistoryEntity.setProbeName(probe.getName());
-            probeHistoryEntity.setAction("Permanently Deleted");
-            probeHistoryEntity.setAtTime(new Date(System.currentTimeMillis()));
-            // xóa probe
-            probeRepository.deleteById(id);
-            // Lưu thông tin vào lịch sử
-            probeHistoryRepository.save(probeHistoryEntity);
-            json.put("code", "1");
-            json.put("message", "Delete probe success");
-            return json;
+        return jsonArray;
+    }
+
+    // lấy ra toàn bộ probe phục vụ màn thùng rác
+    @Override // lấy toàn bộ probe màn thùng r
+    public List<ProbeDto> findAllProbeByDeleted(String name, Integer page) {
+        // lấy ra toàn bộ probe có deleted = 1(trong thùng rác)
+        Pageable pageable = PageRequest.of(page, 10);
+        List<ProbeEntity> listProbe = probeRepository.findByNameOrLocationOrAreaOrVlan(name, "", "", "", 1);
+        List<ProbeDto> probeDtoList = new ArrayList<>();
+        Long totalRow = probeRepository.countAllByDeleted(1);
+        Long totalPage = Math.round(((double)totalRow) / 10);
+        if(totalPage < (double)totalRow / 10) {
+            totalPage += 1;
         }
-        catch (Exception e) {
-            System.out.println("Lưu lịch sử probe lỗi rồi(Xóa vĩnh viễn probe từ thùng rác Line 338)");
-            e.printStackTrace();
-            json.put("code", "0");
-            json.put("message", "Delete failed");
-            return json;
+        for(ProbeEntity probe : listProbe) {
+            ProbeDto probeDto = ProbeConverter.toDto(probe);
+            probeDto.setTotalPage(totalPage);
+            probeDtoList.add(probeDto);
         }
+        return probeDtoList;
     }
 
     // đếm số lượng module theo probe và status
@@ -460,15 +505,15 @@ public class ProbeService implements IProbeService {
     }
     //hướng
     private Boolean checkUsername(String username) {
-        return probeOptionRepository.existsByUserName(username);
+        return probeOptionRepository.existsByUserNameAndDeleted(username, 0);
     }
     // hướng
     private Boolean checkIpAddress(String ipAddress) {
-        return probeRepository.existsByIpAddress(ipAddress);
+        return probeRepository.existsByIpAddressAndDeleted(ipAddress, 0);
     }
     // hướng
     private Boolean checkProbeName(String probeName) {
-        return probeRepository.existsByName(probeName);
+        return probeRepository.existsByNameAndDeleted(probeName, 0);
     }
     // hướng
     private Boolean checkValidateIpAddress(String ipAddress) {

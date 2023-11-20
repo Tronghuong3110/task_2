@@ -14,21 +14,22 @@ import java.util.Optional;
 
 @Repository
 public interface ProbeRepository extends JpaRepository<ProbeEntity, Integer> {
-    Boolean existsByIpAddress(String ipAddress);
-    Boolean existsByName(String probeName);
+    Boolean existsByIpAddressAndDeleted(String ipAddress, Integer deleted);
+    Boolean existsByNameAndDeleted(String probeName, Integer deleted);
     @Query(value = "select * from probe where (name  like %:name%) " + // COLLATE Latin1_General_CI_AI
                     "and (location like %:location%) " +
                     "and (area like %:area%) " +
                     "and (vlan like %:vlan%) " +
-                    "and deleted = 0", nativeQuery = true)
+                    "and deleted = :deleted", nativeQuery = true)
     List<ProbeEntity> findByNameOrLocationOrAreaOrVlan(@Param("name") String name,
                                                        @Param("location") String location,
                                                        @Param("area") String area,
-                                                       @Param("vlan") String vlan);
+                                                       @Param("vlan") String vlan,
+                                                       @Param("deleted") Integer deleted);
 
 //    @Query(value = "select * from probemodule.probe where deleted = :deleted ", nativeQuery = true)
     List<ProbeEntity> findProbeByDeletedAndStatus(Integer deleted, String status);
-    Integer countAllByStatus(String status);
+    Integer countAllByStatusAndDeleted(String status, Integer deleted);
     Optional<ProbeEntity> findByName(String name);
     Optional<ProbeEntity> findByIpAddress(String ipAddress);
     Optional<ProbeEntity> findByIdAndDeleted(Integer id, Integer deleted);
@@ -39,6 +40,8 @@ public interface ProbeRepository extends JpaRepository<ProbeEntity, Integer> {
             "GROUP BY id_probe, status) subquery " +
             "GROUP BY id_probe;", nativeQuery = true)
     List<JSONObject> countStatusByProbe();
+
+    Long countAllByDeleted(Integer deleted);
 }
 
 
