@@ -4,6 +4,7 @@ import '../../sass/Probes/Probes.scss';
 import Button from "@mui/material/Button"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
+    faCopy,
     faMagnifyingGlass
 } from '@fortawesome/free-solid-svg-icons';
 import {
@@ -17,9 +18,11 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ProbesProvider, ProbesContext } from "./ProbesTable/ProbesContext";
 import Confirm from '../action/Confirm'
 import { IP } from "../Layout/constaints";
+import DuplicateProbe from './DuplicateProbe'
 
 const Probes = () => {
-    const [isOpen, openCloseWindow] = useState(false);
+    const [isOpenAddWindow, openCloseAddWindow] = useState(false);
+    const [isOpenDuplicateWindow, openCloseDuplicateWindow] = useState(false);
     const [location, setLocation] = useState([])
     const [selectedLocation, setSelectedLocation] = useState(null);
     const [selectedArea, setSelectedArea] = useState(null);
@@ -54,11 +57,18 @@ const Probes = () => {
         setSelectedArea(selectedValue);
     };
     // Hàm đóng mở cửa sổ thêm mới Probe
-    const handleOpenWindow = () => {
-        openCloseWindow(true)
+    const handleOpenAddWindow = () => {
+        openCloseAddWindow(true)
     }
-    const handleCloseWindow = () => {
-        openCloseWindow(false)
+    const handleCloseAddWindow = () => {
+        openCloseAddWindow(false)
+    }
+    // Hàm đóng mở cửa sổ  nhan ban Probe
+    const handleOpenDuplicateWindow = () => {
+        openCloseDuplicateWindow(true)
+    }
+    const handleCloseDuplicateWindow = () => {
+        openCloseDuplicateWindow(false)
     }
     //Tim theo dieu kien
     const findByCondition = () => {
@@ -68,18 +78,18 @@ const Probes = () => {
             "area": (document.querySelector("#area .dropdown .select").textContent === 'Search area' || document.querySelector("#area .dropdown .select").textContent === '---.---') ? '' : document.querySelector("#area .dropdown .select").textContent,
             "vlan": document.querySelector("#vlan .dropdown .select").textContent==='Search VLAN'||'---.---'?'':document.querySelector("#vlan .dropdown .select").textContent
         }
-        // console.log(conditions)
         probesContext.setConditions(conditions)
     }
-    // const getProbes = setInterval(()=>{
-    //     probesContext.probes
-    // })
     return (
         <div className="probes">
-            <div className="probes-action-buttonAdd">
-                <Button className="addProbe-btn" onClick={handleOpenWindow}>
-                    <FontAwesomeIcon icon={faSquarePlus} style={{ color: "#ffffff", }} />
+            <div className="probes-action-buttonAdd d-flex">
+                <Button className="addProbe-btn" style={{padding: "7px 15px" }} onClick={handleOpenAddWindow}>
+                    <FontAwesomeIcon icon={faSquarePlus} style={{ color: "#ffffff"}} />
                     <div className="btn-text">Add probes</div>
+                </Button>
+                <Button className="addProbe-btn" onClick={handleOpenDuplicateWindow} style={{marginLeft:"20px",padding: "7px 15px" }}> 
+                    <FontAwesomeIcon icon={faCopy} style={{ color: "#ffffff" }} />
+                    <div className="btn-text">Duplicate</div>
                 </Button>
             </div>
             <div className="probes-action d-flex justify-content-between">
@@ -106,7 +116,8 @@ const Probes = () => {
                 </div>
             </div>
             <ProbesTable></ProbesTable>
-            {isOpen && <AddProbe handleCloseWindow={handleCloseWindow} ></AddProbe>}
+            {isOpenAddWindow && <AddProbe handleCloseWindow={handleCloseAddWindow} ></AddProbe>}
+            {isOpenDuplicateWindow && <DuplicateProbe handleCloseWindow = {handleCloseDuplicateWindow}></DuplicateProbe>}
             <ToastContainer ></ToastContainer>
             {probesContext.openDeleteScreen && <Confirm confirmContent={probesContext.deletedProbe} ></Confirm>}
         </div>

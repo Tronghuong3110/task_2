@@ -2,18 +2,25 @@ import { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import { TableRow, Table, TableHead, TableCell, TableBody, Checkbox } from "@mui/material";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {  faTrashCan } from '@fortawesome/free-regular-svg-icons'
-import {  faArrowRotateLeft, faArrowRotateBack } from '@fortawesome/free-solid-svg-icons'
+import { faTrashCan } from '@fortawesome/free-regular-svg-icons'
+import { faArrowRotateLeft, faArrowRotateBack } from '@fortawesome/free-solid-svg-icons'
 import '../../../sass/RecycleBin/RecycleBinTable.scss'
 import { IP } from '../../Layout/constaints'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import NotifyContainer from './NotifyContainer';
+import SmallConfirm from '../../action/SmallConfirm';
 const RecycleBinTable = (props) => {
-    const { probes, getProbes } = props
+    const { probes, getProbesInBin, nameCondition } = props
     const [selectedProbes, setSelectedProbes] = useState([])
-    const recoverProbe = (id) => {
-
-    }
+    const [notifyList, setNotifyList] = useState([])
+    const [notifyScreen, setOpenNotifyScreen] = useState(false)
+    const [confirmScreen, setOpenConfirmScreen] = useState(false)
+    const [action, setAction] = useState({
+        "module": null,
+        "action": "",
+        "note": ""
+    })
     const tickAllDisplay = (event, checked) => {
         let nodes = document.querySelectorAll("table tbody tr td input[type ='checkbox']")
         let arr = []
@@ -39,31 +46,6 @@ const RecycleBinTable = (props) => {
             console.log(selectedProbes.filter(item => item != id))
         }
     }
-    // const removeProbe = (id) => {
-    //     let param = []
-    //     if (!Array.isArray(id)) {
-    //         param = [id]
-    //     }
-    //     else param = id
-    //     console.log(param)
-    //     let options = {
-    //         method: "DELETE",
-    //         headers: {
-    //             "Content-Type": "application/json"
-    //         },
-    //         body: JSON.stringify({
-    //             idsStr: param
-    //         })
-    //     }
-    //     fetch("http://" + IP + ":8081/api/v1/module/history", options)
-    //         .then(response => response.json())
-    //         .then(data => {
-    //             console.log(data)
-    //             notify(data.message, data.code)
-    //             getModuleHistory()
-    //         })
-    //         .catch(err => console.log(err))
-    // }
     const notify = (message, status) => {
         if (status == 1) {
             toast.success(message, {
@@ -100,6 +82,89 @@ const RecycleBinTable = (props) => {
         }
 
     }
+    const openConfirmWindow = () => {
+        setOpenConfirmScreen(true)
+    }
+    const closeConfirmWindow = () => {
+        setOpenConfirmScreen(false)
+    }
+    const actionProbe = (id, action) => {
+        let param = []
+        if (!Array.isArray(id)) {
+            param = [id]
+        }
+        else param = id
+        console.log(param)
+        let options = {
+            method: action == "remove" ? "DELETE" : "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                ids: param
+            })
+        }
+        let api = "http://" + IP + ":8081/api/v1/probe"
+        if (action === "remove") api += "/remove"
+        fetch(api, options)
+            .then(response => response.json())
+            .then(data => {
+                if (data.length == 1) {
+                    notify(data[0].message, data[0].code)
+                    setSelectedProbes([])
+                    getProbesInBin(nameCondition)
+                }
+                else {
+                    setOpenNotifyScreen(true)
+                    setSelectedProbes([])
+                    setNotifyList(data)
+                    getProbesInBin(nameCondition)
+                }
+            })
+            .catch(err => console.log(err))
+    }
+    // const removeProbe = (id) => {
+    //     let param = []
+    //     if (!Array.isArray(id)) {
+    //         param = [id]
+    //     }
+    //     else param = id
+    //     console.log(param)
+    //     let options = {
+    //         method: "DELETE",
+    //         headers: {
+    //             "Content-Type": "application/json"
+    //         },
+    //         body: JSON.stringify({
+    //             ids: param
+    //         })
+    //     }
+    //     fetch("http://" + IP + ":8081/api/v1/probe/remove", options)
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             if (data.length == 1) {
+    //                 notify(data[0].message, data[0].code)
+    //             }
+    //             else {
+    //                 setOpenNotifyScreen(true)
+    //                 setNotifyList(data)
+    //                 setSelectedProbes([])
+    //                 getProbesInBin(nameCondition)
+    //             }
+    //         })
+    //         .catch(err => console.log(err))
+    // }
+    const actionWithProbe = (id, action) => {
+        let arr;
+        if (Array.isArray(id)) arr = id;
+        else arr = [id]
+        setAction({
+            "module": arr,
+            "action": action,
+            "note": action=="remove"?"The devices will be permanently deleted from the system":""
+        })
+        openConfirmWindow()
+    }
     return (
         <div className='RecycleBinTable'>
             <div className="actionBar d-flex align-items-center">
@@ -116,13 +181,17 @@ const RecycleBinTable = (props) => {
                     </Checkbox>
                 </div>
                 <div className="refreshButton">
-                    <button>
+                    <button
+                        onClick={() => {
+                            actionWithProbe(selectedProbes, "recover")
+                        }}
+                    >
                         <FontAwesomeIcon icon={faArrowRotateBack}></FontAwesomeIcon>
                     </button>
                 </div>
                 <div className="deleteButton">
                     <button onClick={() => {
-                        // removeProbe(selectedProbes)
+                        actionWithProbe(selectedProbes, "remove")
                     }}>
                         <FontAwesomeIcon icon={faTrashCan}></FontAwesomeIcon>
                     </button>
@@ -168,15 +237,15 @@ const RecycleBinTable = (props) => {
                                     <TableCell className='actions'>
                                         <div className='actions-container d-flex justify-content-around'>
                                             <div className='action'>
-                                                <button disabled={item.ack} onClick={() => {
-                                                    recoverProbe(item.id)
+                                                <button onClick={() => {
+                                                    actionWithProbe(item.id, "recover")
                                                 }}>
-                                                    <FontAwesomeIcon icon={faArrowRotateLeft} style={{color: "#1ae6ea",}} />
+                                                    <FontAwesomeIcon icon={faArrowRotateLeft} style={{ color: "#1ae6ea", }} />
                                                 </button>
                                             </div>
                                             <div className='action'>
                                                 <button onClick={() => {
-                                                    // removeProbe(item.idModuleHistory)
+                                                    actionWithProbe(item.id, "remove")
                                                 }}>
                                                     <FontAwesomeIcon icon={faTrashCan} style={{ color: "white" }} />
                                                 </button>
@@ -194,6 +263,8 @@ const RecycleBinTable = (props) => {
                     }
                 </TableBody>
             </Table>
+            {notifyScreen && <NotifyContainer notifyList={notifyList} setOpenNotifyScreen={setOpenNotifyScreen} handleCloseWindow={closeConfirmWindow} ></NotifyContainer>}
+            {confirmScreen && <SmallConfirm setOpenConfirmScreen={setOpenConfirmScreen} action={action} handleFunction={actionProbe} object="probe" ></SmallConfirm>}
         </div>
     )
 }

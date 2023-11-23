@@ -2,7 +2,7 @@ import { React, useState, useEffect, useContext } from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import '../../sass/smallconfirm.scss'
 const SmallConfirm = (props) => {
-    const {setOpenConfirmScreen,action, handleFunction} = props;
+    const {setOpenConfirmScreen,action, handleFunction,object} = props;
     const handleCancel = ()=>{
         setOpenConfirmScreen(false)
     }
@@ -10,12 +10,25 @@ const SmallConfirm = (props) => {
         setOpenConfirmScreen(false)
         handleFunction(action.module,action.action)
     }
+    const checkRender = (arr) =>{
+        let result="";
+        console.log(arr)
+        for(let i=0 ; i< arr.length ;i++){
+            if(i<arr.length-1){
+                result+=arr[i]+", "
+            }
+            else result+=arr[i]
+            
+        }
+        console.log(result)
+        return result;
+    }
     return (
         <div className='smallConfirmScreen'>
             <div className="smallConfirm">
-                <div className="question">Are you sure to do this task with module</div>
-                <div className="question"><strong>Kiểm tra đường truyền mạng 2</strong> ? </div>
-                <div className='note'>Performing this operation does not affect other processes</div>
+                <div className="question">Are you sure to {action.action} {action.module.length>1?`${object}s`:object} with id</div>
+                <div className="question"><strong>{checkRender(action.module)}</strong> ? </div>
+                <div className='note'>{action.note}</div>
                 <div className="confirmBtn">
                     <button className="confirmBtn-cancel" onClick={()=>{
                         handleCancel()

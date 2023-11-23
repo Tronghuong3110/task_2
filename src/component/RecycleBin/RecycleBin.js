@@ -1,10 +1,8 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import 'bootstrap/dist/css/bootstrap.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCube, faMagnifyingGlass, faClockRotateLeft, faArrowRotateBack } from '@fortawesome/free-solid-svg-icons';
-import { faPlusSquare, faTrashCan } from '@fortawesome/free-regular-svg-icons';
-import { Checkbox, Pagination } from "@mui/material";
-import DropDownInput from "../action/DropDownInput";
+import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import { Pagination } from "@mui/material";
 import { IP } from "../Layout/constaints";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -14,30 +12,51 @@ const RecycleBin = () => {
     const [probes, setProbes] = useState([])
     const [selectedProbe, setSelectedProbe] = useState("")
     const [page, setPage] = useState(1)
-    const [totalPage, setTotalPage] = useState(0)
+    const [totalPage, setTotalPage] = useState(1)
+    const [nameCondition,setNameCondition] = useState("")
     useEffect(() => {
-        fetch("http://" + IP + ":8081/api/v1/probes/recycle")
-            .then(response => response.json())
-            .then(data => {
-                setProbes(data)
-            })
-    }, [])
+        getProbesInBin(nameCondition)
+    }, [page,nameCondition])
+    const getProbesInBin = (nameCondition) => {
+        const fetchData = () => {
+            let api = "http://" + IP + ":8081/api/v1/probes/recycle?page=" + (page - 1);
+            if (nameCondition != "") {
+                api += "&name=" + nameCondition;
+            }
+            fetch(api)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length === 0) {
+                        setTotalPage(0)
+                    }
+                    else setTotalPage(data[0].totalPage)
+                    setProbes(data)
+                })
+                .catch(err => console.log(err))
+        }
+        fetchData()
+    }
     const handleChangePage = (event, newPage) => {
+        console.log(newPage)
         setPage(newPage)
     }
+
     return (
         <div className="RecycleBin">
             <div className='searchBar d-flex justify-content-between align-items-end'>
                 <div className='searchTitle'>
-                    <FontAwesomeIcon icon={faMagnifyingGlass} rotation={90} style={{color: "#ffffff",}} />
-                    <input 
-                        type='text' 
-                        placeholder='Search by probe name...' 
+                    <FontAwesomeIcon icon={faMagnifyingGlass} rotation={90} style={{ color: "#ffffff", }} />
+                    <input
+                        type='text'
+                        placeholder='Search by probe name...'
                         id="content"
+                        onChange={(e)=>{
+                            setNameCondition(e.target.value)
+                        }}
                     ></input>
                 </div>
             </div>
-            <RecycleBinTable probes={probes} setProbes={setProbes}  ></RecycleBinTable>
+            <RecycleBinTable probes={probes} getProbesInBin={getProbesInBin} nameCondition={nameCondition} ></RecycleBinTable>
             <div className='pagination d-flex justify-content-center'>
                 <Pagination count={totalPage}
                     siblingCount={1}

@@ -6,7 +6,7 @@ import {
 } from '@fortawesome/free-regular-svg-icons'
 import { faCheck, faQuestion, faX } from '@fortawesome/free-solid-svg-icons';
 const Confirm = (props) => {
-    const {confirmContent,listDelete,setOpenDeleteScreen,handleFunction} = props
+    const {confirmContent,listDelete,setOpenDeleteScreen,handleFunction,object} = props
     const handleCancel = () =>{
         setOpenDeleteScreen(false);
     }

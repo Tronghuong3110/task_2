@@ -197,7 +197,8 @@ const Probe_Modules = ({ id }) => {
         else {
             setAction({
                 "module": arr,
-                "action": action
+                "action": action,
+                "note":"Performing this operation does not affect other processes"
             })
             openConfirmWindow()
         }
@@ -568,7 +569,7 @@ const Probe_Modules = ({ id }) => {
             {isOpen && <AddProbeModule id={isEditedModule} handleCloseWindow={handleCloseWindow} idProbe={id} ></AddProbeModule>}
             <ToastContainer></ToastContainer>
             {isOpenDeleteScreen && <Confirm confirmContent={deletingProbeModule} listDelete={selectedProbeModules} setOpenDeleteScreen={setOpenDeleteScreen} handleFunction={deleteModule} ></Confirm>}
-            {isOpenConfirmScreen && <SmallConfirm setOpenConfirmScreen={setOpenConfirmScreen} action={action} handleFunction={doActions} ></SmallConfirm>}
+            {isOpenConfirmScreen && <SmallConfirm setOpenConfirmScreen={setOpenConfirmScreen} action={action} handleFunction={doActions} object="module" ></SmallConfirm>}
         </div>
     )
 }

@@ -1,0 +1,49 @@
+$primary: #0b0c24;
+$secondary: #27293d;
+$pink-color: #e14eca;
+$blue-color: #9747ff;
+
+.notifyContainer {
+    height: 100vh;
+    width: 100vw;
+    background-color: rgba(48, 39, 39, 0.8);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2;
+
+    .notifies {
+        color: white;
+        font-size: 1em;
+        width: 40%;
+        position: absolute;
+        max-height: 300px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border: whitesmoke 2px solid;
+        border-radius: 10px;
+        padding: 20px;
+        background-color: $secondary;
+        opacity: none;
+        overflow-y: scroll;
+
+        .notify {
+            padding-bottom: 10px;
+        }
+
+        .btnConfirm {
+            display: flex;
+            justify-content: flex-end;
+            padding-top: 20px;
+
+            button {
+                padding: 5px 10px;
+                background-color: #0FA958;
+                border-radius: 10px;
+                color: white;
+                border: none;
+            }
+        }
+    }
+}

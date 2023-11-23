@@ -5,7 +5,7 @@ import {
     faLocationDot, faChartArea, faNetworkWired
 } from '@fortawesome/free-solid-svg-icons'
 const DropDownInput = (props) => {
-    const {defaultContent,inputOptions,handleSelect} = props
+    const {defaultContent,inputOptions,handleSelect,needAll} = props
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [customInputValue, setCustomInputValue] = useState('');
     const [options, setOptions] = useState([]);
@@ -62,7 +62,7 @@ const DropDownInput = (props) => {
                         />
                     </div>
                     <div className="options">
-                        {(<div
+                        { !needAll && (<div
                             key={"---.---"}
                             className="option"
                             onClick={() => handleOptionSelect({

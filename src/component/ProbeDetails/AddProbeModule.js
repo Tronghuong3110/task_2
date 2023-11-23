@@ -9,7 +9,6 @@ import {
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
 import { IP } from '../Layout/constaints';
-import { ProbesContext } from '../Probes/ProbesTable/ProbesContext';
 
 const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
 
