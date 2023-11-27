@@ -30,25 +30,25 @@ const Probes = () => {
     const probesContext = useContext(ProbesContext)
     //Hàm hiển thị select location và area
     useEffect(() => {
-        fetch("http://"+IP+":8081/api/v1/locations")
+        fetch("http://" + IP + ":8081/api/v1/locations")
             .then(response => response.json())
             .then(data => setLocation(data))
             .catch(err => console.log(err))
     }, [])
     useEffect(() => {
         if (selectedLocation) {
-            if(selectedLocation=="---.---"){
+            if (selectedLocation == "---.---") {
                 setArea([])
             }
-            else{
+            else {
                 let locationChoosen = location.find(element => element.name == selectedLocation)
                 setArea(locationChoosen.listArea)
             }
         }
     }, [selectedLocation])
-    useEffect(()=>{
+    useEffect(() => {
         document.querySelector(".header-name").textContent = "PROBES"
-    },[])
+    }, [])
     const handleOptionSelectLocation = (selectedValue) => {
         setSelectedLocation(selectedValue);
         setSelectedArea(null)
@@ -76,18 +76,18 @@ const Probes = () => {
             "name": document.getElementById("name").value,
             "location": (document.querySelector("#location .dropdown .select").textContent === 'Search location' || document.querySelector("#location .dropdown .select").textContent === '---.---') ? '' : document.querySelector("#location .dropdown .select").textContent,
             "area": (document.querySelector("#area .dropdown .select").textContent === 'Search area' || document.querySelector("#area .dropdown .select").textContent === '---.---') ? '' : document.querySelector("#area .dropdown .select").textContent,
-            "vlan": document.querySelector("#vlan .dropdown .select").textContent==='Search VLAN'||'---.---'?'':document.querySelector("#vlan .dropdown .select").textContent
+            "vlan": document.querySelector("#vlan .dropdown .select").textContent === 'Search VLAN' || '---.---' ? '' : document.querySelector("#vlan .dropdown .select").textContent
         }
         probesContext.setConditions(conditions)
     }
     return (
         <div className="probes">
             <div className="probes-action-buttonAdd d-flex">
-                <Button className="addProbe-btn" style={{padding: "7px 15px" }} onClick={handleOpenAddWindow}>
-                    <FontAwesomeIcon icon={faSquarePlus} style={{ color: "#ffffff"}} />
+                <Button className="addProbe-btn" style={{ padding: "7px 15px" }} onClick={handleOpenAddWindow}>
+                    <FontAwesomeIcon icon={faSquarePlus} style={{ color: "#ffffff" }} />
                     <div className="btn-text">Add probes</div>
                 </Button>
-                <Button className="addProbe-btn" onClick={handleOpenDuplicateWindow} style={{marginLeft:"20px",padding: "7px 15px" }}> 
+                <Button className="addProbe-btn" onClick={handleOpenDuplicateWindow} style={{ marginLeft: "20px", padding: "7px 15px" }}>
                     <FontAwesomeIcon icon={faCopy} style={{ color: "#ffffff" }} />
                     <div className="btn-text">Duplicate</div>
                 </Button>
@@ -117,9 +117,19 @@ const Probes = () => {
             </div>
             <ProbesTable></ProbesTable>
             {isOpenAddWindow && <AddProbe handleCloseWindow={handleCloseAddWindow} ></AddProbe>}
-            {isOpenDuplicateWindow && <DuplicateProbe handleCloseWindow = {handleCloseDuplicateWindow}></DuplicateProbe>}
-            <ToastContainer ></ToastContainer>
+            {isOpenDuplicateWindow && <DuplicateProbe handleCloseWindow={handleCloseDuplicateWindow}></DuplicateProbe>}
             {probesContext.openDeleteScreen && <Confirm confirmContent={probesContext.deletedProbe} ></Confirm>}
+            <ToastContainer
+                position="top-center"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="dark"></ToastContainer>
         </div>
     );
 }

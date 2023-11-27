@@ -52,13 +52,13 @@ const Probe_Modules = ({ id }) => {
     }, [])
     useEffect(() => {
         console.log(conditions)
-        // let name = conditions.name;
-        // let status = conditions.status;
-        // let result = fullModules.filter(modules => modules.moduleName.includes(name) && (modules.status == (status == "All" ? modules.status : status)))
-
-        // setProbeModules(result)
         getProbeModulesByConditions()
     }, [conditions])
+    useEffect(()=>{
+        setInterval(()=>{
+            getProbeModulesByConditions()
+        },15000)
+    },[])
     const getProbeModules = () => {
         fetch("http://" + IP + ":8081/api/v1/probe/modules?idProbe=" + id + "&&name=&&status=")
             .then(response => response.json())
@@ -397,6 +397,7 @@ const Probe_Modules = ({ id }) => {
                 <div className='action'>
                     <Tooltip title="Run all selected modules">
                         <button
+                            disabled ={(sessionStorage.getItem("check")!=null &&sessionStorage.getItem("check")!=1)}
                             onClick={() => {
                                 actionWithModule(selectedProbeModules, "run")
                             }}
@@ -408,7 +409,7 @@ const Probe_Modules = ({ id }) => {
                 <div className='action'>
                     <Tooltip title="Restart all selected modules">
                         <button
-                            // disabled={module.loading}
+                            disabled={(sessionStorage.getItem("check")!=null &&sessionStorage.getItem("check")!=1)}
                             onClick={() => {
                                 actionWithModule(selectedProbeModules, "restart")
                             }}
@@ -420,7 +421,7 @@ const Probe_Modules = ({ id }) => {
                 <div className='action'>
                     <Tooltip title="Stop all selected modules">
                         <button
-                            // disabled={module.loading}
+                            disabled={(sessionStorage.getItem("check")!=null &&sessionStorage.getItem("check")!=1)}
                             onClick={() => {
                                 actionWithModule(selectedProbeModules, "stop")
                             }}
@@ -432,7 +433,7 @@ const Probe_Modules = ({ id }) => {
                 <div className='action'>
                     <Tooltip title="Delete all selected modules">
                         <button
-                            // disabled={module.loading}
+                            disabled={(sessionStorage.getItem("check")!=null &&sessionStorage.getItem("check")!=1)}
                             onClick={() => {
                                 // deleteMultiModules()
                                 displayDeleteMultiModule()
@@ -482,7 +483,7 @@ const Probe_Modules = ({ id }) => {
                                                     <div className='actions-container d-flex justify-content-between'>
                                                         <div className='action'>
                                                             <button className='actionBtn runBtn'
-                                                                disabled={module.loading}
+                                                                disabled={module.loading||(sessionStorage.getItem("check")!=null &&sessionStorage.getItem("check")!=1)}
                                                                 onClick={() => {
                                                                     actionWithModule(module.id, "run")
                                                                 }}
@@ -492,7 +493,7 @@ const Probe_Modules = ({ id }) => {
                                                         </div>
                                                         <div className='action'>
                                                             <button className='actionBtn reStartBtn'
-                                                                disabled={module.loading}
+                                                                disabled={module.loading||(sessionStorage.getItem("check")!=null &&sessionStorage.getItem("check")!=1)}
                                                                 onClick={() => {
                                                                     actionWithModule(module.id, "restart")
                                                                 }}
@@ -502,7 +503,7 @@ const Probe_Modules = ({ id }) => {
                                                         </div>
                                                         <div className='action'>
                                                             <button className='actionBtn stopBtn'
-                                                                disabled={module.loading || (module.status == "Stopped") ? true : false}
+                                                                disabled={module.loading || (module.status == "Stopped") ? true : false ||(sessionStorage.getItem("check")!=null &&sessionStorage.getItem("check")!=1)}
                                                                 onClick={() => {
                                                                     actionWithModule(module.id, "stop")
                                                                 }}
@@ -512,7 +513,7 @@ const Probe_Modules = ({ id }) => {
                                                         </div>
                                                         <div className='action'>
                                                             <button
-                                                                disabled={module.loading || (module.status == "Running" || module.status == "Pending") ? true : false}
+                                                                disabled={module.loading || (module.status == "Running" || module.status == "Pending") ? true : false ||(sessionStorage.getItem("check")!=null &&sessionStorage.getItem("check")!=1)}
                                                             >
                                                                 <FontAwesomeIcon icon={faPenToSquare} style={{ color: "powderblue", }} onClick={() => {
                                                                     handleOpenWindow(module.id)
@@ -521,7 +522,7 @@ const Probe_Modules = ({ id }) => {
                                                         </div>
                                                         <div className='action'>
                                                             <button
-                                                                disabled={module.loading || (module.status == "Running" || module.status == "Pending") ? true : false}
+                                                                disabled={module.loading || (module.status == "Running" || module.status == "Pending") ? true : false || (sessionStorage.getItem("check")!=null &&sessionStorage.getItem("check")!=1)}
                                                                 onClick={() => {
                                                                     displayDeleteModule(module.id, module.moduleName)
                                                                 }}
