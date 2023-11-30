@@ -28,6 +28,7 @@ public class JsonUtil {
             jsonObject.put("nameProcess", probeModuleEntity.getProcessName()); // tên process để dừng
             jsonObject.put("action", action);
             jsonObject.put("probeName", probeName);
+            jsonObject.put("typeModule", probeModuleEntity.getTypeModuleName());
             return jsonObject.toJSONString();
         }
         catch (NullPointerException e) {

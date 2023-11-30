@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface ProbeOptionRepository extends JpaRepository<ProbeOptionEntity, Integer> {
+public interface ProbeOptionRepository extends JpaRepository<ProbeOptionEntity, Long> {
 
     Boolean existsByUserNameAndDeleted(String username, Integer deleted);
     Optional<ProbeOptionEntity> findByUserName(String username);

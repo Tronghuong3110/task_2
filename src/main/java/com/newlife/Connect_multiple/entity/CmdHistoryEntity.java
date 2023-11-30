@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.sql.Date;
+import java.sql.Timestamp;
 
 @Entity
 @Data
@@ -45,10 +45,10 @@ public class CmdHistoryEntity {
     @Column(name = "retry_times")
     private Integer retryTimes;
 
-    @Column(name = "at_time")
-    private Date atTime;
+    @Column(name = "at_time", columnDefinition = "datetime")
+    private Timestamp atTime;
 
-    @Column(name = "modifiledate")
-    private Date modifiledate;
+    @Column(name = "modifiledate", columnDefinition = "datetime")
+    private Timestamp modifiledate;
 
 }

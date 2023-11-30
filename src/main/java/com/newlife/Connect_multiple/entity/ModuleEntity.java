@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.sql.Date;
+import java.sql.Timestamp;
 
 @Entity
 @Data
@@ -29,7 +29,7 @@ public class ModuleEntity {
     private String pathDefault;
 
     @Column(name = "create_at")
-    private Date creatAt;
+    private Timestamp creatAt;
 
     @Column(name = "arg_default")
     private String argDefalt;

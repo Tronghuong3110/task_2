@@ -1,5 +1,6 @@
 package com.newlife.Connect_multiple.service;
 
+import com.newlife.Connect_multiple.dto.DuplicateRequest;
 import com.newlife.Connect_multiple.dto.InfoLogin;
 import com.newlife.Connect_multiple.dto.ProbeDto;
 import com.newlife.Connect_multiple.dto.ProbeOptionDto;
@@ -19,4 +20,5 @@ public interface IProbeService {
     Integer countProbeByStatus(String status);
     JSONArray deleteProbe(List<Integer> ids);
     List<ProbeDto> findAllProbeByDeleted(String name, Integer page);
+    JSONArray duplicate(DuplicateRequest duplicateRequest);
 }

@@ -1,5 +1,6 @@
 package com.newlife.Connect_multiple.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +17,7 @@ public class ProbeOptionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_probe_option")
-    private Integer id;
+    private Long id;
 
     @Column(name = "keep_alive")
     private Integer keepAlive;

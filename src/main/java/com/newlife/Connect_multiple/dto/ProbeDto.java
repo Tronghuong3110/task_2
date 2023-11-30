@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 @Data
 @Getter
@@ -16,7 +17,7 @@ public class ProbeDto {
     private String name;
     private String status; // đại diện cho probe còn kết nối tới broker không
     private String ipAddress;
-    private Date connectAt;
+    private Timestamp connectAt;
     private String numberStopedModule;
     private String numberRunningModule;
     private String numberPendingModule;

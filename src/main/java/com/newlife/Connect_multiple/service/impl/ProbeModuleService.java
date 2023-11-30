@@ -22,7 +22,9 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.*;
@@ -389,7 +391,7 @@ public class ProbeModuleService implements IProbeModuleService {
             cmd.setCaption(probeModuleEntity.getCaption());
             cmd.setCommand(probeModuleEntity.getCommand());
             cmd.setPath(probeModuleEntity.getPath());
-            cmd.setAtTime(new Date(System.currentTimeMillis()));
+            cmd.setAtTime(new Timestamp(System.currentTimeMillis()));
             cmd.setMessage("");
             cmd.setStatus(0);
             cmd.setRetryTimes(0);
@@ -410,7 +412,7 @@ public class ProbeModuleService implements IProbeModuleService {
         if(retry >= 0) {
             cmdHistoryEntity.setRetryTimes(retry);
         }
-        cmdHistoryEntity.setModifiledate(new Date(System.currentTimeMillis()));
+        cmdHistoryEntity.setModifiledate(new Timestamp(System.currentTimeMillis()));
         if(!status.equals(0)) {
             cmdHistoryEntity.setStatus(status);
             if(status.equals(1)) {
@@ -451,7 +453,7 @@ public class ProbeModuleService implements IProbeModuleService {
             moduleHistoryEntity.setIdProbe(probeModuleEntity.getIdProbe());
             moduleHistoryEntity.setContent(content);
             moduleHistoryEntity.setTitle((String)responseMessage.get("title"));
-            moduleHistoryEntity.setAtTime(new Date(System.currentTimeMillis()));
+            moduleHistoryEntity.setAtTime(new Timestamp(System.currentTimeMillis()));
             moduleHistoryEntity.setCaption((String)responseMessage.get("caption"));
             moduleHistoryEntity.setArg((String)responseMessage.get("arg"));
             moduleHistoryEntity.setStatus(statusResult);
@@ -536,7 +538,7 @@ public class ProbeModuleService implements IProbeModuleService {
             moduleHistoryEntity.setIdProbe(probeModuleEntity.getIdProbe());
             moduleHistoryEntity.setContent(content);
             moduleHistoryEntity.setTitle(null);
-            moduleHistoryEntity.setAtTime(new Date(System.currentTimeMillis()));
+            moduleHistoryEntity.setAtTime(new Timestamp(System.currentTimeMillis()));
             moduleHistoryEntity.setCaption(probeModuleEntity.getCaption());
             moduleHistoryEntity.setArg(probeModuleEntity.getArg());
             moduleHistoryEntity.setStatus(statusResult);
@@ -1021,7 +1023,8 @@ public class ProbeModuleService implements IProbeModuleService {
                 return null;
             }
             JSONObject jsonError = moduleHistoryRepository.solveErrorPerWeekOfModule(idProbeModule, timeAfter, timeBefore, "Failed");
-            return jsonError.containsKey("epw") ? Long.parseLong(jsonError.get("epw").toString()) : 0;
+            System.out.println(jsonError);
+            return (jsonError != null && jsonError.containsKey("epw")) ? Long.parseLong(jsonError.get("epw").toString()) : 0;
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -1031,8 +1034,8 @@ public class ProbeModuleService implements IProbeModuleService {
     }
     private String getTimeBefore() {
         try {
-            LocalDate currentDate = LocalDate.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDateTime currentDate = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             return currentDate.format(formatter);
         }
         catch (Exception e) {
@@ -1043,9 +1046,9 @@ public class ProbeModuleService implements IProbeModuleService {
     }
     private String getTimeAfter() {
         try {
-            LocalDate currentDate = LocalDate.now();
-            LocalDate sevenDateFromCurrent = currentDate.minusDays(7);
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDateTime currentDate = LocalDateTime.now();
+            LocalDateTime sevenDateFromCurrent = currentDate.minusDays(7);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             return sevenDateFromCurrent.format(formatter);
         }
         catch (Exception e) {

@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 @Data
@@ -12,6 +13,6 @@ import java.util.Date;
 public class ProbeHistoryDto {
     private Integer id;
     private String action;
-    private Date atTime;
+    private Timestamp atTime;
     private String probeName;
 }

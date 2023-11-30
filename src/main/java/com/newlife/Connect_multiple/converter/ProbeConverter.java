@@ -3,7 +3,6 @@ package com.newlife.Connect_multiple.converter;
 import com.newlife.Connect_multiple.dto.ProbeDto;
 import com.newlife.Connect_multiple.entity.ProbeEntity;
 import org.modelmapper.ModelMapper;
-import org.springframework.ui.ModelMap;
 
 public class ProbeConverter {
 
@@ -63,6 +62,19 @@ public class ProbeConverter {
             System.out.println("Convert from probe dto to probe entity error (Update probe)");
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public static ProbeEntity toEntity(ProbeEntity probe1) {
+        try {
+            ModelMapper mapper = new ModelMapper();
+            ProbeEntity probeEntity = mapper.map(probe1, ProbeEntity.class);
+            probeEntity.setId(null);
+            return probeEntity;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return new ProbeEntity();
         }
     }
 }

@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.sql.Date;
+import java.sql.Timestamp;
 
 @Entity
 @Data
@@ -23,7 +24,7 @@ public class ProbeHistoryEntity {
     private String action;
 
     @Column(name = "at_time")
-    private Date atTime;
+    private Timestamp atTime;
 
     @Column(name = "probe_name", columnDefinition = "nvarchar(255)")
     private String probeName;

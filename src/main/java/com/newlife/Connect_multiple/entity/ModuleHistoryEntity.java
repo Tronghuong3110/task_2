@@ -6,6 +6,8 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.sql.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
 
 @Entity
 @Data
@@ -37,7 +39,7 @@ public class ModuleHistoryEntity {
     private String status;
 
     @Column(name = "at_time")
-    private Date atTime;
+    private Timestamp atTime;
 
     @Column(name = "module_name", columnDefinition = "nvarchar(255)")
     private String moduleName;

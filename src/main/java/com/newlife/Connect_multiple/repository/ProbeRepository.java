@@ -41,7 +41,16 @@ public interface ProbeRepository extends JpaRepository<ProbeEntity, Integer> {
             "GROUP BY id_probe;", nativeQuery = true)
     List<JSONObject> countStatusByProbe();
 
-    Long countAllByDeleted(Integer deleted);
+    @Query(value = "select count(*) from probe where (name  like %:name%) " + // COLLATE Latin1_General_CI_AI
+            "and deleted = :deleted", nativeQuery = true)
+    Long countAllByDeleted(@Param("deleted") Integer deleted,
+                           @Param("name") String name);
+
+    @Query(value = "select * from probe where (name like %:name%) " + // COLLATE Latin1_General_CI_AI
+            "and deleted = :deleted", nativeQuery = true)
+    List<ProbeEntity> findByName(@Param("name") String name,
+                                                       @Param("deleted") Integer deleted,
+                                                       Pageable pageable);
 }
 
 

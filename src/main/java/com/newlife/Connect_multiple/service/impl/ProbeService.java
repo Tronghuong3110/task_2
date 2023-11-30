@@ -3,7 +3,9 @@ package com.newlife.Connect_multiple.service.impl;
 import com.newlife.Connect_multiple.api.ApiAddInfoToBroker;
 import com.newlife.Connect_multiple.api.ApiCheckConnect;
 import com.newlife.Connect_multiple.converter.ProbeConverter;
+import com.newlife.Connect_multiple.converter.ProbeModuleConverter;
 import com.newlife.Connect_multiple.converter.ProbeOptionConverter;
+import com.newlife.Connect_multiple.dto.DuplicateRequest;
 import com.newlife.Connect_multiple.dto.InfoLogin;
 import com.newlife.Connect_multiple.dto.ProbeDto;
 import com.newlife.Connect_multiple.dto.ProbeOptionDto;
@@ -23,10 +25,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.net.*;
 import java.nio.charset.Charset;
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.Timestamp;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,6 +48,8 @@ public class ProbeService implements IProbeService {
     private ServerRepository serverRepository;
     @Autowired
     private BrokerRepository brokerRepository;
+    @Autowired
+    private ModuleProbeRepository moduleProbeRepository;
 
     // hân
     @Override
@@ -97,7 +102,7 @@ public class ProbeService implements IProbeService {
             String responseAddUserToBroker = ApiAddInfoToBroker.addUserToBroker(probeOptionDto.getUsername(), probeOptionDto.getPassword());
             // TH không thêm được user vào broker
             if(!responseAddUserToBroker.equals("Create user success")) {
-                responseProbe.setMessage(responseAddUserToBroker);
+                responseProbe.setMessage("Can not add user to broker!!");
                 return responseProbe;
             }
 
@@ -115,7 +120,7 @@ public class ProbeService implements IProbeService {
             try {
                 probeEntity.setClientId(clientId);
                 probeEntity.setPubTopic(pubtopic);
-                probeEntity.setCreateAt(new Date(System.currentTimeMillis()));
+                probeEntity.setCreateAt(new Timestamp(System.currentTimeMillis()));
                 probeEntity.setStatus("disconnected");
                 probeEntity.setDeleted(0);
                 probeEntity = probeRepository.save(probeEntity);
@@ -174,7 +179,7 @@ public class ProbeService implements IProbeService {
                 // add record to Probe_history
                 ProbeHistoryEntity probeHistoryEntity = new ProbeHistoryEntity();
                 probeHistoryEntity.setAction("Create");
-                probeHistoryEntity.setAtTime(new Date(System.currentTimeMillis()));
+                probeHistoryEntity.setAtTime(new Timestamp(System.currentTimeMillis()));
                 probeHistoryEntity.setProbeName(probeEntity.getName());
                 probeHistoryRepository.save(probeHistoryEntity);
             }
@@ -229,7 +234,7 @@ public class ProbeService implements IProbeService {
             ProbeHistoryEntity probeHistoryEntity = new ProbeHistoryEntity();
             probeHistoryEntity.setProbeName(probeEntity.getName());
             probeHistoryEntity.setAction("Moved to the recycle");
-            probeHistoryEntity.setAtTime(new Date(System.currentTimeMillis()));
+            probeHistoryEntity.setAtTime(new Timestamp(System.currentTimeMillis()));
             probeEntity.setDeleted(1);
             probeEntity = probeRepository.save(probeEntity);
             probeOptionRepository.save(probeOption);
@@ -307,7 +312,7 @@ public class ProbeService implements IProbeService {
                 ProbeHistoryEntity probeHistoryEntity = new ProbeHistoryEntity();
                 probeHistoryEntity.setProbeName(probeEntity.getName());
                 probeHistoryEntity.setAction("Update probe");
-                probeHistoryEntity.setAtTime(new Date(System.currentTimeMillis()));
+                probeHistoryEntity.setAtTime(new Timestamp(System.currentTimeMillis()));
                 probeEntity = probeRepository.save(probeEntity);
                 probeHistoryRepository.save(probeHistoryEntity);
                 json.put("code", "1");
@@ -350,7 +355,7 @@ public class ProbeService implements IProbeService {
                 ProbeHistoryEntity probeHistoryEntity = new ProbeHistoryEntity();
                 probeHistoryEntity.setProbeName(probeEntity.getName());
                 probeHistoryEntity.setAction("Permanently Deleted");
-                probeHistoryEntity.setAtTime(new Date(System.currentTimeMillis()));
+                probeHistoryEntity.setAtTime(new Timestamp(System.currentTimeMillis()));
                 probeEntity.setDeleted(0);
                 // username, name, ip
                 if(checkProbeName(probeEntity.getName()) || checkIpAddress(probeEntity.getIpAddress()) || checkUsername(probeEntity.getProbeOptionEntity().getUserName())) {
@@ -382,6 +387,8 @@ public class ProbeService implements IProbeService {
     @Override
     public InfoLogin downloadFile(Integer idProbe) {
         try {
+            InetAddress ip = Inet4Address.getLocalHost();
+            System.out.println("Ip " + ip.getHostAddress());
             InfoLogin info = new InfoLogin();
             ProbeEntity probe = probeRepository.findByIdAndDeleted(idProbe, 0).orElse(null);
             if(probe == null) {
@@ -398,11 +405,12 @@ public class ProbeService implements IProbeService {
             if(probe == null) {
                 return null;
             }
+
             ProbeOptionEntity probeOption = probe.getProbeOptionEntity();
             String login = CreateTokenUtil.encodeToken(probeOption.getUserName(), probeOption.getPassword(), probe.getPubTopic());
             info.setLogin(login);
             info.setCleanSession(probeOption.getCleanSession());
-            info.setBrokerUrl(broker.getUrl());
+            info.setBrokerUrl(broker.getUrl().replaceAll("localhost", getIpAddress()));
             info.setKeepAlive(probeOption.getKeepAlive());
             info.setConnectionTimeOut(probeOption.getConnectionTimeOut());
             info.setClientId(probe.getClientId());
@@ -446,7 +454,7 @@ public class ProbeService implements IProbeService {
                 ProbeHistoryEntity probeHistoryEntity = new ProbeHistoryEntity();
                 probeHistoryEntity.setProbeName(probe.getName());
                 probeHistoryEntity.setAction("Permanently Deleted");
-                probeHistoryEntity.setAtTime(new Date(System.currentTimeMillis()));
+                probeHistoryEntity.setAtTime(new Timestamp(System.currentTimeMillis()));
                 // xóa probe
                 probeRepository.deleteById(id);
                 // Lưu thông tin vào lịch sử
@@ -467,23 +475,182 @@ public class ProbeService implements IProbeService {
     }
 
     // lấy ra toàn bộ probe phục vụ màn thùng rác
-    @Override // lấy toàn bộ probe màn thùng r
+    @Override // lấy toàn bộ probe màn thùng rác
     public List<ProbeDto> findAllProbeByDeleted(String name, Integer page) {
         // lấy ra toàn bộ probe có deleted = 1(trong thùng rác)
         Pageable pageable = PageRequest.of(page, 10);
-        List<ProbeEntity> listProbe = probeRepository.findByNameOrLocationOrAreaOrVlan(name, "", "", "", 1);
+        List<ProbeEntity> listProbe = probeRepository.findByName(name, 1, pageable);
         List<ProbeDto> probeDtoList = new ArrayList<>();
-        Long totalRow = probeRepository.countAllByDeleted(1);
+        Long totalRow = probeRepository.countAllByDeleted(1, name);
         Long totalPage = Math.round(((double)totalRow) / 10);
         if(totalPage < (double)totalRow / 10) {
             totalPage += 1;
         }
+        System.out.println(("Total page " + totalPage));
         for(ProbeEntity probe : listProbe) {
             ProbeDto probeDto = ProbeConverter.toDto(probe);
             probeDto.setTotalPage(totalPage);
             probeDtoList.add(probeDto);
         }
         return probeDtoList;
+    }
+
+    @Override
+    public JSONArray duplicate(DuplicateRequest duplicateRequest) {
+        // Lấy ra probe mẫu trong database
+        JSONArray response = new JSONArray();
+        ProbeEntity probeOrigin = probeRepository.findById(duplicateRequest.getProbeOrigin()).orElse(null);
+        ProbeOptionEntity probeOptionEntity = probeOrigin.getProbeOptionEntity();
+        Integer idProbeOrigin = duplicateRequest.getProbeOrigin();
+        String nameProbeOrigin = probeOrigin.getName();
+        for(JSONObject object : duplicateRequest.getListProbe()) {
+            probeOrigin.setId(null);
+            JSONObject jsonObject = new JSONObject();
+            String probeName = object.get("name").toString();
+            String ipAddress = (String) object.get("ip");
+            String clientId = System.nanoTime() + "_" + probeName.replaceAll(" ", "_");
+            String topic = probeName.replaceAll(" ", "_") + "/" + clientId;
+            String username = System.nanoTime() + probeName;
+            if(checkProbeName(probeName)) {
+                // tên probe đã tồn tại
+                jsonObject.put("code", 0);
+                jsonObject.put("message", "Ip " + ipAddress + " has been duplicated!!");
+                response.add(jsonObject);
+                continue;
+            }
+            if(checkIpAddress(ipAddress)) {
+                // địa chỉ ip đã tồn tại
+                jsonObject.put("code", 0);
+                jsonObject.put("message", "Ip " + ipAddress + " address exists");
+                response.add(jsonObject);
+                continue;
+            }
+            if(!checkValidateIpAddress(ipAddress)) {
+                jsonObject.put("code", 0);
+                jsonObject.put("message", "Ip" + ipAddress + " invalidate");
+                response.add(jsonObject);
+                continue;
+            }
+
+            String responseAddUserToBroker = ApiAddInfoToBroker.addUserToBroker(username, "123456789@");
+            // TH không thêm được user vào broker
+            if(!responseAddUserToBroker.equals("Create user success")) {
+                jsonObject.put("code", 0);
+                jsonObject.put("message", "Ip " + clientId);
+                response.add(jsonObject);
+                continue;
+            }
+
+            // thêm option vào database
+            ProbeOptionEntity probeOption = new ProbeOptionEntity();
+            probeOption.setDeleted(0);
+            probeOption.setUserName(username);
+            probeOption.setPassword("123456789@");
+            probeOption.setCleanSession(probeOptionEntity.getCleanSession());
+            probeOption.setKeepAlive(probeOptionEntity.getKeepAlive());
+            probeOption.setConnectionTimeOut(probeOptionEntity.getConnectionTimeOut());
+            probeOption = probeOptionRepository.save(probeOption);
+
+            probeOrigin.setStatus("disconnected");
+            probeOrigin.setDeleted(0);
+            probeOrigin.setNumberFailedModule(0);
+            probeOrigin.setNumberRunningModule(0);
+            probeOrigin.setNumberPendingModule(0);
+            probeOrigin.setPubTopic(topic);
+            probeOrigin.setClientId(clientId);
+            probeOrigin.setName(probeName);
+            probeOrigin.setIpAddress(ipAddress);
+            probeOrigin.setProbeOptionEntity(probeOption);
+            probeOrigin.setCreateAt(new Timestamp(System.currentTimeMillis()));
+//            probeOrigin = ProbeConverter.toEntity(probeOrigin);
+            probeOrigin = probeRepository.save(probeOrigin);
+
+            // thêm topic vào danh sách topic của server
+            SubtopicServerEntity subTopic = new SubtopicServerEntity();
+            try {
+                subTopic.setSubTopic(topic);
+                subTopic.setIdProbe(probeOrigin.getId());
+                subTopic = subtopicRepository.save(subTopic);
+            }
+            catch (Exception e) {
+                System.out.println("Thêm mới vào bảng subTopic của server lỗi rồi (Duplicate)");
+                e.printStackTrace();
+            }
+
+            // lấy thông tin server từ database
+            // cập nhật role để server subscribe tới topic của client
+            try {
+                // lấy ra danh sách toàn bộ topic của các client đã được thêm vào database
+                List<SubtopicServerEntity> listSubTopic = subtopicRepository.findAll();
+                ServerEntity server = serverRepository.findAll().get(0);
+                ProbeOptionEntity probeOptionOfServer = server.getProbeOptionEntity();
+                String responseAddRuleServer = ApiAddInfoToBroker.addRuleToBroker(probeOptionOfServer.getUserName(), listSubTopic);
+                // TH thêm role cho server lỗi
+                if(!responseAddRuleServer.equals("Create rule success")) {
+                    System.out.println("Thêm quyền cho server lỗi rồi! (duplicate)");
+                    probeRepository.deleteById(probeOrigin.getId());
+                    probeOptionRepository.deleteById(probeOptionEntity.getId());
+                    jsonObject.put("code", 0);
+                    jsonObject.put("message", "Server can not subscribe to topic of probe have ip " + ipAddress);
+                    response.add(jsonObject);
+                    continue;
+                }
+            }
+            catch (Exception e) {
+                System.out.println("Lấy thông tin server lỗi rồi!");
+                e.printStackTrace();
+            }
+
+            // Thêm quyền cho client
+            List<SubtopicServerEntity> listTopic = new ArrayList<>();
+            // tạo ra danh sách các topic (chỉ có 1 topic của client)
+            listTopic.add(subTopic);
+            String responseAddRuleClient = ApiAddInfoToBroker.addRuleToBroker(username, listTopic);
+            // TH thêm quyền cho client lỗi
+            if(!responseAddRuleClient.equals("Create rule success")) {
+                System.out.println("Thêm quyền subscribe tới topic cho client lỗi!! (duplicate)");
+                probeRepository.deleteById(probeOrigin.getId());
+                probeOptionRepository.deleteById(probeOptionEntity.getId());
+                jsonObject.put("code", 0);
+                jsonObject.put("message", "Ip " + ipAddress + " can not subscribe to topic");
+                response.add(jsonObject);
+                continue;
+            }
+            try {
+                // add record to Probe_history
+                ProbeHistoryEntity probeHistoryEntity = new ProbeHistoryEntity();
+                probeHistoryEntity.setAction("Cloned from probe " + nameProbeOrigin);
+                probeHistoryEntity.setAtTime(new Timestamp(System.currentTimeMillis()));
+                probeHistoryEntity.setProbeName(probeName);
+                probeHistoryRepository.save(probeHistoryEntity);
+            }
+            catch (Exception e) {
+                System.out.println("Thêm mới probe_history lỗi rồi!");
+                e.printStackTrace();
+            }
+
+            jsonObject.put("code", 1);
+            jsonObject.put("message", "Duplicate probe with ip " + ipAddress + " success");
+            response.add(jsonObject);
+
+            List<ProbeModuleEntity> listModule = moduleProbeRepository.findAllModuleByProbe(idProbeOrigin);
+            for(ProbeModuleEntity probeModuleEntity : listModule) {
+                probeModuleEntity.setId(null);
+                probeModuleEntity.setErrorPerWeek(0);
+                probeModuleEntity.setStatus("Stopped");
+                probeModuleEntity.setLoading(0);
+                probeModuleEntity.setExpectStatus(0);
+                probeModuleEntity.setProcessStatus(2);
+                probeModuleEntity.setProcessId("0");
+                probeModuleEntity.setIdProbe(probeOrigin.getId());
+                probeModuleEntity = ProbeModuleConverter.toEntity(probeModuleEntity);
+                moduleProbeRepository.save(probeModuleEntity);
+            }
+            probeOrigin.setNumberStopedModule(listModule.size());
+            probeOrigin.setTotalModule(listModule.size());
+            probeRepository.save(probeOrigin);
+        }
+        return response;
     }
 
     // đếm số lượng module theo probe và status
@@ -517,7 +684,8 @@ public class ProbeService implements IProbeService {
     }
     // hướng
     private Boolean checkValidateIpAddress(String ipAddress) {
-        String[] ips = ipAddress.split(".");
+        String[] ips = ipAddress.split("\\.");
+        System.out.println("Độ dài ip " + ipAddress + " " + ips.length);
         if(ips.length < 4) return false;
         for(String ip : ips) {
             try {
@@ -562,5 +730,25 @@ public class ProbeService implements IProbeService {
             return null;
         }
         return probe.getId();
+    }
+
+    private String getIpAddress() {
+        try {
+            Enumeration<NetworkInterface> networkInterfaceEnumeration = NetworkInterface.getNetworkInterfaces();
+            for(NetworkInterface net : Collections.list(networkInterfaceEnumeration)) {
+                Enumeration<InetAddress> inetAddresses = net.getInetAddresses();
+                for(InetAddress ipAddress : Collections.list(inetAddresses)) {
+                    if(ipAddress.isSiteLocalAddress() && net.getDisplayName().startsWith("Intel(R) Wireless")) {
+                        System.out.println("Name " + net.getDisplayName());
+                        System.out.println("IP local " + ipAddress.getHostAddress());
+                        return ipAddress.getHostAddress();
+                    }
+                }
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return null;
     }
 }

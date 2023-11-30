@@ -62,4 +62,17 @@ public class ProbeModuleConverter {
             return null;
         }
     }
+
+    public static ProbeModuleEntity toEntity(ProbeModuleEntity probeModuleEntity1) {
+        try {
+            ModelMapper mapper = new ModelMapper();
+            ProbeModuleEntity probeModuleEntity = mapper.map(probeModuleEntity1, ProbeModuleEntity.class);
+            probeModuleEntity.setId(null);
+            return probeModuleEntity;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return new ProbeModuleEntity();
+        }
+    }
 }

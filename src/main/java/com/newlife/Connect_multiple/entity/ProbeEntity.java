@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.sql.Timestamp;
 import java.util.*;
 
 import javax.persistence.*;
@@ -32,7 +33,7 @@ public class ProbeEntity {
     @Column(name = "ip_address")
     private String ipAddress;
     @Column(name = "connect_at")
-    private Date connectAt;
+    private Timestamp connectAt;
     @Column(name = "number_stoped_module")
     private Integer numberStopedModule;
     @Column(name = "number_running_module")
@@ -52,7 +53,7 @@ public class ProbeEntity {
     @Column(name = "total_module")
     private Integer totalModule;
     @Column(name = "create_at")
-    private Date createAt;
+    private Timestamp createAt;
     @Column(name = "deleted")
     private Integer deleted;
     @Column(name = "token", columnDefinition = "text")

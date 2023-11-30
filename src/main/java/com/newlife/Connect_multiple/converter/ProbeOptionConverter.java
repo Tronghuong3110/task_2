@@ -24,4 +24,17 @@ public class ProbeOptionConverter {
         ProbeOptionDto dto = modelMapper.map(entity, ProbeOptionDto.class);
         return dto;
     }
+
+    public static ProbeOptionEntity toEntity(ProbeOptionEntity probeOption1) {
+        try {
+            ModelMapper mapper = new ModelMapper();
+            ProbeOptionEntity probeOptionEntity = mapper.map(probeOption1, ProbeOptionEntity.class);
+            probeOptionEntity.setId(null);
+            return probeOptionEntity;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return new ProbeOptionEntity();
+        }
+    }
 }

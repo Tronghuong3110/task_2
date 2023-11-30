@@ -133,4 +133,12 @@ public class ProbeController {
             }
         }, executorService);
     }
+
+    @PostMapping("/duplicate")
+    public CompletableFuture<JSONArray> duplicateProbe(@RequestBody DuplicateRequest duplicateRequest) {
+        return CompletableFuture.supplyAsync(() -> {
+            JSONArray response = probeService.duplicate(duplicateRequest);
+            return response;
+        }, executorService);
+    }
 }

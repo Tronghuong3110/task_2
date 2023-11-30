@@ -26,6 +26,9 @@ public interface ModuleProbeRepository extends JpaRepository<ProbeModuleEntity, 
                                                             @Param("status1") String status1,
                                                             @Param("status2") String status2);
 
+    @Query(value = "select * from probemodule.probe_module where id_probe = :probeId", nativeQuery = true)
+    List<ProbeModuleEntity> findAllModuleByProbe(@Param("probeId") Integer probeId);
+
     Boolean existsByCommandAndIdProbe(String command, Integer idProbe);
     Integer countAllByStatus(String status);
     Optional<ProbeModuleEntity> findByCommandAndIdProbe(String commandLine, Integer idProbe);

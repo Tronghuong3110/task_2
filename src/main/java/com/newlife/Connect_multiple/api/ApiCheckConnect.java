@@ -11,63 +11,36 @@ import java.io.IOException;
 public class ApiCheckConnect {
     private static final String username = "2aee9b12c90aabd6";
     private static final String password = "iyOKvKD2t7uw2LUM7dOMcIYDYN4Bg9AuX8ZahoKRBwvM";
+
     public static Boolean checkExistClient(String clientId) {
         try {
             OkHttpClient client = new OkHttpClient();
             Request request = new Request.Builder()
-                    .url("http://localhost:18083/api/v5/clients/"+clientId)
+                    .url("http://localhost:18083/api/v5/clients/" + clientId)
                     .header("Content-Type", "application/json")
                     .header("Authorization", Credentials.basic(username, password))
                     .build();
             Response response = client.newCall(request).execute();
             String responseBody = response.body().string();
             JSONObject jsonObject = JsonUtil.parseJson(responseBody);
-            try{
+            try {
                 System.out.println("Kiểm tra client có clientId la " + clientId + " có còn kết nối hay không?");
                 Object data = jsonObject.get("connected");
                 System.out.println("Kết Quả " + data);
-                if(data.equals(true)) {
+                if (data.equals(true)) {
                     System.out.println("Kết quả cuối cùng " + data);
                     return true;
                 }
-            }
-            catch (Exception e){
+            } catch (Exception e) {
                 Object messageCode = jsonObject.get("code");
-                if(messageCode.equals("CLIENTID_NOT_FOUND")) {
+                if (messageCode.equals("CLIENTID_NOT_FOUND")) {
                     return false;
                 }
             }
             return false;
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return false;
     }
-
-
-//    public static void main(String[] args) {
-//        System.out.println(checkExistClient(""));
-//    }
 }
-
-//            OkHttpClient client = new OkHttpClient();
-//
-//            Request request = new Request.Builder()
-//                    .url("http://localhost:18083/api/v5/clients/"+clientId)
-//                    .header("Content-Type", "application/json")
-//                    .header("Authorization", Credentials.basic(this.username, this.password))
-//                    .build();
-//            Response response = client.newCall(request).execute();
-
-//        Gson gson = new Gson();
-//        JsonObject jsonObject = gson.fromJson(responseBody,JsonObject.class);
-//        try{
-//            String messageCode = jsonObject.get("code").getAsString();
-//            return messageCode;
-//        }
-//        catch (Exception e){
-//            JsonObject meta = jsonObject.getAsJsonObject("meta");
-//            int count = meta.get("count").getAsInt();
-//            return count+"";
-//        }

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 @Data
 @Getter
@@ -17,7 +18,7 @@ public class ModuleHistoryDto {
     private String caption;
     private String arg;
     private String status;
-    private Date atTime;
+    private Timestamp atTime;
     private String moduleName;
     private String note;
     private String probeName;
