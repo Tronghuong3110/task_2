@@ -24,7 +24,7 @@ public class ProbeModuleController {
     private IProbeModuleService probeModuleService;
     @Autowired
     private ITypeModuleService typeModuleService;
-    private ExecutorService executorService = Executors.newFixedThreadPool(10);
+    private ExecutorService executorService = Executors.newFixedThreadPool(12);
     private Boolean checkProcessRun = false;
     private Boolean checkProcessStop = false;
     private Boolean checkProcessRestart = false;
@@ -205,5 +205,12 @@ public class ProbeModuleController {
             return ResponseEntity.badRequest().body("Get all type module error");
         }
         return ResponseEntity.ok(moduleDtoList);
+    }
+
+    @GetMapping("/test123")
+    public CompletableFuture<ResponseEntity<?>> findAllMmemories(@RequestParam("idProbe") Integer idProbe) {
+        return CompletableFuture.supplyAsync(() -> {
+            return ResponseEntity.ok(probeModuleService.findAllMemories(idProbe));
+        }, executorService);
     }
 }

@@ -1,6 +1,8 @@
 package com.newlife.Connect_multiple.service;
 
+import com.newlife.Connect_multiple.dto.MemoryDto;
 import com.newlife.Connect_multiple.dto.ProbeModuleDto;
+import com.newlife.Connect_multiple.entity.MemoryClient;
 import org.json.simple.JSONObject;
 
 import java.util.List;
@@ -17,4 +19,6 @@ public interface IProbeModuleService {
     ProbeModuleDto findOneById(Integer idProbeModule);
     JSONObject updateProbeModule(ProbeModuleDto probeModuleDto);
     List<ProbeModuleDto> findAllProbeModuleAndError(Integer probeId, Integer mooduleId);
+
+    List<MemoryClient> findAllMemories(Integer probeId);
 }

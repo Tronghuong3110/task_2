@@ -3,6 +3,7 @@ package com.newlife.Connect_multiple.service.impl;
 import com.newlife.Connect_multiple.api.ApiCheckConnect;
 import com.newlife.Connect_multiple.converter.ProbeConverter;
 import com.newlife.Connect_multiple.converter.ProbeModuleConverter;
+import com.newlife.Connect_multiple.dto.MemoryDto;
 import com.newlife.Connect_multiple.dto.ProbeDto;
 import com.newlife.Connect_multiple.dto.ProbeModuleDto;
 import com.newlife.Connect_multiple.entity.*;
@@ -13,6 +14,7 @@ import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -46,6 +48,10 @@ public class ProbeModuleService implements IProbeModuleService {
     private BrokerRepository brokerRepository;
     @Autowired
     private ServerRepository serverRepository;
+    @Autowired
+    private MemoryRepository memoryRepository;
+    @Autowired
+    private PerformanceRepository performanceRepository;
     private MqttClient client = null;
     private Map<String, Boolean> checkProcessStop = new ConcurrentHashMap<>();
     private ExecutorService executorService = Executors.newFixedThreadPool(100);
@@ -80,7 +86,7 @@ public class ProbeModuleService implements IProbeModuleService {
             for(ProbeModuleEntity entity : listProbeModuleEntity) {
                 ProbeModuleDto dto = ProbeModuleConverter.toDto(entity);
                 Long error = countErrorModuleProbe(entity.getId());
-                System.out.println("Error " + error);
+//                System.out.println("Error " + error);
                 dto.setErrorPerWeek(error);
                 listProbeModuleDto.add(dto);
             }
@@ -137,7 +143,7 @@ public class ProbeModuleService implements IProbeModuleService {
                     String idModule = tmp.split("-")[1];
                     MqttMessage message = new MqttMessage(messageToClientMap.get(idModule).getBytes());
                     message.setQos(2);
-                    System.out.println("Topic đang được gửi tin nhắn: " + subTopic.getSubTopic());
+//                    System.out.println("Topic đang được gửi tin nhắn: " + subTopic.getSubTopic());
                     // TH 2 lệnh được gửi liên tiếp nhau của cùng 1 topic
                     // // topic + "-" + idProbeModule, idCmd + "-" + topic + "-" + idProbeModule
                     if(!topicrequestRun.isEmpty() && topic.equals(topicrequestRun.peek().split("-")[0])) {
@@ -176,16 +182,16 @@ public class ProbeModuleService implements IProbeModuleService {
                             while ((!checkResultCommand.containsKey(topic + "-" + idModule) || (checkResultCommand.containsKey(topic + "-" + idModule) && !checkResultCommand.get(topic + "-" + idModule))) && time <= 8000) {
                                 Thread.sleep(1000);
                                 time = System.currentTimeMillis() - timeCurrent;
-                                System.out.println("Chờ kết quả của topic " + topic + " " + checkResultCommand.get(topic + "-" + idModule));
+//                                System.out.println("Chờ kết quả của topic " + topic + " " + checkResultCommand.get(topic + "-" + idModule));
                                 if(checkResultCommand.containsKey(topic + "-" + idModule) && checkResultCommand.get(topic + "-" + idModule)) {
                                     check = true;
                                     break;
                                 }
                             }
                         }
-                        System.out.println("Check " + check);
+//                        System.out.println("Check " + check);
                         if(check) continue;
-                        System.out.println("Không nhận được phản hồi!!!");
+//                        System.out.println("Không nhận được phản hồi!!!");
                         responseMessageToFE(probeModule1, "2", 1, null, null);
                         probeModule1.setLoading(0);
                         moduleProbeRepository.save(probeModule1);
@@ -215,7 +221,7 @@ public class ProbeModuleService implements IProbeModuleService {
             if(client == null || !client.isConnected()) {
                 solveConnection();
             }
-            System.out.println("ID probe module " + idProbeModule);
+//            System.out.println("ID probe module " + idProbeModule);
             ProbeModuleEntity probeModuleEntity = moduleProbeRepository.findById(idProbeModule).orElse(null);
             try {
                 if (probeModuleEntity == null || probeModuleEntity.getStatus().equals("Stopped")) {
@@ -259,7 +265,7 @@ public class ProbeModuleService implements IProbeModuleService {
                     String tmp = topicrequestStop.poll(); // topicrequestStop = topic + "-" + idProbeModule
                     String topic = tmp.split("-")[0];
                     String idModule = tmp.split("-")[1];
-                    System.out.println("Tin nhắn gửi tới probe " + topic + " (Stop) " + messageToClientStop.get(idModule));
+//                    System.out.println("Tin nhắn gửi tới probe " + topic + " (Stop) " + messageToClientStop.get(idModule));
                     String messageSendToClientStop = messageToClientStop.get(idModule);
                     // topicrequestStop = topic + "-" + idProbeModule
                     if(!topicrequestStop.isEmpty() && topic.equals(topicrequestStop.peek().split("-")[0])) {
@@ -293,7 +299,7 @@ public class ProbeModuleService implements IProbeModuleService {
                         Long timeCurrent = System.currentTimeMillis();
                         Long time = 0L;
                         if(checkResultCommandStop.containsKey(topic + "-" + idModule)) {
-                            System.out.println("Check result command " + checkResultCommandStop.get(topic + "-" + idModule));
+//                            System.out.println("Check result command " + checkResultCommandStop.get(topic + "-" + idModule));
                         }
                         if(checkResultCommandStop.containsKey(topic + "-" + idModule) && checkResultCommandStop.get(topic + "-" + idModule)) {
                             check = true;
@@ -303,16 +309,16 @@ public class ProbeModuleService implements IProbeModuleService {
                         while ((!checkResultCommandStop.containsKey(topic + "-" + idModule) || (checkResultCommandStop.containsKey(topic + "-" + idModule) && !checkResultCommandStop.get(topic + "-" + idModule))) && time <= 8000) {
                             Thread.sleep(1000);
                             time = System.currentTimeMillis() - timeCurrent;
-                            System.out.println("Chờ kết quả");
+//                            System.out.println("Chờ kết quả");
                             if(checkResultCommandStop.containsKey(topic + "-" + idModule) && checkResultCommandStop.get(topic + "-" + idModule)) {
                                 check = true;
                                 break;
                             }
                         }
                     }
-                    System.out.println("check " + check);
+//                    System.out.println("check " + check);
                     if(check) continue;
-                    System.out.println("Không nhận được phản hồi!!!");
+//                    System.out.println("Không nhận được phản hồi!!!");
                     responseMessageToFE(probeModule, "2", 1, null, null);
                     updateCmdHistory(idCmdHistory, 3, 4);
                     saveModuleHistory("1", 2, probeModuleEntity, null, JsonUtil.parseJson(messageToClientStop.get(idModule)));
@@ -367,7 +373,7 @@ public class ProbeModuleService implements IProbeModuleService {
                 if(mess != null) {
                     MqttMessage message = new MqttMessage(mess.getBytes());
                     message.setQos(2);
-                    System.out.println("Gửi tin nhắn tới topic(kiểm tra trạng thái theo chu kì) " + probe.getPubTopic() + " " + mess);
+//                    System.out.println("Gửi tin nhắn tới topic(kiểm tra trạng thái theo chu kì) " + probe.getPubTopic() + " " + mess);
                     client.publish(probe.getPubTopic(), message);
                 }
             }
@@ -381,7 +387,7 @@ public class ProbeModuleService implements IProbeModuleService {
     // Lưu thông tin lịch sử gửi lệnh
     private String saveCmd(ProbeModuleEntity probeModuleEntity) {
         try {
-            System.out.println("Lưu thông tin cmd history vào database");
+//            System.out.println("Lưu thông tin cmd history vào database");
             String id = System.nanoTime() + "_" + probeModuleEntity.getIdProbe();
             CmdHistoryEntity cmd = new CmdHistoryEntity();
             cmd.setId(id);
@@ -407,8 +413,8 @@ public class ProbeModuleService implements IProbeModuleService {
     // Cập nhật trạng thái của lịch sử gửi lệnh từ server tới client
     private void updateCmdHistory(String idCmd, Integer retry, Integer status) {
         CmdHistoryEntity cmdHistoryEntity = cmdHistoryRepository.findById(idCmd).orElse(null);
-        System.out.println("IDCMD " + idCmd);
-        System.out.println("Cập nhật lại cmd history");
+//        System.out.println("IDCMD " + idCmd);
+//        System.out.println("Cập nhật lại cmd history");
         if(retry >= 0) {
             cmdHistoryEntity.setRetryTimes(retry);
         }
@@ -584,7 +590,7 @@ public class ProbeModuleService implements IProbeModuleService {
     @Override
     public JSONObject saveProbeModule(ProbeModuleDto probeModuleDto) {
         JSONObject json = new JSONObject();
-        System.out.println("ID probe " + probeModuleDto.getIdProbe());
+//        System.out.println("ID probe " + probeModuleDto.getIdProbe());
         try {
             ProbeModuleEntity probeModule = ProbeModuleConverter.toEntity(probeModuleDto);
             String cmd = probeModuleDto.getCaption().trim() + " " + probeModuleDto.getArg().trim();
@@ -656,9 +662,9 @@ public class ProbeModuleService implements IProbeModuleService {
             }
             String commandLine = probeModuleEntity.getCaption().trim() + " " + probeModuleEntity.getArg().trim();
             Integer newId = getIdOfProbeModuleInDatabase(commandLine, probeModuleDto.getIdProbe());
-            System.out.println(commandLine);
-            System.out.println("NewId " + newId);
-            System.out.println();
+//            System.out.println(commandLine);
+//            System.out.println("NewId " + newId);
+//            System.out.println();
             if(newId != null && newId != probeModuleDto.getId()) {
                 json.put("code", "0");
                 json.put("message", "Can not update probeModule due to duplicate commands");
@@ -684,6 +690,13 @@ public class ProbeModuleService implements IProbeModuleService {
         return null;
     }
 
+    @Override
+    public List<MemoryClient> findAllMemories(Integer probeId) {
+        List<MemoryClient> listMemories = memoryRepository.findAllByProbeId(probeId);
+        List<MemoryDto> listResponse = new ArrayList<>();
+        return listMemories;
+    }
+
     // lấy ra id của probeModule theo command từ database để check có trùng không
     private Integer getIdOfProbeModuleInDatabase(String commandLine, Integer idProbe) {
         try {
@@ -701,8 +714,8 @@ public class ProbeModuleService implements IProbeModuleService {
     }
     // xử lý các phản hồi
     private void solveResponseMessage(String topic, JSONObject response, String idCmd, Integer statusExcept) {
-        System.out.println("Kết quả chạy lệnh của topic " + topic);
-        System.out.println("Kết quả: " + response);
+        System.out.println("KQ offffff " + topic);
+        System.out.println("KQ: " + response);
         System.out.println("==============================================================");
         String status = (String) response.get("statusModule");
         String action = response.get("action").toString();
@@ -716,20 +729,20 @@ public class ProbeModuleService implements IProbeModuleService {
             }
             else {
                 probeModuleEntity = probeModuleEntityMapStop.get(id);
-                System.out.println("Module dừng thành công " + probeModuleEntity.getId());
+//                System.out.println("Module dừng thành công " + probeModuleEntity.getId());
                 checkResultCommandStop.put(topic + "-" + id, true);
             }
             String pId = (String) response.get("PID");
             if(pId != null && !pId.equals(-1)) {
                 probeModuleEntity.setProcessId(pId);
-                System.out.println("PID " + pId);
+//                System.out.println("PID " + pId);
             }
             String statusResult = statusResult(statusExcept, status);
             probeModuleEntity.setStatus(statusResult);
             probeModuleEntity.setLoading(0);
             probeModuleEntity = moduleProbeRepository.save(probeModuleEntity);
             saveModuleHistory(status, statusExcept, probeModuleEntity, null, response);
-            System.out.println("Status " + probeModuleEntity.getStatus());
+//            System.out.println("Status " + probeModuleEntity.getStatus());
         }
     }
     // gửi lại tin nhắn trong TH chạy module
@@ -741,14 +754,14 @@ public class ProbeModuleService implements IProbeModuleService {
                 String idModule = tmp.split("-")[1];
                 ProbeModuleEntity probeModule1 = probeModuleEntityMapRun.get(idModule); // lấy ra probeModule theo topic
                 String mess = messageToClientMap.get(idModule);
-                System.out.println("Topic gửi lại " + topic);
-                System.out.println("Tin nhắn gửi lại " + mess);
+//                System.out.println("Topic gửi lại " + topic);
+//                System.out.println("Tin nhắn gửi lại " + mess);
                 MqttMessage message = new MqttMessage(mess.getBytes());
                 message.setQos(2);
                 Integer retry = 0;
                 // topic + "-" + idProbeModule, idCmd + "-" + topic + "-" + idProbeModule
                 String idCmd = topicCheckResultRun.get(tmp).split("-")[0];
-                System.out.println("id cmd trong TH gửi lại " + idCmd);
+//                System.out.println("id cmd trong TH gửi lại " + idCmd);
                 int loop = 0;
                 while (loop <= 5) {
                     if(clientStatusMapRun.containsKey(tmp) && clientStatusMapRun.get(tmp)) {
@@ -759,16 +772,16 @@ public class ProbeModuleService implements IProbeModuleService {
                 }
                 while (true) {
                     try {
-                        System.out.println("Kiểm tra xem trong queue có chứa topic không? " + clientStatusMapRun.containsKey(tmp));
+//                        System.out.println("Kiểm tra xem trong queue có chứa topic không? " + clientStatusMapRun.containsKey(tmp));
                         // không tôồn tại hoặc tồn tại nhưng bằng false
                         if (retry <= 2 && (!clientStatusMapRun.containsKey(tmp) || (clientStatusMapRun.containsKey(tmp) && !clientStatusMapRun.get(tmp)))) {
-                            System.out.println("TH gửi lại");
+//                            System.out.println("TH gửi lại");
                             retry++;
                             client.publish(topic, message);
                         }
                         // không tồn tại hoặc tồn tại những == false và số lần gửi vượt quá quy định
                         else if (!clientStatusMapRun.containsKey(tmp) || (clientStatusMapRun.containsKey(tmp) && !clientStatusMapRun.get(tmp)) && retry > 2) {
-                            System.out.println("TH gửi lại quá số lần quy định ");
+//                            System.out.println("TH gửi lại quá số lần quy định ");
                             // kiểm tra cmdHistory đã được cập nhật thành công chưa
                             CmdHistoryEntity cmdHistoryEntity = cmdHistoryRepository.findById(idCmd).orElse(null);
                             if(cmdHistoryEntity == null || cmdHistoryEntity.getMessage().equals("")) {
@@ -778,7 +791,7 @@ public class ProbeModuleService implements IProbeModuleService {
                                 }
                                 Boolean clientIsDisconnect = checkClientIsDisconnect(clientId);
                                 if (!clientIsDisconnect) {
-                                    System.out.println("Send to front end " + "đã mất kết nối tới broker");
+//                                    System.out.println("Send to front end " + "đã mất kết nối tới broker");
                                     responseMessageToFE(probeModule1, "2", 1, null, null);
                                     probeModule1.setLoading(0);
                                     moduleProbeRepository.save(probeModule1);
@@ -786,7 +799,7 @@ public class ProbeModuleService implements IProbeModuleService {
                                     checkErrorMapRun.put(tmp, true);
                                     break; // Thoát khỏi luồng khi xử lý xong
                                 } else {
-                                    System.out.println("Send to front end " + "không nhận được yêu cầu thực hiện");
+//                                    System.out.println("Send to front end " + "không nhận được yêu cầu thực hiện");
                                     responseMessageToFE(probeModule1, "2", 1, null, null);
                                     probeModule1.setLoading(0);
                                     moduleProbeRepository.save(probeModule1);
@@ -799,7 +812,7 @@ public class ProbeModuleService implements IProbeModuleService {
                         }
                         // tồn tại và bằng true
                         else if (clientStatusMapRun.containsKey(tmp) && clientStatusMapRun.get(tmp)) {
-                            System.out.println("TH không cần gửi lại(Client đã có phản hồi nhận được lệnh)");
+//                            System.out.println("TH không cần gửi lại(Client đã có phản hồi nhận được lệnh)");
                             break; // Thoát khỏi luồng khi xử lý xong
                         }
                         Thread.sleep(5000);
@@ -835,13 +848,13 @@ public class ProbeModuleService implements IProbeModuleService {
                 }
                 while (!check) {
                     // clientStatusMapStop = topic + "-" + idProbeModule = tmp
-                    System.out.println("Client status check resend " + clientStatusMapStop.get(tmp));
+//                    System.out.println("Client status check resend " + clientStatusMapStop.get(tmp));
                     try {
-                        System.out.println("Kiểm tra xem trong queue có chứa topic không? " + clientStatusMapStop.containsKey(tmp));
+//                        System.out.println("Kiểm tra xem trong queue có chứa topic không? " + clientStatusMapStop.containsKey(tmp));
                         // không tôồn tại hoặc tồn tại nhưng bằng false
-                        System.out.println("Topic " + topic + (clientStatusMapStop.containsKey(tmp) ? clientStatusMapStop.get(tmp) : "null"));
+//                        System.out.println("Topic " + topic + (clientStatusMapStop.containsKey(tmp) ? clientStatusMapStop.get(tmp) : "null"));
                         if (retry <= 2 && (!clientStatusMapStop.containsKey(tmp) || (clientStatusMapStop.containsKey(tmp) && !clientStatusMapStop.get(tmp)))) {
-                            System.out.println("TH gửi lại");
+//                            System.out.println("TH gửi lại");
                             retry++;
                             client.publish(topic, message);
                         }
@@ -849,14 +862,14 @@ public class ProbeModuleService implements IProbeModuleService {
                         else if (!clientStatusMapStop.containsKey(tmp) || (clientStatusMapStop.containsKey(tmp) && !clientStatusMapStop.get(tmp)) && retry > 2) {
                             CmdHistoryEntity cmdHistoryEntity = cmdHistoryRepository.findById(idCmd).orElse(null);
                             if(cmdHistoryEntity == null || cmdHistoryEntity.getMessage().equals("")) {
-                                System.out.println("TH gửi lại quá số lần quy định ");
+//                                System.out.println("TH gửi lại quá số lần quy định ");
                                 if(!clientStatusMapStop.containsKey(tmp) || (clientStatusMapStop.containsKey(tmp) && !clientStatusMapStop.get(tmp))) {
                                     updateCmdHistory(idCmd, 3, 4);
 //                                    saveModuleHistory("2", 1, probeModule, null, JsonUtil.parseJson(messageToClientStop.get(idModule)));
                                 }
                                 Boolean clientIsDisconnect = checkClientIsDisconnect(clientId);
                                 if (!clientIsDisconnect) {
-                                    System.out.println("Send to front end " + "đã mất kết nối tới broker");
+//                                    System.out.println("Send to front end " + "đã mất kết nối tới broker");
                                     responseMessageToFE(probeModule, "2", 1, null, null);
                                     probeModule.setLoading(0);
                                     moduleProbeRepository.save(probeModuleCheck);
@@ -866,7 +879,7 @@ public class ProbeModuleService implements IProbeModuleService {
                                     break; // Thoát khỏi luồng khi xử lý xong
                                 }
                                 else {
-                                    System.out.println("Send to front end " + "không nhận được yêu cầu thực hiện");
+//                                    System.out.println("Send to front end " + "không nhận được yêu cầu thực hiện");
                                     responseMessageToFE(probeModule, "2", 1, null, null);
                                     probeModule.setLoading(0);
                                     moduleProbeRepository.save(probeModuleCheck);
@@ -879,7 +892,7 @@ public class ProbeModuleService implements IProbeModuleService {
                         }
                         // tồn tại và bằng true
                         else if (clientStatusMapStop.containsKey(tmp) && clientStatusMapStop.get(tmp)) {
-                            System.out.println("TH không cần gửi lại(Client đã có phản hồi nhận được lệnh)");
+//                            System.out.println("TH không cần gửi lại(Client đã có phản hồi nhận được lệnh)");
                             break; // Thoát khỏi luồng khi xử lý xong
                         }
                         Thread.sleep(5000);
@@ -929,21 +942,28 @@ public class ProbeModuleService implements IProbeModuleService {
                                 // TH client thông báo nhận được tin nhắn
                                 try {
                                     if (json.containsKey("statusCmd") && json.get("statusCmd").equals("OK")) {
-                                        System.out.println("Message " + json.get("message"));
+//                                        System.out.println("Message " + json.get("message"));
                                     }
                                     // TH client thông báo danh sách các trạng thái khi đã xử lý xong
                                     else {
-                                        System.out.println("Response(phản hồi từ client) " + message);
+//                                        System.out.println("Response(phản hồi từ client) " + message);
                                         // chuyển tin nhắn từ client gửi tới thành chuỗi json object
                                         String messageFromClient = (String) json.get("message");
-                                        System.out.println("Tin nhắn (get Status) " + messageFromClient);
+//                                        System.out.println("Tin nhắn (get Status) " + messageFromClient);
                                         // danh sách trạng thái của các module của probe
-                                        System.out.println("Danh sách trạng thái các module của probe thứ " + (String) json.get("idProbe"));
+//                                        System.out.println("Danh sách trạng thái các module của probe thứ " + (String) json.get("idProbe"));
                                         JSONArray jsonArray = (JSONArray) json.get("listStatus");
                                         // duyệt để cập nhật trạng thái của các module của probe
                                         for(Object object : jsonArray) {
                                             updateProbeModule((JSONObject) object);
                                         }
+                                        // update thông tin về memory
+                                        JSONArray listMemory = (JSONArray) json.get("memories");
+                                        Integer probeId = Integer.parseInt(json.get("idProbe").toString());
+                                        saveInfoMemory(listMemory, probeId);
+                                        // update thông tin về tải trung bình cpu
+                                        JSONObject load_average = (JSONObject) json.get("load_average");
+                                        saveLoadAverage(load_average, probeId);
                                     }
                                 }
                                 catch (Exception e) {
@@ -957,12 +977,12 @@ public class ProbeModuleService implements IProbeModuleService {
                                 // clientStatusMapStop = topic + "-" + idProbeModule
                                 clientStatusMapStop.put(topic + "-" + idProbeModule, true); // đánh dấu đã nhận được phản hồi của topic
                                 Object pid = json.get("PID");
-                                System.out.println("Topic result " + topic);
+//                                System.out.println("Topic result " + topic);
                                 if (!pid.equals("")) {
-                                    System.out.println("Dừng module");
+//                                    System.out.println("Dừng module");
                                     // checkResultCommandStop = topic + "-" + idProbeModule, true(false)
                                     checkResultCommandStop.put(topic + "-" + idProbeModule, true); // đaánh dấu đã nhận được kết quả chạy module
-                                    System.out.println("Status cmd " + json.get("message"));
+//                                    System.out.println("Status cmd " + json.get("message"));
                                     // lưu lại kết quả của module
                                     // topicCheckResultStop = topic+"-"+idProbeModule, idCmd + "-" + topic + "-" + idProbeModule
                                     solveResponseMessage(topic, json, topicCheckResultStop.get(topic + "-" + idProbeModule).split("-")[0], 2);
@@ -1004,26 +1024,57 @@ public class ProbeModuleService implements IProbeModuleService {
                         e.printStackTrace();
                     }
                 }, executorService);
-                System.out.println("Đã subscribe tới topic " + pubtopic.getSubTopic());
+//                System.out.println("Đã subscribe tới topic " + pubtopic.getSubTopic());
             }
         }
         catch (Exception e) {
-
+            e.printStackTrace();
         }
     }
 
+    private void saveInfoMemory(JSONArray jsonArray, Integer probeId) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime time = LocalDateTime.now().minusSeconds(20);
+        String timeAfterSecond = formatter.format(time);
+        String currentTime = formatter.format(LocalDateTime.now());
+        if(probeId != -1) {
+            for(Object object : jsonArray) {
+                JSONObject jsonObject = (JSONObject) object;
+                Double memoryFree = Double.valueOf(jsonObject.get("memory_free").toString());
+                MemoryClient memoryClientBefore = memoryRepository.findByTime(timeAfterSecond, currentTime).orElse(null);
+                if(memoryClientBefore != null && memoryClientBefore.getMemoryDisk().equals(memoryFree)) {
+                    continue;
+                }
+                MemoryClient memoryClient = new MemoryClient();
+                memoryClient.setDiskName(jsonObject.get("nameDisk").toString());
+                memoryClient.setMemoryDisk(memoryFree);
+                memoryClient.setTotalMemory(Double.valueOf(jsonObject.get("memory_total").toString()));
+                memoryClient.setProbeId(probeId);
+                memoryClient.setModifiedTime(new Timestamp(System.currentTimeMillis()));
+                memoryRepository.save(memoryClient);
+            }
+        }
+    }
+    // lưu thông tin tải trung bình CPU
+    private void saveLoadAverage(JSONObject jsonObject, Integer probeId) {
+        PerformanceCpu performanceCpu = new PerformanceCpu();
+        performanceCpu.setLoadAverage(Double.valueOf(jsonObject.get("load_average").toString()));
+        performanceCpu.setProbeId(probeId);
+        performanceCpu.setMessage(jsonObject.get("message").toString());
+        performanceCpu.setModifiedTime(new Timestamp(System.currentTimeMillis()));
+        performanceRepository.save(performanceCpu);
+    }
     // count error per week of module
     private Long countErrorModuleProbe(Integer idProbeModule) {
         try {
             String timeBefore = getTimeBefore();
             String timeAfter = getTimeAfter();
-            System.out.println("7 ngày trước " + timeAfter);
             if(timeBefore == null || timeAfter == null) {
                 System.out.println("Đếm lỗi module lồi rồi (line 50) !!!");
                 return null;
             }
             JSONObject jsonError = moduleHistoryRepository.solveErrorPerWeekOfModule(idProbeModule, timeAfter, timeBefore, "Failed");
-            System.out.println(jsonError);
+//            System.out.println(jsonError);
             return (jsonError != null && jsonError.containsKey("epw")) ? Long.parseLong(jsonError.get("epw").toString()) : 0;
         }
         catch (Exception e) {

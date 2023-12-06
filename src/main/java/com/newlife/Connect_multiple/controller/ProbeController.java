@@ -3,6 +3,8 @@ package com.newlife.Connect_multiple.controller;
 import com.newlife.Connect_multiple.dto.*;
 import com.newlife.Connect_multiple.service.ILocationService;
 import com.newlife.Connect_multiple.service.IProbeService;
+import com.newlife.Connect_multiple.util.ConstVariable;
+import org.apache.tomcat.util.bcel.Const;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +73,8 @@ public class ProbeController {
     public CompletableFuture<JSONObject> deleteProbe(@RequestParam("id") Integer id) {
         return CompletableFuture.supplyAsync(() -> {
             JSONObject message = probeService.delete(id);
+            System.out.println("Username " + ConstVariable.username);
+            System.out.println("Password " + ConstVariable.password);
             return message;
         }, executorService);
     }

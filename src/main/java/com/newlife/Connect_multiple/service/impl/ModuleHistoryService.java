@@ -56,9 +56,9 @@ public class ModuleHistoryService implements IModuleHistoryService {
         if(totalPage < (double)totalRow / 10) {
             totalPage += 1;
         }
-        System.out.println("totalPage " + totalPage);
-        System.out.println("totalRow / 10 " + (double)totalRow / 10);
-        System.out.println("totalRow " + totalRow);
+//        System.out.println("totalPage " + totalPage);
+//        System.out.println("totalRow / 10 " + (double)totalRow / 10);
+//        System.out.println("totalRow " + totalRow);
         for(ModuleHistoryEntity moduleHistory : listModuleHistories.toList()) {
             ModuleHistoryDto dto = ModuleHistoryConverter.toDto(moduleHistory);
             dto.setTotalPage(totalPage);
@@ -76,11 +76,11 @@ public class ModuleHistoryService implements IModuleHistoryService {
             }
             // ack = 1: đã xác nhận xem
             // ack = 0: chưa xác nhận xem
-            System.out.println("ACK trước khi cập nhật " + moduleHistory.getAck());
+//            System.out.println("ACK trước khi cập nhật " + moduleHistory.getAck());
             if(!moduleHistory.getAck().equals(1)) {
                 moduleHistory.setAck(1);
                 moduleHistory = moduleHistoryRepository.save(moduleHistory);
-                System.out.println("ACK sau khi cập nhật" + moduleHistory.getAck());
+//                System.out.println("ACK sau khi cập nhật" + moduleHistory.getAck());
                 return 1;
             }
             return 1;

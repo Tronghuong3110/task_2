@@ -5,10 +5,7 @@ import com.newlife.Connect_multiple.api.ApiCheckConnect;
 import com.newlife.Connect_multiple.converter.ProbeConverter;
 import com.newlife.Connect_multiple.converter.ProbeModuleConverter;
 import com.newlife.Connect_multiple.converter.ProbeOptionConverter;
-import com.newlife.Connect_multiple.dto.DuplicateRequest;
-import com.newlife.Connect_multiple.dto.InfoLogin;
-import com.newlife.Connect_multiple.dto.ProbeDto;
-import com.newlife.Connect_multiple.dto.ProbeOptionDto;
+import com.newlife.Connect_multiple.dto.*;
 import com.newlife.Connect_multiple.entity.*;
 import com.newlife.Connect_multiple.repository.*;
 import com.newlife.Connect_multiple.service.IProbeService;
@@ -220,7 +217,7 @@ public class ProbeService implements IProbeService {
     @Override
     public JSONObject delete(Integer id) { // hướng (Đưa probe vào thùng rác)
         JSONObject json = new JSONObject();
-        System.out.println("ID probe delete " + id);
+//        System.out.println("ID probe delete " + id);
         try {
             ProbeEntity probeEntity = probeRepository.findByIdAndDeleted(id, 0)
                     .orElse(null);
@@ -297,7 +294,7 @@ public class ProbeService implements IProbeService {
                 // 3 trạng thái: error, connected, disconnect
                 // probeDto.getStatus().equals("connected")
                 Boolean checkConnectToBroker = ApiCheckConnect.checkExistClient(probeEntity.getClientId());
-                System.out.println("Check connect " + checkConnectToBroker);
+//                System.out.println("Check connect " + checkConnectToBroker);
                 if(!checkConnectToBroker) { // TH probe chưa chạy ứng dụng ==> không thể yêucaaufu kết nối tới broker
                     probeEntity.setStatus("error");
                     probeEntity = probeRepository.save(probeEntity);
@@ -388,7 +385,7 @@ public class ProbeService implements IProbeService {
     public InfoLogin downloadFile(Integer idProbe) {
         try {
             InetAddress ip = Inet4Address.getLocalHost();
-            System.out.println("Ip " + ip.getHostAddress());
+//            System.out.println("Ip " + ip.getHostAddress());
             InfoLogin info = new InfoLogin();
             ProbeEntity probe = probeRepository.findByIdAndDeleted(idProbe, 0).orElse(null);
             if(probe == null) {
@@ -486,7 +483,7 @@ public class ProbeService implements IProbeService {
         if(totalPage < (double)totalRow / 10) {
             totalPage += 1;
         }
-        System.out.println(("Total page " + totalPage));
+//        System.out.println(("Total page " + totalPage));
         for(ProbeEntity probe : listProbe) {
             ProbeDto probeDto = ProbeConverter.toDto(probe);
             probeDto.setTotalPage(totalPage);
@@ -662,7 +659,6 @@ public class ProbeService implements IProbeService {
     private JSONObject findStatusByProbe(Integer id, List<JSONObject> listStatusOfProbe) {
         for(JSONObject json : listStatusOfProbe) {
             Integer idProbe = Integer.parseInt(json.get("id_probe").toString());
-            System.out.println("id probe " + idProbe);
             if (id.equals(idProbe)) {
                 JSONObject status = JsonUtil.parseJson(json.get("status_counts").toString());
                 return status;
@@ -685,7 +681,6 @@ public class ProbeService implements IProbeService {
     // hướng
     private Boolean checkValidateIpAddress(String ipAddress) {
         String[] ips = ipAddress.split("\\.");
-        System.out.println("Độ dài ip " + ipAddress + " " + ips.length);
         if(ips.length < 4) return false;
         for(String ip : ips) {
             try {
@@ -739,8 +734,8 @@ public class ProbeService implements IProbeService {
                 Enumeration<InetAddress> inetAddresses = net.getInetAddresses();
                 for(InetAddress ipAddress : Collections.list(inetAddresses)) {
                     if(ipAddress.isSiteLocalAddress() && net.getDisplayName().startsWith("Intel(R) Wireless")) {
-                        System.out.println("Name " + net.getDisplayName());
-                        System.out.println("IP local " + ipAddress.getHostAddress());
+//                        System.out.println("Name " + net.getDisplayName());
+//                        System.out.println("IP local " + ipAddress.getHostAddress());
                         return ipAddress.getHostAddress();
                     }
                 }

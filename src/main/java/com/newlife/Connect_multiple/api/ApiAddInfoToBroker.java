@@ -1,6 +1,7 @@
 package com.newlife.Connect_multiple.api;
 
 import com.newlife.Connect_multiple.entity.SubtopicServerEntity;
+import com.newlife.Connect_multiple.util.ConstVariable;
 import com.squareup.okhttp.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -10,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ApiAddInfoToBroker {
-    private static final String usernameBroker = "2aee9b12c90aabd6";
-    private static final String passwordBroker = "iyOKvKD2t7uw2LUM7dOMcIYDYN4Bg9AuX8ZahoKRBwvM";
+    private static final String usernameBroker = ConstVariable.username;
+    private static final String passwordBroker = ConstVariable.password;
     private static String urlApiCreateUser = "http://localhost:18083/api/v5/authentication/password_based%3Abuilt_in_database/users";
     private static String urlApiAddRule = "http://localhost:18083/api/v5/authorization/sources/built_in_database/rules/users/";
 

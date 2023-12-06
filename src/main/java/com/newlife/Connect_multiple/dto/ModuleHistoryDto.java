@@ -1,11 +1,9 @@
 package com.newlife.Connect_multiple.dto;
-import com.fasterxml.jackson.databind.node.LongNode;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.sql.Date;
-import java.sql.Timestamp;
+import java.util.Date;
 
 @Data
 @Getter
@@ -18,7 +16,7 @@ public class ModuleHistoryDto {
     private String caption;
     private String arg;
     private String status;
-    private Timestamp atTime;
+    private String atTime;
     private String moduleName;
     private String note;
     private String probeName;

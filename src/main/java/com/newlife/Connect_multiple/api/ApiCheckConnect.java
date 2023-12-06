@@ -1,4 +1,5 @@
 package com.newlife.Connect_multiple.api;
+import com.newlife.Connect_multiple.util.ConstVariable;
 import com.newlife.Connect_multiple.util.JsonUtil;
 import com.squareup.okhttp.Credentials;
 import com.squareup.okhttp.OkHttpClient;
@@ -9,8 +10,8 @@ import org.json.simple.JSONObject;
 import java.io.IOException;
 
 public class ApiCheckConnect {
-    private static final String username = "2aee9b12c90aabd6";
-    private static final String password = "iyOKvKD2t7uw2LUM7dOMcIYDYN4Bg9AuX8ZahoKRBwvM";
+    private static final String username = ConstVariable.username;
+    private static final String password = ConstVariable.password;
 
     public static Boolean checkExistClient(String clientId) {
         try {
@@ -24,7 +25,6 @@ public class ApiCheckConnect {
             String responseBody = response.body().string();
             JSONObject jsonObject = JsonUtil.parseJson(responseBody);
             try {
-                System.out.println("Kiểm tra client có clientId la " + clientId + " có còn kết nối hay không?");
                 Object data = jsonObject.get("connected");
                 System.out.println("Kết Quả " + data);
                 if (data.equals(true)) {

@@ -49,8 +49,8 @@ public interface ProbeRepository extends JpaRepository<ProbeEntity, Integer> {
     @Query(value = "select * from probe where (name like %:name%) " + // COLLATE Latin1_General_CI_AI
             "and deleted = :deleted", nativeQuery = true)
     List<ProbeEntity> findByName(@Param("name") String name,
-                                                       @Param("deleted") Integer deleted,
-                                                       Pageable pageable);
+                                 @Param("deleted") Integer deleted,
+                                 Pageable pageable);
 }
 
 
