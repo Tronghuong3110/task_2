@@ -3,12 +3,13 @@ $secondary: #27293d;
 $pink-color: #e14eca;
 $blue-color: #9747ff;
 .addProbeModuleScreen {
-    height: 100vh;
+    height: 100%;
     width: 100vw;
     background-color: rgba(48, 39, 39,0.8);
-    position: absolute;
+    position: fixed;
     top:0;
     left: 0;
+    z-index: 2;
     .addProbe {
         font-size: 0.9em;
         width: 40%;

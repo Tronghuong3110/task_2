@@ -21,7 +21,7 @@ const DuplicateProbe = (props) => {
     const [notifyScreen, setOpenNotifyScreen] = useState(false)
     const probeContext = useContext(ProbesContext)
     useEffect(() => {
-        fetch("http://" + IP + ":8081/api/v1/probes?name=&location=&area=&vlan=")
+        fetch("http://" + IP + "/api/v1/probes?name=&location=&area=&vlan=")
             .then(response => response.json())
             .then(data => {
                 let arr = []
@@ -99,7 +99,7 @@ const DuplicateProbe = (props) => {
                 },
                 body: JSON.stringify(checkData.data) 
             }
-            fetch(" http://"+IP+":8081/api/v1/duplicate",options)
+            fetch(" http://"+IP+"/api/v1/duplicate",options)
                 .then(response => response.json())
                 .then(data => {
                     probeContext.getProbes()

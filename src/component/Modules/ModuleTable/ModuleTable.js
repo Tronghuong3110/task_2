@@ -53,7 +53,7 @@ const ModuleTable = () => {
         getModules()
     }
     const getModules = () => {
-        fetch("http://" + IP + ":8081/api/v1/modules")
+        fetch("http://" + IP + "/api/v1/modules")
             .then(respone => respone.json())
             .then(data => {
                 let renderData = data.filter(module => module.name.toLowerCase().includes(keyword.toLowerCase()));
@@ -87,7 +87,7 @@ const ModuleTable = () => {
                     "Content-Type": "application/json",
                 }
             };
-            fetch("http://" + IP + ":8081/api/v1/module?id=" + id, options)
+            fetch("http://" + IP + "/api/v1/module?id=" + id, options)
                 .then(response => response.json())
                 .then(data => {
                     console.log(data)

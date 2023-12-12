@@ -4,7 +4,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faLocationDot, faChartArea, faNetworkWired
 } from '@fortawesome/free-solid-svg-icons'
-import { type } from '@testing-library/user-event/dist/type';
 const DropdownWithInput = (props) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [customInputValue, setCustomInputValue] = useState('');
@@ -52,7 +51,7 @@ const DropdownWithInput = (props) => {
     setRenderInputValue(value)
     setCustomInputValue("");
     setIsPopupOpen(false);
-    if (props.type != 'Search VLAN') props.onOptionSelect(value);
+    if (props.type !== 'Search VLAN') props.onOptionSelect(value);
 
   }
 

@@ -21,14 +21,14 @@ const AddModule = ({ handleCloseWindow, id }) => {
     const [typeModule, setTypeModule] = useState([])
     useEffect(() => {
         if (id != null) {
-            fetch("http://" + IP + ":8081/api/v1/module?idModule=" + id)
+            fetch("http://" + IP + "/api/v1/module?idModule=" + id)
                 .then(response => response.json())
                 .then(data => setEditModule(data))
                 .catch(err => console.log(err))
         }
     }, [])
     useEffect(()=>{
-        fetch("http://" + IP + ":8081/api/v1/typeModule")
+        fetch("http://" + IP + "/api/v1/typeModule")
                 .then(response => response.json())
                 .then(data => setTypeModule(data))
                 .catch(err => console.log(err))
@@ -62,7 +62,7 @@ const AddModule = ({ handleCloseWindow, id }) => {
                 body: JSON.stringify(data)
             }
             if (id == null) {
-                fetch("http://" + IP + ":8081/api/v1/module/import", options)
+                fetch("http://" + IP + "/api/v1/module/import", options)
                     .then(response => response.json())
                     .then(data => {
                         if (data.code == 1) {
@@ -74,7 +74,7 @@ const AddModule = ({ handleCloseWindow, id }) => {
                     .catch(err => console.log(err))
             }
             else {
-                fetch("http://" + IP + ":8081/api/v1/module", options)
+                fetch("http://" + IP + "/api/v1/module", options)
                     .then(response => response.json())
                     .then(data => {
                         console.log(data)

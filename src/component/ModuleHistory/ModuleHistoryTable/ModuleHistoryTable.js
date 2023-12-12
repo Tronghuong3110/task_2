@@ -15,7 +15,7 @@ const ModuleHistoryTable = (props) => {
         let options = {
             method: "PUT"
         }
-        fetch("http://" + IP + ":8081/api/v1//moduleHistory?idModuleHistory=" + id, options)
+        fetch("http://" + IP + "/api/v1//moduleHistory?idModuleHistory=" + id, options)
             .then(respose => respose.text())
             .then(data => {
                 getModuleHistory(conditions)
@@ -62,7 +62,7 @@ const ModuleHistoryTable = (props) => {
                 idsStr: param
             })
         }
-        fetch("http://" + IP + ":8081/api/v1/module/history", options)
+        fetch("http://" + IP + "/api/v1/module/history", options)
             .then(response => response.json())
             .then(data => {
                 console.log(data)

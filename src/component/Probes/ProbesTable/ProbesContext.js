@@ -26,7 +26,7 @@ const ProbesProvider = ({ children }) => {
             let url =
                 "http://" +
                 IP +
-                ":8081/api/v1/probes?" +
+                "/api/v1/probes?" +
                 (name ? "name=" + name : "") +
                 (location ? "&location=" + location : "") +
                 (area ? "&area=" + area : "") +

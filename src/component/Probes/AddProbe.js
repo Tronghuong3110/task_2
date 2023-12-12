@@ -30,7 +30,7 @@ const AddProbe = ({ handleCloseWindow }) => {
         setSelectedArea(selectedValue);
     };
     useEffect(() => {
-        fetch("http://"+IP+":8081/api/v1/locations")
+        fetch("http://"+IP+"/api/v1/locations")
             .then(response => response.json())
             .then(data => setLocation(data))
             .catch(err => console.log(err))
@@ -116,7 +116,7 @@ const AddProbe = ({ handleCloseWindow }) => {
                 },
                 body: JSON.stringify(formData)
             };
-            fetch("http://"+IP+":8081/api/v1/probe/import", requestOptions)
+            fetch("http://"+IP+"/api/v1/probe/import", requestOptions)
                 .then(response => response.json())
                 .then(response => {
                     let newData = [...probesContext.probes, response];

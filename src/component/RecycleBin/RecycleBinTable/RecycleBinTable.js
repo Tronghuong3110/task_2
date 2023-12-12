@@ -104,7 +104,7 @@ const RecycleBinTable = (props) => {
                 ids: param
             })
         }
-        let api = "http://" + IP + ":8081/api/v1/probe"
+        let api = "http://" + IP + "/api/v1/probe"
         if (action === "remove") api += "/remove"
         fetch(api, options)
             .then(response => response.json())
@@ -139,7 +139,7 @@ const RecycleBinTable = (props) => {
     //             ids: param
     //         })
     //     }
-    //     fetch("http://" + IP + ":8081/api/v1/probe/remove", options)
+    //     fetch("http://" + IP + "/api/v1/probe/remove", options)
     //         .then(response => response.json())
     //         .then(data => {
     //             if (data.length == 1) {

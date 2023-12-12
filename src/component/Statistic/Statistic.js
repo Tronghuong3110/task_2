@@ -20,7 +20,7 @@ const Statistic = () => {
     const [modules, setModules] = useState([])
     const [conditions,setConditions] = useState(null)
     useEffect(() => {
-        fetch("http://" + IP + ":8081/api/v1/probes?name=&location=&area=&vlan=")
+        fetch("http://" + IP + "/api/v1/probes?name=&location=&area=&vlan=")
             .then(response => response.json())
             .then(data => {
                 let arr = []
@@ -34,7 +34,7 @@ const Statistic = () => {
             })
     }, [])
     useEffect(() => {
-        fetch("http://" + IP + ":8081/api/v1/modules")
+        fetch("http://" + IP + "/api/v1/modules")
             .then(response => response.json())
             .then(data => {
                 let arr = []
@@ -51,7 +51,7 @@ const Statistic = () => {
         getModuleHistory(conditions)
     }, [page])
     const getModuleHistory = (conditions) =>{
-        let api = "http://" + IP + ":8081/api/v1/moduleHistories?page="+(page-1);
+        let api = "http://" + IP + "/api/v1/moduleHistories?page="+(page-1);
         if(conditions!=null){
             for(let key in conditions){
                 if(conditions[key]!=""&&conditions[key]!=null) api+= "&"+key+"="+conditions[key]

@@ -45,7 +45,7 @@ const ProbesTable = () => {
                     'Content-Type': 'application/json'
                 }
             };
-            fetch("http://" + IP + ":8081/api/v1/probe?id=" + id, options)
+            fetch("http://" + IP + "/api/v1/probe?id=" + id, options)
                 .then(response => response.json())
                 .then(data => {
                     const newArray = probes.filter(item => item.id !== id);
@@ -104,7 +104,7 @@ const ProbesTable = () => {
                 "status": status == 'connected' ? "disconnected" : "connected"
             })
         };
-        fetch("http://" + IP + ":8081/api/v1/probe", requestOptions)
+        fetch("http://" + IP + "/api/v1/probe", requestOptions)
             .then(respone => respone.json())
             .then(data => {
                 console.log(data)

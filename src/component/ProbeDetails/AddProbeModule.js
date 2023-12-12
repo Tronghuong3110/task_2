@@ -22,7 +22,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
     const [logPath, setLogPath] = useState("")
     const [typeModule, setTypeModule] = useState([])
     useEffect(() => {
-        fetch("http://" + IP + ":8081/api/v1/modules")
+        fetch("http://" + IP + "/api/v1/modules")
             .then(response => response.json())
             .then(data => {
                 setListSampleModule(data)
@@ -38,7 +38,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
     }, [])
     useEffect(() => {
         if (id != null) {
-            fetch("http://" + IP + ":8081/api/v1/probe/module?idProbeModule=" + id)
+            fetch("http://" + IP + "/api/v1/probe/module?idProbeModule=" + id)
                 .then(response => response.json())
                 .then(data => {
                     console.log(data)
@@ -50,7 +50,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
 
     }, [])
     useEffect(() => {
-        fetch("http://" + IP + ":8081/api/v1/typeModule")
+        fetch("http://" + IP + "/api/v1/typeModule")
             .then(response => response.json())
             .then(data => setTypeModule(data))
             .catch(err => console.log(err))
@@ -83,7 +83,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
             }
             if (fullData.id == null) {
                 console.log("POST NOW")
-                fetch("http://" + IP + ":8081/api/v1/probeModule/import", options)
+                fetch("http://" + IP + "/api/v1/probeModule/import", options)
                     .then(response => response.json())
                     .then(data => {
                         console.log(data)
@@ -102,7 +102,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
             }
             else {
                 console.log("PUT NOW")
-                fetch("http://" + IP + ":8081/api/v1/probe/module", options)
+                fetch("http://" + IP + "/api/v1/probe/module", options)
                     .then(response => response.json())
                     .then(data => {
                         console.log(data)
@@ -162,11 +162,14 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
         const selectedModule = selectedOption.getAttribute('module');
         const caption = selectedOption.getAttribute('caption');
         const argDefalt = selectedOption.getAttribute('argdefault');
+        const pathDefault = selectedOption.getAttribute('path');
+        const pathLogDefault = selectedOption.getAttribute('pathLog');
+        console.log(argDefalt,pathDefault,pathLogDefault)
         setCommandValue(caption + " " + argDefalt);
         setCaption(caption)
         setArg(argDefalt)
-        setPath(selectedModule.pathDefault)
-        setLogPath(selectedModule.pathLogDefault)
+        setPath(pathDefault)
+        setLogPath(pathLogDefault)
     }
     const getModuleInfo = (id) => {
         let idModule = document.querySelector("#idModule")
@@ -204,7 +207,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
         return emptyFields;
     }
     return (
-        <div>
+        <div style={{height:"100%"}}>
             {isOpen && (<div className='addProbeModuleScreen'>
                 <div className="addProbe">
                     <div className='btn-container d-flex justify-content-end'>
@@ -224,7 +227,14 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                                     {
                                         listSampleModule.map(modules => {
                                             return (
-                                                <option key={modules.id} module={modules} caption={modules.caption} argdefault={modules.argDefalt} value={modules.id}>{modules.name}</option>
+                                                <option key={modules.id}
+                                                 module={modules} 
+                                                 caption={modules.caption} 
+                                                 argdefault={modules.argDefalt} 
+                                                 value={modules.id}
+                                                 path = {modules.pathDefault}
+                                                 pathLog ={modules.pathLogDefault}
+                                                 >{modules.name}</option>
                                             )
                                         })
                                     }
@@ -295,7 +305,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                             </div>
                             <div className='input_container-input'>
                                 <input className='commandInput inputModuleInfo' type='text' placeholder='Path...' id='path'
-                                    defaultValue={id == null ? path : isEditedModule.path}
+                                    defaultValue={path}
                                     onChange={(e) => {
                                         setPath(e.target.value)
                                     }}
@@ -303,7 +313,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                             </div>
                             <div className='input_container-input'>
                                 <input className='inputModuleInfo' type='text' placeholder='Log path here....' id='pathLog'
-                                    defaultValue={id == null ? logPath : isEditedModule.pathLog}
+                                    defaultValue={logPath}
                                     onChange={(e) => {
                                         setLogPath(e.target.value)
                                     }}

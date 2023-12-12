@@ -60,7 +60,7 @@ const Probe_Modules = ({ id }) => {
         },15000)
     },[])
     const getProbeModules = () => {
-        fetch("http://" + IP + ":8081/api/v1/probe/modules?idProbe=" + id + "&&name=&&status=")
+        fetch("http://" + IP + "/api/v1/probe/modules?idProbe=" + id + "&&name=&&status=")
             .then(response => response.json())
             .then(data => {
                 setFullModules(data)
@@ -70,7 +70,7 @@ const Probe_Modules = ({ id }) => {
             .catch(err => console.log(err))
     }
     const getProbeModulesByConditions = () => {
-        fetch("http://" + IP + ":8081/api/v1/probe/modules?idProbe=" + id + "&&name=&&status=")
+        fetch("http://" + IP + "/api/v1/probe/modules?idProbe=" + id + "&&name=&&status=")
             .then(response => response.json())
             .then(data => {
                 let name = document.getElementById("keyWordInput").value;
@@ -167,7 +167,7 @@ const Probe_Modules = ({ id }) => {
                 clearInterval(interval)
             }
             else{
-                fetch("http://" + IP + ":8081/api/v1/probeModule/check")
+                fetch("http://" + IP + "/api/v1/probeModule/check")
                     .then(response => response.text())
                     .then(data => {
                         if(data == 1){
@@ -215,13 +215,13 @@ const Probe_Modules = ({ id }) => {
             })
         }
 
-        fetch("http://" + IP + ":8081/api/v1/probeModule/action/" + action, options)
+        fetch("http://" + IP + "/api/v1/probeModule/action/" + action, options)
             .then(response => response.text())
             .then(data => {
                 notify("Received request succesfully", 1)
             })
             .then(()=>{
-                fetch("http://" + IP + ":8081/api/v1/probeModule/"+action,options)
+                fetch("http://" + IP + "/api/v1/probeModule/"+action,options)
             })
             .catch(err => console.log(err))
         checkDoneContinues()
@@ -260,7 +260,7 @@ const Probe_Modules = ({ id }) => {
                     "Content-Type": "application/json",
                 }
             };
-            fetch("http://" + IP + ":8081/api/v1/probeModule?id=" + stringParam, options)
+            fetch("http://" + IP + "/api/v1/probeModule?id=" + stringParam, options)
                 .then(response => response.json())
                 .then(data => {
                     notify(data.message, data.code)

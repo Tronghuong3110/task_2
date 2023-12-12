@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import 'bootstrap/dist/css/bootstrap.css';
 import '../../sass/ProbeDetails/ProbeDetails.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDisplay, faMapPin, faLocationDot, faChartArea, faCube, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import { faDisplay, faMapPin, faLocationDot, faChartArea, faCube, faMagnifyingGlass, faWaveSquare } from '@fortawesome/free-solid-svg-icons';
 import {
     faFloppyDisk,
     faPenToSquare,
@@ -12,10 +12,12 @@ import {
 import DropdownWithInput from "../action/DropdownWithInput";
 import Probe_Modules from "./ProbeDetailsTable/Probe_Modules";
 import AddProbeModule from './AddProbeModule';
-import {  toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useParams } from "react-router-dom";
 import { IP } from "../Layout/constaints";
+import ProbeCPUChart from "./ProbeStatistic/ProbeCPUChart";
+import DiskContainer from "./ProbeStatistic/DiskContainer";
 
 const ProbeDetails = () => {
     const { id } = useParams();
@@ -37,7 +39,7 @@ const ProbeDetails = () => {
         setSelectedArea(selectedValue);
     };
     useEffect(() => {
-        fetch("http://"+IP+":8081/api/v1/locations")
+        fetch("http://" + IP + "/api/v1/locations")
             .then(response => response.json())
             .then(data => setLocation(data))
             .catch(err => console.log(err))
@@ -63,7 +65,7 @@ const ProbeDetails = () => {
     }
     //Hàm hiển thị thông tin probe
     useEffect(() => {
-        fetch("http://"+IP+":8081/api/v1/probe?idProbe=" + id)
+        fetch("http://" + IP + "/api/v1/probe?idProbe=" + id)
             .then(response => response.json())
             .then(data => setProbeDetails(data))
             .catch(err => console.log(err))
@@ -149,7 +151,7 @@ const ProbeDetails = () => {
                 },
                 body: JSON.stringify(info)
             }
-            fetch("http://"+IP+":8081/api/v1/probe", options)
+            fetch("http://" + IP + "/api/v1/probe", options)
                 .then(response => response.json())
                 .then(data => {
                     if (data.code == 1) {
@@ -222,6 +224,24 @@ const ProbeDetails = () => {
     }
     return (
         <div className="probeDetails">
+            <div className="infos">
+                <div className="info">
+                    <div className="info-title d-flex align-items-center">
+                        <div className="info-title-icon">
+                            <FontAwesomeIcon icon={faWaveSquare}></FontAwesomeIcon>
+                        </div>
+                        <div className="info-title-text">PERFORMANCE AND MEMORIES</div>
+                    </div>
+                </div>
+                <div className="statisticContainer d-flex justify-content-between">
+                    <div className="chartContainer">
+                        <ProbeCPUChart probeId={id} ></ProbeCPUChart>
+                    </div>
+                    <div className="diskContainer">
+                        <DiskContainer probeId={id}></DiskContainer>
+                    </div>
+                </div>
+            </div>
             <div className="infos d-flex justify-content-between align-items-center">
                 <div className="info probe_name">
                     <div className="info-title d-flex align-items-center">
@@ -300,7 +320,7 @@ const ProbeDetails = () => {
                 </div>
 
             </div>
-            
+
             <Probe_Modules id={id}   ></Probe_Modules>
             {isOpen && <AddProbeModule idProbe={id} id={null} handleCloseWindow={handleCloseWindow}></AddProbeModule>}
         </div>

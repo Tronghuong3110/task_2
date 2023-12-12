@@ -54,7 +54,7 @@ const ModuleHistory = () => {
     const intervalRef = useRef(null);
     
     useEffect(() => {
-        fetch("http://" + IP + ":8081/api/v1/probes?name=&location=&area=&vlan=")
+        fetch("http://" + IP + "/api/v1/probes?name=&location=&area=&vlan=")
             .then(response => response.json())
             .then(data => {
                 let arr = []
@@ -69,7 +69,7 @@ const ModuleHistory = () => {
     }, [])
     useEffect(() => {
         if (selectedProbe != "" && selectedProbe != null) {
-            fetch("http://" + IP + ":8081/api/v1/probe/modules?idProbe=" + selectedProbe + "&&name=&&status=")
+            fetch("http://" + IP + "/api/v1/probe/modules?idProbe=" + selectedProbe + "&&name=&&status=")
                 .then(response => response.json())
                 .then(data => {
                     let arr = []
@@ -90,7 +90,7 @@ const ModuleHistory = () => {
     }, [page,conditions])
     const getModuleHistory = (conditions) => {
         const fetchData = async () => {
-            let api = "http://" + IP + ":8081/api/v1/moduleHistories?page=" + (page - 1);
+            let api = "http://" + IP + "/api/v1/moduleHistories?page=" + (page - 1);
             if (conditions != null) {
                 for (let key in conditions) {
                     if (conditions[key] != "" && conditions[key] != null) api += "&" + key + "=" + conditions[key]

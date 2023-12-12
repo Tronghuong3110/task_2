@@ -1,0 +1,27 @@
+.disk{
+    width: 35%;
+    &-symbol{
+        display: flex;
+        align-items: center;
+        svg{
+            font-size: 2.2em;
+        }
+        padding:5px;
+    }
+    &-info{
+        width: 100%;
+        &-usage{
+            background-color: #c1c3cf;
+            height: 16px;
+            .usageBar{
+                height: 100%;
+                position: relative;
+                .percent{
+                    position: absolute;
+                    height: 100%;
+                }
+                width: 100%;
+            }
+        }
+    }
+}

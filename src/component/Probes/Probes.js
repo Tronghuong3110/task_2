@@ -30,7 +30,7 @@ const Probes = () => {
     const probesContext = useContext(ProbesContext)
     //Hàm hiển thị select location và area
     useEffect(() => {
-        fetch("http://" + IP + ":8081/api/v1/locations")
+        fetch("http://" + IP + "/api/v1/locations")
             .then(response => response.json())
             .then(data => setLocation(data))
             .catch(err => console.log(err))

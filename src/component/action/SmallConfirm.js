@@ -1,4 +1,4 @@
-import { React, useState, useEffect, useContext } from 'react';
+
 import 'bootstrap/dist/css/bootstrap.css';
 import '../../sass/smallconfirm.scss'
 const SmallConfirm = (props) => {
