@@ -1,0 +1,19 @@
+{
+  "probes":
+    {
+      "id": "p1",
+      "name": "PC_01",
+      "ipAddress": "127.0.0.1",
+      "location": "Hà Nội",
+      "area": "Ba Đình",
+      "vlan": "vlan_01",
+      "status": "connected",
+      "totalModule": 50,
+      "numberRunningModule": 15,
+      "numberPendingModule": 15,
+      "numberStopedModule": 10,
+      "numberFailedModule": 10,
+      "connectAt": "19-08-2022 15:00:00",
+      "description": "Important PC"
+    }
+}

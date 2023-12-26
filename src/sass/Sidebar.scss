@@ -1,0 +1,57 @@
+$primary: #0b0c24;
+$secondary: #27293d;
+$pink-color: #E14ECA;
+$blue-color: #9747FF;
+
+.sidebar {
+    padding: 20px 10px;
+    background-image: linear-gradient($pink-color, $blue-color);
+    border-top-right-radius: 30px;
+    border-bottom-right-radius: 30px;
+    color: white;
+    position: fixed;
+
+    &-title {
+        padding: 0 5px;
+        &-symbol{
+            padding: 10px;
+            button{
+                padding:0;
+                background: transparent;
+                border: none;
+                color: white;
+            }
+        }
+        &-text {
+            padding-left: 5px;
+            font-size: 0.9em;
+            text-align: center;
+            align-self: center;
+        }
+    }
+    hr{
+        margin: 5px 0;
+    }
+    &-selections {
+        a{
+            display: flex;
+            text-decoration: none;
+            color: white;
+            padding: 10px 5px;
+            .selection {
+                &-symbol {
+                    // background-color: #0b0c24;
+                    padding: 10px;
+                    border-radius: 50%;
+                }
+    
+                &-text {
+                    font-size: 0.8em;
+                    padding-left: 5px;
+                    align-self: center;
+                }
+            }
+        }
+    }
+
+}

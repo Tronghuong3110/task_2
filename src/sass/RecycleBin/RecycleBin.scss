@@ -1,0 +1,90 @@
+$primary: #0b0c24;
+$secondary: #27293d;
+$pink-color: #E14ECA;
+$blue-color: #9747FF;
+$mixcolor: linear-gradient(90deg, $pink-color, $blue-color);
+
+.RecycleBin {
+    height: 78.5vh;
+    padding: 20px;
+    font-size: 0.8em !important;
+    width: 100%;
+    background-color: $secondary;
+    border-radius: 30px;
+    box-sizing: border-box;
+    position: relative;
+    .searchBar {
+        width: 100%;
+        font-size: 0.8em;
+        .searchTitle {
+            width: 35%;
+            position: relative;
+            align-items: center;
+            input {
+                width: 100%;
+                background-color: $primary;
+                outline: none;
+                border: 2px solid white;
+                border-radius: 20px;
+                padding: 5px 0;
+                padding-left: 8%;
+                color: white;
+            }
+            svg {
+                position: absolute;
+                color: white;
+                top: 50%;
+                transform: translateY(-50%);
+                left: 3%;
+            }
+            .conditionTitle{
+                font-size: 1.2em;
+                color: white;
+                padding: 5px ;   
+            }
+        }
+    }
+    .actionBar{
+        .checkAll{
+            span{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                svg{
+                    height: 16px;
+                    width: 16px;
+                }
+            }
+        }
+        .refreshButton,.deleteButton{
+            padding: 9px;
+            button{
+                background: transparent;
+                border: none;
+                border-radius: 50%;
+                svg{
+                    color: white;
+                }
+                &:hover{
+                    background-color: $primary;
+                }
+            }
+        }
+    }
+    .pagination{
+        margin-top: 20px;
+        position: absolute;
+        bottom: 5%;
+        left: 50%;
+        transform: translateX(-50%);
+        nav{
+            ul{
+                li{
+                    .MuiPaginationItem-root{
+                        color :white;
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,73 @@
+$primary: #0b0c24;
+$secondary: #27293d;
+$pink-color: #E14ECA;
+$blue-color: #9747FF;
+.dropdown2 {
+    font-size: 1em;
+  }
+  
+  .select {
+    border: 2px solid white;
+    padding: 5px 20px;
+    background-color: $primary;
+    color: white;
+    cursor: pointer;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .popup {
+    position: absolute;
+    top: 117%;
+    left: 0;
+    width: 100%;
+    background-color: $primary;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    border: white solid 1px;
+    color : white;
+    border-radius: 10px;
+  }
+  .filterInput{
+    padding: 10px 5px;
+    input{
+      width: 100%;
+      border: 1px solid white;
+      border-radius: 10px;
+      padding-left: 10px;
+    }
+  }
+  .input-filter {
+    width: calc(100% - 20px);
+    padding: 10px;
+    border: white 1px solid;
+    border-bottom: 1px solid #ccc;
+    outline: none;
+  }
+  
+  .options {
+    max-height: 150px;
+    overflow-y: auto;
+  }
+  
+  .option {
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .option:hover {
+    background-color: #f2f2f2;
+    color: $secondary;
+  }
+  
+  /* Optional: Add some transitions for smoother animations */
+  .select, .input-filter, .option {
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  /* Optional: Style the placeholder text */
+  .select::before {
+    content: attr(data-placeholder);
+    color: #888;
+  }
+  

@@ -1,0 +1,141 @@
+$primary: #0b0c24;
+$secondary: #27293d;
+$pink-color: #e14eca;
+$blue-color: #9747ff;
+$mixcolor: linear-gradient(90deg, $pink-color, $blue-color);
+.probeDetails {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    font-size: 0.7em !important;
+    width: 100%;
+    background-color: $secondary;
+    border-radius: 30px;
+    box-sizing: border-box;
+    color: white !important;
+    min-height: 78.5vh;
+    .infos {
+        .info {
+            &-title {
+                &-icon {
+                    color: white;
+                    padding: 10px 0;
+                    svg {
+                        padding-right: 5px;
+                    }
+                }
+            }
+            &-input {
+                position: relative;
+                .disabled{
+                    border: 2px solid gray !important;
+                }
+                input {
+                    width: 100%;
+                    background-color: $primary;
+                    outline: none;
+                    border: 2px solid $pink-color;
+                    border-radius: 5px;
+                    padding: 5px 10px;
+                    color: white;
+                    font-size: 0.8em;
+                    &::placeholder {
+                        color: white;
+                        opacity: 0.7;
+                    }
+                }
+                textarea {
+                    width: 100%;
+                    background: $primary;
+                    outline: none;
+                    border: 2px solid $pink-color;
+                    border-radius: 5px;
+                    padding: 5px 10px;
+                    color: white;
+                    &::placeholder {
+                        color: white;
+                        opacity: 0.7;
+                    }
+                }
+            }
+            .select_container {
+                position: relative;
+                font-size: 0.8em;
+                .disabled{
+                    border: 2px solid gray !important;
+                    pointer-events: none;
+                }
+                .dropdown {
+                    // padding: 5px 10px;
+                    // border-radius: 5px;
+                    // background: $primary;
+                    .select {
+                        border: 2px solid $pink-color;
+                        // border: 2px solid gray ;
+                        background-color: $primary;
+                        svg {
+                            display: none;
+                        }
+                    }
+                }
+                .down-arrow {
+                    position: absolute;
+                    top: 50%;
+                    right: 10%;
+                    color: white;
+                    transform: translateY(-50%);
+                }
+            }
+        }
+        .probe_name {
+            width: 23%;
+        }
+        .ip_address {
+            width: 23%;
+        }
+        .location {
+            width: 15%;
+        }
+        .area {
+            width: 15%;
+        }
+        .note {
+            width: 70%;
+        }
+        .saveOrEditButton {
+            .btn {
+                padding: 4px 17px;
+                font-size: 0.9em;
+                background: $mixcolor !important ;
+                color: white;
+                &-icon {
+                    svg {
+                        padding-right: 7px;
+                    }
+                }
+            }
+        }
+        .statisticContainer{
+            margin: 10px 0;
+            height: 250px;
+            .chartContainer{
+                padding: 10px;
+                width: 35%;
+                background-color: $primary;
+                border-radius: 10px;
+                border: 2px solid $pink-color;
+                cursor: pointer;
+            }
+            .diskContainer{
+                padding: 10px;
+                width: 60%;
+                background-color: $primary;
+                border-radius: 10px;
+                border: 2px solid $pink-color;
+                height: 100%;
+                overflow-y: scroll;
+            }
+        }
+    
+    }
+}

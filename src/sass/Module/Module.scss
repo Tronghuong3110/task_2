@@ -1,0 +1,16 @@
+$primary: #0b0c24;
+$secondary: #27293d;
+$pink-color: #E14ECA;
+$blue-color: #9747FF;
+$mixcolor: linear-gradient(90deg, $pink-color, $blue-color);
+
+.module {
+    height: 78.5vh;
+    padding: 20px;
+    font-size: 0.8em !important;
+    width: 100%;
+    background-color: $secondary;
+    border-radius: 30px;
+    box-sizing: border-box;
+    position: relative;
+}

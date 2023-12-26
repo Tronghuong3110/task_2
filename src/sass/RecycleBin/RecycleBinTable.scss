@@ -1,0 +1,94 @@
+$primary: #0b0c24;
+$secondary: #27293d;
+$pink-color: #E14ECA;
+$blue-color: #9747FF;
+
+.RecycleBinTable {
+    table {
+        table-layout: fixed;
+        border-radius: 10px;
+        thead {
+            border-bottom: 2px white solid;
+            tr {
+                th {
+                    font-size: 0.8rem !important;
+                    color: white !important;
+                    text-align: center !important;
+                    padding: 5px !important;
+                    height: fit-content;
+                    border: none !important;
+                    line-height: 1rem;
+                }
+                .checkbox {
+                    width: 3%;
+                }
+                .id{
+                    width: 3%;
+                }
+                .name {
+                    width: 18%;
+                }
+                .ip_address{
+                    width: 18%;
+                }
+                .location {
+                    width: 12%;
+                }
+                .area {
+                    width: 12%;
+                }
+                .description{
+                    width: 27%;
+                }
+                .action {
+                    width: 7%;
+                }
+            }
+        }
+
+        tbody {
+            td {
+                font-size: 0.7rem ;
+                color: white ;
+                text-align: center ;
+                padding:0;
+                height: fit-content;
+                border: none ;
+                line-height: 1rem;
+                border-top: 2px white solid;
+                div {
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                .action {
+                    display: flex !important;
+                    justify-content: center;
+                    align-items: center;
+
+                    button {
+                        background-color: transparent;
+                        outline: none;
+                        border: none;
+                        svg {
+                            font-size: 1.4em;
+                        }
+                    }
+                }
+            }
+            .checkbox{
+                span{
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    svg{
+                        height: 16px;
+                        width: 16px;
+                    }
+                }
+            }
+        }
+
+    }
+}
