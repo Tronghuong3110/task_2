@@ -15,6 +15,7 @@ public class ProbeConverter {
             probeEntity.setNumberPendingModule(0);
             probeEntity.setNumberRunningModule(0);
             probeEntity.setNumberStopedModule(0);
+            probeEntity.setPending(false);
             return probeEntity;
         }
         catch (Exception e) {
@@ -56,6 +57,9 @@ public class ProbeConverter {
             if(dto.getStatus()!=null && !dto.getStatus().equals(entity.getStatus())) {
                 entity.setStatus(dto.getStatus());
             }
+            if(dto.getPending() != null && !dto.getPending().equals(entity.getPending())) {
+                entity.setPending(dto.getPending());
+            }
             return entity;
         }
         catch (NullPointerException e) {
@@ -65,16 +69,4 @@ public class ProbeConverter {
         }
     }
 
-    public static ProbeEntity toEntity(ProbeEntity probe1) {
-        try {
-            ModelMapper mapper = new ModelMapper();
-            ProbeEntity probeEntity = mapper.map(probe1, ProbeEntity.class);
-            probeEntity.setId(null);
-            return probeEntity;
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            return new ProbeEntity();
-        }
-    }
 }

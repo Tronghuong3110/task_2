@@ -19,6 +19,6 @@ public interface IProbeModuleService {
     ProbeModuleDto findOneById(Integer idProbeModule);
     JSONObject updateProbeModule(ProbeModuleDto probeModuleDto);
     List<ProbeModuleDto> findAllProbeModuleAndError(Integer probeId, Integer mooduleId);
-
     List<MemoryClient> findAllMemories(Integer probeId);
+    void getCpuUsage();
 }

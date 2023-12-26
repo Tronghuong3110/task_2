@@ -28,4 +28,5 @@ public class ProbeDto {
     private Integer totalModule;
     private String message;
     private Long totalPage;
+    private Boolean pending;
 }

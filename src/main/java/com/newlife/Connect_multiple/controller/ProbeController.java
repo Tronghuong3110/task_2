@@ -73,8 +73,6 @@ public class ProbeController {
     public CompletableFuture<JSONObject> deleteProbe(@RequestParam("id") Integer id) {
         return CompletableFuture.supplyAsync(() -> {
             JSONObject message = probeService.delete(id);
-            System.out.println("Username " + ConstVariable.username);
-            System.out.println("Password " + ConstVariable.password);
             return message;
         }, executorService);
     }

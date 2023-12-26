@@ -58,6 +58,8 @@ public class ProbeEntity {
     private Integer deleted;
     @Column(name = "token", columnDefinition = "text")
     private String token;
+    @Column(name = "pending")
+    private Boolean pending;
 
     @OneToOne
     @JoinColumn(name = "id_probe_option")

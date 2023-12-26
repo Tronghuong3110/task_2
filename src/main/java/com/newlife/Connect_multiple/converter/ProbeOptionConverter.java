@@ -10,6 +10,7 @@ public class ProbeOptionConverter {
         try {
             ModelMapper modelMapper = new ModelMapper();
             ProbeOptionEntity entity = modelMapper.map(probeOptionDto, ProbeOptionEntity.class);
+            entity.setConnectionTimeOut(100);
             return entity;
         }
         catch (Exception e) {

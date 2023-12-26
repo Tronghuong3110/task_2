@@ -1,5 +1,6 @@
 package com.newlife.Connect_multiple.util;
 
+import com.newlife.Connect_multiple.entity.ProbeEntity;
 import com.newlife.Connect_multiple.entity.ProbeModuleEntity;
 import org.json.JSONArray;
 import org.json.simple.JSONObject;
@@ -67,10 +68,9 @@ public class JsonUtil {
         }
     }
 
-    public static String createJsonStatus(String action, List<ProbeModuleEntity> probeModuleEntities, String probeName) {
+    public static String createJsonStatus(String action, List<ProbeModuleEntity> probeModuleEntities, String probeName, Integer idProbe, Boolean pending) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("action", action);
-        Integer idProbe = -1;
         JSONArray jsonArray = new JSONArray();
         for (ProbeModuleEntity probeModule : probeModuleEntities) {
             JSONObject jsonObject1 = new JSONObject();
@@ -80,13 +80,26 @@ public class JsonUtil {
             jsonObject1.put("cmd_win", probeModule.getCommand());
             jsonObject1.put("cmd_linux", probeModule.getCommand());
             jsonObject1.put("CommandLine", probeModule.getCommand());
-            idProbe = probeModule.getIdProbe();
+            jsonObject1.put("pending", pending);
             jsonArray.put(jsonObject1);
         }
         jsonObject.put("id_probe", idProbe.toString());
         jsonObject.put("probeName", probeName);
         jsonObject.put("listModule", jsonArray);
         return jsonObject.toJSONString();
+    }
+
+    public static String createJsonGetCpu(String action, Integer idProbe) {
+        try {
+            JSONObject json = new JSONObject();
+            json.put("action", action);
+            json.put("id_probe", idProbe);
+            return json.toJSONString();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private static Integer codeResponse(String status) {

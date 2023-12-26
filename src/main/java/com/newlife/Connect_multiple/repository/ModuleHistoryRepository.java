@@ -37,7 +37,7 @@ public interface ModuleHistoryRepository extends JpaRepository<ModuleHistoryEnti
     Integer solveErrorPerWeek(@Param("idProbeModule") Integer idProbeModule);
 
     // Tên module / tên probe / thời gian / đã được ACK hay chưa
-    @Query(value = "select * from probemodule.module_history where (:idProbeModule is null or id_probe_module = :idProbeModule) " +
+    @Query(value = "select * from module_history where (:idProbeModule is null or id_probe_module = :idProbeModule) " +
                     "and (:idProbe is null or id_probe = :idProbe) and ((at_time between :timeStart and :timeEnd ) or (:timeStart is null and :timeEnd is null) )" +
                     "and (:ack is null or ack = :ack ) and (:content is null or content like %:content%) and status = 'Failed' ", nativeQuery = true)
     Page<ModuleHistoryEntity> findAllByCondition(@Param("idProbeModule") Integer idProbeModule,
@@ -48,7 +48,7 @@ public interface ModuleHistoryRepository extends JpaRepository<ModuleHistoryEnti
                                                  @Param("ack") Integer ack,
                                                  Pageable pageable);
 
-    @Query(value = "select count(*) from probemodule.module_history where (:idProbeModule is null or id_probe_module = :idProbeModule) " +
+    @Query(value = "select count(*) from module_history where (:idProbeModule is null or id_probe_module = :idProbeModule) " +
             "and (:idProbe is null or id_probe = :idProbe) and ((at_time between :timeStart and :timeEnd ) or (:timeStart is null and :timeEnd is null) )" +
             "and (:ack is null or ack = :ack ) and (:content is null or content like %:content%) and status = 'Failed'", nativeQuery = true)
     Long count(@Param("idProbeModule") Integer idProbeModule,

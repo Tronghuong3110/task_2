@@ -9,6 +9,8 @@ import com.newlife.Connect_multiple.dto.*;
 import com.newlife.Connect_multiple.entity.*;
 import com.newlife.Connect_multiple.repository.*;
 import com.newlife.Connect_multiple.service.IProbeService;
+import com.newlife.Connect_multiple.test.Server;
+import com.newlife.Connect_multiple.util.ConstVariable;
 import com.newlife.Connect_multiple.util.CreateTokenUtil;
 import com.newlife.Connect_multiple.util.JsonUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -264,7 +266,7 @@ public class ProbeService implements IProbeService {
             }
 
             // kiểm tra tính hợp lệ của địa chỉ ip của probe
-            if(probeDto.getIpAddress() != null && checkValidateIpAddress(probeEntity.getIpAddress())) {
+            if(probeDto.getIpAddress() != null && !checkValidateIpAddress(probeEntity.getIpAddress())) {
                 json.put("code", "0");
                 json.put("message", "Ip address invalidate");
                 return json;
@@ -312,6 +314,7 @@ public class ProbeService implements IProbeService {
                 probeHistoryEntity.setAtTime(new Timestamp(System.currentTimeMillis()));
                 probeEntity = probeRepository.save(probeEntity);
                 probeHistoryRepository.save(probeHistoryEntity);
+                System.out.println("Test update pending " + probeEntity.getPending() + " " + probeDto.getPending());
                 json.put("code", "1");
                 json.put("message", "Update probe success");
                 return json;
@@ -407,9 +410,12 @@ public class ProbeService implements IProbeService {
             String login = CreateTokenUtil.encodeToken(probeOption.getUserName(), probeOption.getPassword(), probe.getPubTopic());
             info.setLogin(login);
             info.setCleanSession(probeOption.getCleanSession());
-            info.setBrokerUrl(broker.getUrl().replaceAll("localhost", getIpAddress()));
+            System.out.println("URL " + broker.getUrl());
+//            info.setBrokerUrl(broker.getUrl().replaceAll("localhost", getIpAddress()));
+            info.setBrokerUrl(broker.getUrl().replaceAll("localhost", ConstVariable.IPADDRESS));
             info.setKeepAlive(probeOption.getKeepAlive());
             info.setConnectionTimeOut(probeOption.getConnectionTimeOut());
+            System.out.println("CLIENT ID " + probe.getClientId());
             info.setClientId(probe.getClientId());
             return info;
         }
@@ -558,6 +564,7 @@ public class ProbeService implements IProbeService {
             probeOrigin.setName(probeName);
             probeOrigin.setIpAddress(ipAddress);
             probeOrigin.setProbeOptionEntity(probeOption);
+            probeOrigin.setPending(false);
             probeOrigin.setCreateAt(new Timestamp(System.currentTimeMillis()));
 //            probeOrigin = ProbeConverter.toEntity(probeOrigin);
             probeOrigin = probeRepository.save(probeOrigin);
@@ -681,14 +688,25 @@ public class ProbeService implements IProbeService {
     // hướng
     private Boolean checkValidateIpAddress(String ipAddress) {
         String[] ips = ipAddress.split("\\.");
-        if(ips.length < 4) return false;
+        System.out.println("Len " +  ips.length + " " + ipAddress);
+        if(ips.length != 4) {
+            System.out.println(0);
+            return false;
+        }
         for(String ip : ips) {
             try {
                 Integer subIp = Integer.parseInt(ip);
+                System.out.println("Sub IP " + subIp);
                 // subIp không nằm trong vùng hợp lệ của địa chỉ ip
-                if(subIp <= 0 || subIp > 255) return false;
+                if(subIp <= 0 || subIp > 255) {
+                    System.out.println(1);
+                    return false;
+                }
                 // subIp có chứa chữ số 0 ở đầu(001) ==> 1
-                if(subIp.toString().length() != ip.length()) return false;
+                if(subIp.toString().length() != ip.length()) {
+                    System.out.println(2);
+                    return false;
+                }
             }
             catch (NumberFormatException e) {
                 System.out.println("Convert from subIpStr to subIpInt error");
@@ -734,8 +752,8 @@ public class ProbeService implements IProbeService {
                 Enumeration<InetAddress> inetAddresses = net.getInetAddresses();
                 for(InetAddress ipAddress : Collections.list(inetAddresses)) {
                     if(ipAddress.isSiteLocalAddress() && net.getDisplayName().startsWith("Intel(R) Wireless")) {
-//                        System.out.println("Name " + net.getDisplayName());
-//                        System.out.println("IP local " + ipAddress.getHostAddress());
+                        System.out.println("Name " + net.getDisplayName());
+                        System.out.println("IP local " + ipAddress.getHostAddress());
                         return ipAddress.getHostAddress();
                     }
                 }
@@ -745,5 +763,43 @@ public class ProbeService implements IProbeService {
             return null;
         }
         return null;
+    }
+
+    public String saveServer(ServerEntity server, ProbeOptionEntity optionEntity) {
+        try {
+            // Thêm probeOption vaào database
+            ProbeOptionEntity probeOptionEntity = probeOptionRepository.findByUserName(optionEntity.getUserName()).orElse(null);
+            List<ServerEntity> serverEntity = serverRepository.findAll();
+            if(probeOptionEntity != null || serverEntity.size() > 0) {
+                return "Đã có server!!";
+            }
+            // TH chưa có server ==> add server vào broker ==> add rule cho server ==> lưu option của server
+            String addServerToBroker = ApiAddInfoToBroker.addUserToBroker(optionEntity.getUserName(), optionEntity.getPassword());
+            if(!addServerToBroker.equals("Create user success")) {
+                return "Thêm mới server lỗi rồi";
+            }
+            List<SubtopicServerEntity> listTopic = subtopicRepository.findAll();
+            if (listTopic.size() > 0) {
+                String addRule = ApiAddInfoToBroker.addRuleToBroker(optionEntity.getUserName(), listTopic);
+                if(!addRule.equals("Create rule success")) {
+                    return "Thêm rule cho server lỗi rồi";
+                }
+            }
+            // Sau đó lưu server
+            optionEntity = probeOptionRepository.save(optionEntity);
+            server.setProbeOptionEntity(optionEntity);
+            serverRepository.save(server);
+            // lưu thông tin broker
+            BrokerEntity broker = new BrokerEntity();
+            broker.setUrl("tcp://localhost:1883");
+            broker.setPassword("1234");
+            broker.setUsername("admin");
+            broker = brokerRepository.save(broker);
+            return "Thêm mới server thành công";
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return "Thêm lỗi rồi!!";
+        }
     }
 }

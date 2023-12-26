@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ApiAddInfoToBroker {
-    private static final String usernameBroker = ConstVariable.username;
-    private static final String passwordBroker = ConstVariable.password;
+    private static final String usernameBroker = ConstVariable.KEY_BROKER;
+    private static final String passwordBroker = ConstVariable.SECRET_KEY_BROKER;
     private static String urlApiCreateUser = "http://localhost:18083/api/v5/authentication/password_based%3Abuilt_in_database/users";
     private static String urlApiAddRule = "http://localhost:18083/api/v5/authorization/sources/built_in_database/rules/users/";
 

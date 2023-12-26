@@ -46,6 +46,9 @@ public class ModuleConverter {
             if(moduleDto.getPathLogDefault() != null && !moduleDto.getPathLogDefault().equals(moduleEntity.getPathLogDefault())) {
                 moduleEntity.setPathLogDefault(moduleDto.getPathLogDefault());
             }
+            if(moduleDto.getCaption() != null && !moduleDto.getCaption().equals(moduleEntity.getCaption())) {
+                moduleEntity.setCaption(moduleDto.getCaption());
+            }
             return moduleEntity;
         }
         catch(NullPointerException e) {

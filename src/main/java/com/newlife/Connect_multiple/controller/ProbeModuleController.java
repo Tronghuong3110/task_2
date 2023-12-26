@@ -90,9 +90,6 @@ public class ProbeModuleController {
     @PostMapping("/probeModule/run")
     public CompletableFuture<ResponseEntity> runModule(@RequestBody Ids ids) {
         return CompletableFuture.supplyAsync(() -> {
-//            if(idProbeModule.equals("")) {
-//                return ResponseEntity.badRequest().body(0);
-//            }
             checkProcessRun = false;
             List<Integer> listIpModule = ids.getIds();
             for(Integer id : listIpModule) {
@@ -189,6 +186,9 @@ public class ProbeModuleController {
     }
     @GetMapping("/probeModule/check")
     public Integer checkProcessFinish() {
+        System.out.println("Check stop " + checkProcessStop);
+        System.out.println("Check run " + checkProcessRun);
+        System.out.println("Check restart " + checkProcessRestart);
         if(checkProcessStop || checkProcessRestart || checkProcessRun) {
             checkProcessRun = false;
             checkProcessStop = false;

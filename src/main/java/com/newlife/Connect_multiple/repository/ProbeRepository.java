@@ -36,8 +36,8 @@ public interface ProbeRepository extends JpaRepository<ProbeEntity, Integer> {
     Optional<ProbeEntity> findByIdAndStatus(Integer id, String status);
 
     @Query(value = "SELECT id_probe, JSON_OBJECTAGG(status, status_count) AS status_counts " +
-            "FROM(SELECT id_probe, status, COUNT(status) AS status_count FROM probemodule.probe_module " +
-            "GROUP BY id_probe, status) subquery " +
+            "FROM(SELECT id_probe, status, COUNT(status) AS status_count FROM probe_module " +
+            "GROUP BY id_probe, status) as subquery " +
             "GROUP BY id_probe;", nativeQuery = true)
     List<JSONObject> countStatusByProbe();
 

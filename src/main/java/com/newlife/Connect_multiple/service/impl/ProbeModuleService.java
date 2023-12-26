@@ -1,31 +1,22 @@
 package com.newlife.Connect_multiple.service.impl;
 
 import com.newlife.Connect_multiple.api.ApiCheckConnect;
-import com.newlife.Connect_multiple.converter.ProbeConverter;
 import com.newlife.Connect_multiple.converter.ProbeModuleConverter;
 import com.newlife.Connect_multiple.dto.MemoryDto;
-import com.newlife.Connect_multiple.dto.ProbeDto;
 import com.newlife.Connect_multiple.dto.ProbeModuleDto;
 import com.newlife.Connect_multiple.entity.*;
 import com.newlife.Connect_multiple.repository.*;
 import com.newlife.Connect_multiple.service.IProbeModuleService;
 import com.newlife.Connect_multiple.util.JsonUtil;
+import com.sun.tracing.Probe;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -119,9 +110,11 @@ public class ProbeModuleService implements IProbeModuleService {
                 topicrequestRun.add(subTopic.getSubTopic() + "-" + probeModuleEntity.getId()); // tạo hàng đợi để gửi tin nhắn
                 probeModuleEntityMapRun.put(probeModuleEntity.getId().toString(), probeModuleEntity); // probeModuleEntityMapRun = idProbeModule, probeModuleEntity
 
-                ProbeEntity probe = probeRepository.findByIdAndStatus(probeModuleEntity.getIdProbe(), "connected").orElse(new ProbeEntity());
+                ProbeEntity probe = probeRepository.findByIdAndStatus(probeModuleEntity.getIdProbe(), "connected").orElse(null);
                 if(probe == null) {
-                    return -1;
+                    probeModuleEntity.setLoading(0);
+                    probeModuleEntity = moduleProbeRepository.save(probeModuleEntity);
+                    return JsonUtil.createJsonResponse("Probe has been disconnected", "0");
                 }
                 // topicrequestRunResend = topic + "-" + idProbeModule
                 // topicrequestRun = topic + "-" + idProbeModule
@@ -132,6 +125,7 @@ public class ProbeModuleService implements IProbeModuleService {
                 // checkResultCommand = topic + "-" + idProbeModule, true(false)
                 // clientStatusMapRun = topic + "-" + idProbeModule
                 // checkErrorMapRun = topic + "- + idprobe, true(false)
+                System.out.println("Tên Probe " + probe.getName());
                 String idCmd = saveCmd(probeModuleEntity); // Lưu thông tin lệnh vào database
                 String jsonObject = JsonUtil.createJson(probeModuleEntity, idCmd, Optional.ofNullable(null), Optional.ofNullable(null), "run", probe.getName());
                 messageToClientMap.put(probeModuleEntity.getId().toString(), jsonObject); // messageToClientMap = idProbeModule, json
@@ -141,6 +135,7 @@ public class ProbeModuleService implements IProbeModuleService {
                     String tmp = topicrequestRun.poll(); // topicrequestRun = topic + "-" idPProbeModule
                     String topic = tmp.split("-")[0];
                     String idModule = tmp.split("-")[1];
+                    System.out.println("Id module " + idModule);
                     MqttMessage message = new MqttMessage(messageToClientMap.get(idModule).getBytes());
                     message.setQos(2);
 //                    System.out.println("Topic đang được gửi tin nhắn: " + subTopic.getSubTopic());
@@ -235,9 +230,11 @@ public class ProbeModuleService implements IProbeModuleService {
                 probeModuleEntityMapStop.put(probeModuleEntity.getId().toString(), probeModuleEntity);
                 checkProcessStop.put(subTopic.getSubTopic(), true);
 
-                ProbeEntity probe = probeRepository.findByIdAndStatus(probeModuleEntity.getIdProbe(), "connected").orElse(new ProbeEntity());
+                ProbeEntity probe = probeRepository.findByIdAndStatus(probeModuleEntity.getIdProbe(), "connected").orElse(null);
                 if(probe == null) {
-                    return -1;
+                    probeModuleEntity.setLoading(0);
+                    probeModuleEntity = moduleProbeRepository.save(probeModuleEntity);
+                    return JsonUtil.createJsonResponse("Probe has been disconnected", "0");
                 }
                 // topicrequestStopResend = topic + "-" + idProbeModule
                 // topicrequestStop = topic + "-" + idProbeModule
@@ -351,7 +348,7 @@ public class ProbeModuleService implements IProbeModuleService {
             for(ProbeEntity probe : listProbes) {
                 List<ProbeModuleEntity> listProbeModule = moduleProbeRepository.findAllModuleByProbeIdAndStatus(probe.getId(), "Running", "Pending");
                 // không kiểm tra các client đang có yêu cầu thực hiện lệnh
-                String json = JsonUtil.createJsonStatus("getStatus", listProbeModule, probe.getName());
+                String json = JsonUtil.createJsonStatus("getStatus", listProbeModule, probe.getName(), probe.getId(), probe.getPending());
                 System.out.println("Message to client " + json);
                 messageToClient.put(probe.getPubTopic(), json);
 //            if()
@@ -413,8 +410,6 @@ public class ProbeModuleService implements IProbeModuleService {
     // Cập nhật trạng thái của lịch sử gửi lệnh từ server tới client
     private void updateCmdHistory(String idCmd, Integer retry, Integer status) {
         CmdHistoryEntity cmdHistoryEntity = cmdHistoryRepository.findById(idCmd).orElse(null);
-//        System.out.println("IDCMD " + idCmd);
-//        System.out.println("Cập nhật lại cmd history");
         if(retry >= 0) {
             cmdHistoryEntity.setRetryTimes(retry);
         }
@@ -447,6 +442,7 @@ public class ProbeModuleService implements IProbeModuleService {
     private void saveModuleHistory(String status, Integer statusExcept, ProbeModuleEntity probeModuleEntity, String pId, JSONObject responseMessage) {
         try {
             String statusResult = statusResult(statusExcept, status);
+            System.out.println("Probe Name" + responseMessage.get("probeName"));
             String probeName = responseMessage.get("probeName").toString();
             String content = null;
             if(statusResult.equals("Failed")) {
@@ -697,6 +693,28 @@ public class ProbeModuleService implements IProbeModuleService {
         return listMemories;
     }
 
+    @Override
+    public void getCpuUsage() {
+        try {
+            if (client == null || !client.isConnected()) {
+                solveConnection();
+            }
+            // lấy ra danh sách các probe chưa bị xóa và trạng thái là đang kết nối
+            List<ProbeEntity> listProbes = probeRepository.findProbeByDeletedAndStatus(0, "connected");
+            for(ProbeEntity probe : listProbes){
+                String message = JsonUtil.createJsonGetCpu("getCPU", probe.getId());
+                if(message != null) {
+                    MqttMessage mqttMessage = new MqttMessage(message.getBytes());
+                    mqttMessage.setQos(2);
+                    client.publish(probe.getPubTopic(), mqttMessage);
+                }
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     // lấy ra id của probeModule theo command từ database để check có trùng không
     private Integer getIdOfProbeModuleInDatabase(String commandLine, Integer idProbe) {
         try {
@@ -937,6 +955,7 @@ public class ProbeModuleService implements IProbeModuleService {
                             String message = new String(mes.getPayload());
                             // chuyển tin nhắn từ client dạng string sang json
                             JSONObject json = JsonUtil.parseJson(message);
+                            System.out.println("KQQQQQQ " + message);
                             // Th lấy trạng thái theo chu kì
                             if (json.containsKey("check") && json.containsKey("action") && json.get("action").equals("getStatus")) {
                                 // TH client thông báo nhận được tin nhắn
@@ -961,9 +980,6 @@ public class ProbeModuleService implements IProbeModuleService {
                                         JSONArray listMemory = (JSONArray) json.get("memories");
                                         Integer probeId = Integer.parseInt(json.get("idProbe").toString());
                                         saveInfoMemory(listMemory, probeId);
-                                        // update thông tin về tải trung bình cpu
-                                        JSONObject load_average = (JSONObject) json.get("load_average");
-                                        saveLoadAverage(load_average, probeId);
                                     }
                                 }
                                 catch (Exception e) {
@@ -1018,6 +1034,13 @@ public class ProbeModuleService implements IProbeModuleService {
                                     checkResultCommand.put(topic + "-" + idProbeModule, false);
                                 }
                             }
+                            // TH lấy thông tin của cpu của probe
+                            if(json.containsKey("check") && json.containsKey("action") && json.get("action").equals("getCPU")) {
+                                System.out.println("=====================================================================");
+                                System.out.println("Lấy thông tin về cpu của từng core của probe có topic là " + topic);
+                                System.out.println(json);
+                                System.out.println("=====================================================================");
+                            }
                         });
                     }
                     catch (Exception e) {
@@ -1031,38 +1054,35 @@ public class ProbeModuleService implements IProbeModuleService {
             e.printStackTrace();
         }
     }
-
     private void saveInfoMemory(JSONArray jsonArray, Integer probeId) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime time = LocalDateTime.now().minusSeconds(20);
-        String timeAfterSecond = formatter.format(time);
-        String currentTime = formatter.format(LocalDateTime.now());
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//        LocalDateTime time = LocalDateTime.now().minusSeconds(20);
+//        String timeAfterSecond = formatter.format(time);
+//        String currentTime = formatter.format(LocalDateTime.now());
         if(probeId != -1) {
             for(Object object : jsonArray) {
                 JSONObject jsonObject = (JSONObject) object;
-                Double memoryFree = Double.valueOf(jsonObject.get("memory_free").toString());
-                MemoryClient memoryClientBefore = memoryRepository.findByTime(timeAfterSecond, currentTime).orElse(null);
-                if(memoryClientBefore != null && memoryClientBefore.getMemoryDisk().equals(memoryFree)) {
+                String diskName = jsonObject.get("nameDisk").toString(); // tên ổ đĩa
+                MemoryClient memory = memoryRepository.findByDiskNameAndProbeId(diskName, probeId).orElse(null);
+                Double memoryFree = Double.valueOf(jsonObject.get("memory_free").toString()); // dung lượng còn trống của ổ đĩa
+                Double totalMemory = Double.valueOf(jsonObject.get("memory_total").toString()); // tổng dung lượng của ổ cứng
+                if(memory != null) {
+                    memory.setTotalMemory(totalMemory);
+                    memory.setMemoryDisk(memoryFree);
+                    memory.setDiskName(diskName);
+                    memory.setModifiedTime(new Timestamp(System.currentTimeMillis()));
+                    memoryRepository.save(memory);
                     continue;
                 }
                 MemoryClient memoryClient = new MemoryClient();
-                memoryClient.setDiskName(jsonObject.get("nameDisk").toString());
+                memoryClient.setDiskName(diskName);
                 memoryClient.setMemoryDisk(memoryFree);
-                memoryClient.setTotalMemory(Double.valueOf(jsonObject.get("memory_total").toString()));
+                memoryClient.setTotalMemory(totalMemory);
                 memoryClient.setProbeId(probeId);
                 memoryClient.setModifiedTime(new Timestamp(System.currentTimeMillis()));
                 memoryRepository.save(memoryClient);
             }
         }
-    }
-    // lưu thông tin tải trung bình CPU
-    private void saveLoadAverage(JSONObject jsonObject, Integer probeId) {
-        PerformanceCpu performanceCpu = new PerformanceCpu();
-        performanceCpu.setLoadAverage(Double.valueOf(jsonObject.get("load_average").toString()));
-        performanceCpu.setProbeId(probeId);
-        performanceCpu.setMessage(jsonObject.get("message").toString());
-        performanceCpu.setModifiedTime(new Timestamp(System.currentTimeMillis()));
-        performanceRepository.save(performanceCpu);
     }
     // count error per week of module
     private Long countErrorModuleProbe(Integer idProbeModule) {
@@ -1106,6 +1126,25 @@ public class ProbeModuleService implements IProbeModuleService {
             System.out.println("Tính thời gian sau 7 ngày từ ngày hiện tại lỗi rồi");
             e.printStackTrace();
             return null;
+        }
+    }
+
+    // lưu thông tin tải trung bình CPU
+    private void saveLoadAverage(JSONObject jsonObject, Integer probeId) {
+        try {
+            // xóa dữ liệu sau 1 tuần
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            PerformanceCpu performanceCpu = new PerformanceCpu();
+            System.out.println("Time save performance " + new Timestamp(System.currentTimeMillis()));
+            List<PerformanceCpu> performanceCpuList = performanceRepository.findAllByModifiedTimeAndProbeId(formatter.format(LocalDateTime.now().minusWeeks(1)), probeId);
+            for(PerformanceCpu cpu: performanceCpuList) {
+                System.out.println("Xóa lịch sử CPU " + formatter.format(LocalDateTime.now().minusWeeks(1)));
+                performanceRepository.delete(cpu);
+            }
+            performanceRepository.save(performanceCpu);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

@@ -10,8 +10,8 @@ import org.json.simple.JSONObject;
 import java.io.IOException;
 
 public class ApiCheckConnect {
-    private static final String username = ConstVariable.username;
-    private static final String password = ConstVariable.password;
+    private static final String username = ConstVariable.KEY_BROKER;
+    private static final String password = ConstVariable.SECRET_KEY_BROKER;
 
     public static Boolean checkExistClient(String clientId) {
         try {

@@ -14,10 +14,13 @@
 	<name>Connect_multiple</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
-		<java.version>1.8</java.version>
+		<java.version>11</java.version>
 		<frontend-maven-plugin.version>1.14.2</frontend-maven-plugin.version>
 		<node.version>v16.17.0</node.version>
 		<yarn.version>v1.12.1</yarn.version>
+<!--		<frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>-->
+<!--		<node.version>v16.17.0</node.version>-->
+<!--		<yarn.version>v1.12.1</yarn.version>-->
 	</properties>
 	<dependencies>
 		<dependency>
@@ -48,7 +51,7 @@
 		<dependency>
 			<groupId>org.mariadb.jdbc</groupId>
 			<artifactId>mariadb-java-client</artifactId>
-<!--			<version>3.3.0</version>-->
+			<!--			<version>3.3.0</version>-->
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -125,10 +128,9 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<executions>
 					<execution>
-					<configuration>
-	<!--							<addClasspath>true</addClasspath>-->
-						<mainClass>com.newlife.Connect_multiple.ConnectMultipleApplication</mainClass>
-					</configuration>
+						<configuration>
+							<mainClass>com.newlife.Connect_multiple.ConnectMultipleApplication</mainClass>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -181,7 +183,19 @@
 						</goals>
 						<phase>generate-resources</phase>
 					</execution>
-
+					<execution>
+						<id>yarn test</id>
+						<goals>
+							<goal>yarn</goal>
+						</goals>
+						<phase>test</phase>
+						<configuration>
+							<arguments>test</arguments>
+							<environmentVariables>
+								<CI>true</CI>
+							</environmentVariables>
+						</configuration>
+					</execution>
 					<execution>
 						<id>yarn build</id>
 						<goals>
