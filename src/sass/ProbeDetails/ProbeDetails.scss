@@ -119,16 +119,16 @@ $mixcolor: linear-gradient(90deg, $pink-color, $blue-color);
             margin: 10px 0;
             height: 250px;
             .chartContainer{
-                padding: 10px;
-                width: 35%;
+                padding: 20px;
+                height: 100%;
+                width: 60%;
                 background-color: $primary;
                 border-radius: 10px;
                 border: 2px solid $pink-color;
-                cursor: pointer;
             }
             .diskContainer{
                 padding: 10px;
-                width: 60%;
+                width: 35%;
                 background-color: $primary;
                 border-radius: 10px;
                 border: 2px solid $pink-color;

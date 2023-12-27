@@ -17,7 +17,7 @@ import Confirm from '../../action/Confirm';
 import { IP } from '../../Layout/constaints';
 import SmallConfirm from '../../action/SmallConfirm';
 import { Link } from 'react-router-dom';
-const Probe_Modules = ({ id }) => {
+const Probe_Modules = ({ id, status }) => {
     const [isOpen, setOpenWindow] = useState(false)
     const [probe_modules, setProbeModules] = useState([])
     const [isOpenDeleteScreen, setOpenDeleteScreen] = useState(false)
@@ -40,8 +40,8 @@ const Probe_Modules = ({ id }) => {
         "name": "",
         "status": "All"
     })
-    const [action,setAction] = useState({
-        "module":null,
+    const [action, setAction] = useState({
+        "module": null,
         "action": ""
     })
     const [checkAllPages, setCheckAllPages] = useState([])
@@ -54,11 +54,11 @@ const Probe_Modules = ({ id }) => {
         console.log(conditions)
         getProbeModulesByConditions()
     }, [conditions])
-    useEffect(()=>{
-        setInterval(()=>{
+    useEffect(() => {
+        setInterval(() => {
             getProbeModulesByConditions()
-        },15000)
-    },[])
+        }, 15000)
+    }, [])
     const getProbeModules = () => {
         fetch("http://" + IP + "/api/v1/probe/modules?idProbe=" + id + "&&name=&&status=")
             .then(response => response.json())
@@ -149,37 +149,41 @@ const Probe_Modules = ({ id }) => {
     const getModuleContinues = () => {
         const interval = setInterval(() => {
             const checkValue = sessionStorage.getItem("check");
-            if (checkValue == null || checkValue ==1) {
+            if (checkValue == null || checkValue == 1) {
                 clearInterval(interval); // Dừng interval khi checkValue là null
             } else {
                 getProbeModulesByConditions();
             }
         }, 2000);
     };
-    const checkDoneContinues =()=>{
-        const interval = setInterval(()=>{
+    const checkDoneContinues = () => {
+        const interval = setInterval(() => {
             const checkValue = sessionStorage.getItem("check");
-            if(checkValue == 1 || checkValue ==null){
+            if (checkValue == 1 || checkValue == null) {
                 console.log("Check value :", checkValue)
-                setTimeout(getProbeModulesByConditions(),5000);
+                setTimeout(getProbeModulesByConditions(), 5000);
                 sessionStorage.removeItem("check");
                 setSelectedProbeModules([]);
                 clearInterval(interval)
             }
-            else{
+            else {
                 fetch("http://" + IP + "/api/v1/probeModule/check")
                     .then(response => response.text())
                     .then(data => {
-                        if(data == 1){
+                        if (data == 1) {
                             getProbeModulesByConditions();
-                            sessionStorage.setItem("check",1);
+                            sessionStorage.setItem("check", 1);
                         }
                     })
                     .catch(err => console.log(err))
             }
-        },2000)
+        }, 2000)
     }
     const actionWithModule = (id, action) => {
+        if (status !== 'connected') {
+            notify("Please connect this probe before do any action", 0)
+            return;
+        }
         let nodes = document.querySelectorAll(".actionBtn")
         nodes.forEach(node => {
             node.setAttribute("disabled", true)
@@ -192,19 +196,23 @@ const Probe_Modules = ({ id }) => {
         else arr = [id]
         sessionStorage.setItem("check", 0)
         if (action == "run") {
-            doActions(arr,action)
+            doActions(arr, action)
         }
         else {
             setAction({
                 "module": arr,
                 "action": action,
-                "note":"Performing this operation does not affect other processes"
+                "note": "Performing this operation does not affect other processes"
             })
             openConfirmWindow()
         }
     }
-    const doActions = (arr,action) => {
-        console.log(arr,action)
+    const doActions = (arr, action) => {
+        if (status !== 'connected') {
+            notify("Please connect this probe before do any action", 0)
+            return;
+        }
+        console.log(arr, action)
         const options = {
             method: "POST",
             headers: {
@@ -220,14 +228,15 @@ const Probe_Modules = ({ id }) => {
             .then(data => {
                 notify("Received request succesfully", 1)
             })
-            .then(()=>{
-                fetch("http://" + IP + "/api/v1/probeModule/"+action,options)
+            .then(() => {
+                sessionStorage.setItem("check", 0)
+                fetch("http://" + IP + "/api/v1/probeModule/" + action, options)
             })
             .catch(err => console.log(err))
         checkDoneContinues()
         getModuleContinues()
 
-        
+
     }
     /** Delete 1 module */
     const displayDeleteModule = (id, name) => {
@@ -397,7 +406,7 @@ const Probe_Modules = ({ id }) => {
                 <div className='action'>
                     <Tooltip title="Run all selected modules">
                         <button
-                            disabled ={(sessionStorage.getItem("check")!=null &&sessionStorage.getItem("check")!=1)}
+                            disabled={(sessionStorage.getItem("check") == 0)}
                             onClick={() => {
                                 actionWithModule(selectedProbeModules, "run")
                             }}
@@ -409,7 +418,7 @@ const Probe_Modules = ({ id }) => {
                 <div className='action'>
                     <Tooltip title="Restart all selected modules">
                         <button
-                            disabled={(sessionStorage.getItem("check")!=null &&sessionStorage.getItem("check")!=1)}
+                            disabled={(sessionStorage.getItem("check") == 0)}
                             onClick={() => {
                                 actionWithModule(selectedProbeModules, "restart")
                             }}
@@ -421,7 +430,7 @@ const Probe_Modules = ({ id }) => {
                 <div className='action'>
                     <Tooltip title="Stop all selected modules">
                         <button
-                            disabled={(sessionStorage.getItem("check")!=null &&sessionStorage.getItem("check")!=1)}
+                            disabled={(sessionStorage.getItem("check") == 0)}
                             onClick={() => {
                                 actionWithModule(selectedProbeModules, "stop")
                             }}
@@ -433,7 +442,7 @@ const Probe_Modules = ({ id }) => {
                 <div className='action'>
                     <Tooltip title="Delete all selected modules">
                         <button
-                            disabled={(sessionStorage.getItem("check")!=null &&sessionStorage.getItem("check")!=1)}
+                            disabled={(sessionStorage.getItem("check") == 0)}
                             onClick={() => {
                                 // deleteMultiModules()
                                 displayDeleteMultiModule()
@@ -462,7 +471,7 @@ const Probe_Modules = ({ id }) => {
 
                                             <TableRow key={module.id} >
                                                 <TableCell className='checkbox'>
-                                                    <input defaultChecked={false} disabled={module.loading} checked={isSelected(module.id)} className='checkbox-input' id={module.id} type='checkbox' onChange={() => {
+                                                    <input  disabled={module.loading} checked={isSelected(module.id)} className='checkbox-input' id={module.id} type='checkbox' onChange={() => {
                                                         addOrRemoveToCheckedList(module.id)
                                                     }}></input>
                                                 </TableCell>
@@ -471,11 +480,13 @@ const Probe_Modules = ({ id }) => {
                                                 </TableCell>
                                                 <TableCell className='module_name' ><div>{module.moduleName}</div></TableCell>
                                                 <TableCell className='caption' ><div>{module.caption}</div></TableCell>
-                                                <TableCell className='argument' ><div>
-                                                    <Tooltip title={module.arg}>
-                                                        {module.arg}
-                                                    </Tooltip>
-                                                </div></TableCell>
+                                                <TableCell className='argument' >
+                                                    <div>
+                                                        <Tooltip title={module.arg}>
+                                                            <span>{module.arg}</span>
+                                                        </Tooltip>
+                                                    </div>
+                                                </TableCell>
                                                 <TableCell className='errorPerWeek' ><div key="errorPerWeek">{module.errorPerWeek}</div></TableCell>
                                                 <TableCell className='status' ><div style={{ color: setStatusColor(module.status) }}>{module.status}</div></TableCell>
                                                 <TableCell className='note' ><div>{module.note}</div></TableCell>
@@ -483,7 +494,7 @@ const Probe_Modules = ({ id }) => {
                                                     <div className='actions-container d-flex justify-content-between'>
                                                         <div className='action'>
                                                             <button className='actionBtn runBtn'
-                                                                disabled={module.loading||(sessionStorage.getItem("check")!=null &&sessionStorage.getItem("check")!=1)}
+                                                                disabled={module.loading || (sessionStorage.getItem("check") == 0)}
                                                                 onClick={() => {
                                                                     actionWithModule(module.id, "run")
                                                                 }}
@@ -493,7 +504,7 @@ const Probe_Modules = ({ id }) => {
                                                         </div>
                                                         <div className='action'>
                                                             <button className='actionBtn reStartBtn'
-                                                                disabled={module.loading||(sessionStorage.getItem("check")!=null &&sessionStorage.getItem("check")!=1)}
+                                                                disabled={module.loading || (sessionStorage.getItem("check") == 0)}
                                                                 onClick={() => {
                                                                     actionWithModule(module.id, "restart")
                                                                 }}
@@ -503,7 +514,7 @@ const Probe_Modules = ({ id }) => {
                                                         </div>
                                                         <div className='action'>
                                                             <button className='actionBtn stopBtn'
-                                                                disabled={module.loading || (module.status == "Stopped") ? true : false ||(sessionStorage.getItem("check")!=null &&sessionStorage.getItem("check")!=1)}
+                                                                disabled={module.loading || (module.status == "Stopped") ? true : false || (sessionStorage.getItem("check") == 0)}
                                                                 onClick={() => {
                                                                     actionWithModule(module.id, "stop")
                                                                 }}
@@ -513,7 +524,7 @@ const Probe_Modules = ({ id }) => {
                                                         </div>
                                                         <div className='action'>
                                                             <button
-                                                                disabled={module.loading || (module.status == "Running" || module.status == "Pending") ? true : false ||(sessionStorage.getItem("check")!=null &&sessionStorage.getItem("check")!=1)}
+                                                                disabled={module.loading || (module.status == "Running" || module.status == "Pending") ? true : false || (sessionStorage.getItem("check") == 0)}
                                                             >
                                                                 <FontAwesomeIcon icon={faPenToSquare} style={{ color: "powderblue", }} onClick={() => {
                                                                     handleOpenWindow(module.id)
@@ -522,7 +533,7 @@ const Probe_Modules = ({ id }) => {
                                                         </div>
                                                         <div className='action'>
                                                             <button
-                                                                disabled={module.loading || (module.status == "Running" || module.status == "Pending") ? true : false || (sessionStorage.getItem("check")!=null &&sessionStorage.getItem("check")!=1)}
+                                                                disabled={module.loading || (module.status == "Running" || module.status == "Pending") ? true : false || (sessionStorage.getItem("check") == 0)}
                                                                 onClick={() => {
                                                                     displayDeleteModule(module.id, module.moduleName)
                                                                 }}

@@ -35,7 +35,7 @@ const ConfigFileGenerator = (props) => {
     }
 
     const createConfigFile = () => {
-        fetch("http://"+IP+":8081/api/v1/downloadFile/"+props.id)
+        fetch("http://"+IP+"/api/v1/downloadFile/"+props.id)
             .then(response => response.json())
             .then(data => convertData(data))
             .catch(err => console.log(err))
@@ -44,7 +44,7 @@ const ConfigFileGenerator = (props) => {
     return (
         <div className='downloadBtn'>
             <button onClick={createConfigFile}>
-                <FontAwesomeIcon icon={faDownload} style={{ color: "#e1ff00", }} />
+                <FontAwesomeIcon icon={faDownload} style={{ color: "#ff1ce8", }} />
             </button>
         </div>
     );

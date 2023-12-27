@@ -161,11 +161,11 @@ const ModuleHistory = () => {
             <div className='searchBar d-flex justify-content-between align-items-end'>
                 <div className="searchDate">
                     <div className="conditionTitle">Start date</div>
-                    <input type="date" placeholder="Choose date" id="startDate" defaultValue={formatDate(new Date())} ></input>
+                    <input type="date" placeholder="Choose date" id="startDate" max={formatDate(new Date())} ></input>
                 </div>
                 <div className="searchDate">
                     <div className="conditionTitle">End date</div>
-                    <input type="date" placeholder="Choose date" id="endDate" defaultValue={formatDate(new Date())} max={formatDate(new Date())} ></input>
+                    <input type="date" placeholder="Choose date" id="endDate"  max={formatDate(new Date())} ></input>
                 </div>
                 <div className="searchProbe">
                     <div className="conditionTitle">Probe name</div>

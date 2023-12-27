@@ -1,10 +1,11 @@
 .disk{
-    width: 35%;
+    width: 45%;
+    height: fit-content;
     &-symbol{
         display: flex;
         align-items: center;
         svg{
-            font-size: 2.2em;
+            font-size: 3em;
         }
         padding:5px;
     }

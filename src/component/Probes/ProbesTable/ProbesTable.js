@@ -6,7 +6,7 @@ import Table from '@mui/material/Table';
 import '../../../sass/Probes/ProbeTable/ProbesTable.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-    faTrashCan, faCircleRight, faCirclePlay, faCircleStop
+    faTrashCan, faCircleRight, faCirclePlay, faCircleStop, faHourglassHalf
 } from '@fortawesome/free-regular-svg-icons'
 import { faCircle, faDownload } from '@fortawesome/free-solid-svg-icons';
 import TableHeader from './TableHeader';
@@ -37,7 +37,9 @@ const ProbesTable = () => {
     useEffect(() => {
         setProbes(probesContext.probes);
     }, [probesContext.probes]);
-    const deletedProbe = (id,userChoice) => {
+
+    /** Check trạng thái probe */
+    const deletedProbe = (id, userChoice) => {
         if (userChoice && deletingProbe) {
             const options = {
                 method: 'DELETE',
@@ -92,17 +94,21 @@ const ProbesTable = () => {
         setRowsPerPage(parseInt(event.target.value), 10)
         setPage(0)
     }
-    const handleOnSwitch = (id, status) => {
+    const handleOnSwitch = (id, status,property) => {
         console.log("PUT")
+        const body = property==='status'?({
+            "id": id,
+            "status" : status == 'connected' ? "disconnected" : "connected"
+        }):({
+            "id": id,
+            "pending" : status == false ? true : false
+        })
         const requestOptions = {
             method: 'PUT',
             headers: {
                 "Content-Type": "application/json; charset=utf8"
             },
-            body: JSON.stringify({
-                "id": id,
-                "status": status == 'connected' ? "disconnected" : "connected"
-            })
+            body: JSON.stringify(body)
         };
         fetch("http://" + IP + "/api/v1/probe", requestOptions)
             .then(respone => respone.json())
@@ -111,7 +117,8 @@ const ProbesTable = () => {
                 if (data.code == "1") {
                     const updatedItems = probesContext.probes.map(item => {
                         if (item.id === id) {
-                            return { ...item, status: status == 'connected' ? "disconnected" : "connected" };
+                            if(property=="status") return { ...item, status: status == 'connected' ? "disconnected" : "connected" };
+                            else return { ...item, pending: status == false ? true : false};
                         }
                         return item;
                     })
@@ -231,9 +238,18 @@ const ProbesTable = () => {
                                         <TableCell className='actions' >
                                             <div className='actions-container d-flex justify-content-around'>
                                                 <div className='action'  >
-                                                    <button onClick={() => { handleOnSwitch(probe.id, probe.status) }}>
-                                                        {setIconConnect(probe.status)}
-                                                    </button>
+                                                    <Tooltip title={probe.status==='connected'?'Ngắt kết nối':'Kết nối'}>
+                                                        <button onClick={() => { handleOnSwitch(probe.id, probe.status, 'status') }}>
+                                                            {setIconConnect(probe.status)}
+                                                        </button>
+                                                    </Tooltip>
+                                                </div>
+                                                <div className='action'  >
+                                                    <Tooltip title={probe.pending===false?'Kích hoạt nhận trạng thái pending':'Hủy nhận trạng thái pending'}>
+                                                        <button onClick={() => { handleOnSwitch(probe.id, probe.pending,'pending') }}>
+                                                            <FontAwesomeIcon icon={faHourglassHalf} style={{ color: probe.pending===false?'#9A8383':"#e1ff00"}} />
+                                                        </button>
+                                                    </Tooltip>
                                                 </div>
                                                 <div className='action'>
                                                     <button onClick={() => {
@@ -254,7 +270,7 @@ const ProbesTable = () => {
                                 )
                             })) : (
                             <TableRow style={{ border: "none" }}>
-                                <TableCell colSpan={15} style={{padding:"20px", fontWeight:"500", fontSize:"1.2em"}} >There is no probe in the list</TableCell>
+                                <TableCell colSpan={15} style={{ padding: "20px", fontWeight: "500", fontSize: "1.2em" }} >There is no probe in the list</TableCell>
                             </TableRow>
                         )
 

@@ -321,7 +321,7 @@ const ProbeDetails = () => {
 
             </div>
 
-            <Probe_Modules id={id}   ></Probe_Modules>
+            <Probe_Modules id={id} status={probeDetails.status}   ></Probe_Modules>
             {isOpen && <AddProbeModule idProbe={id} id={null} handleCloseWindow={handleCloseWindow}></AddProbeModule>}
         </div>
     )

@@ -15,14 +15,27 @@ const TableHeader = (props) => {
                 <TableCell className='id'>ID</TableCell>
                 <TableCell className='probe_name' >PROBE NAME</TableCell>
                 <TableCell className='ip_address'>IP ADDRESS</TableCell>
-                <TableCell className='location'><Tooltip title="Location">LO</Tooltip></TableCell>
-                <TableCell className='area'><Tooltip title="Area">AR</Tooltip></TableCell>
+                <TableCell className='location'>
+                    <Tooltip title="Location">
+                        <span>LO</span>
+                    </Tooltip>
+                </TableCell>
+                <TableCell className='area'>
+                    <Tooltip title="Area">
+                        <span>AR</span>
+                    </Tooltip>
+                </TableCell>
                 <TableCell className='vlan'>VLAN</TableCell>
                 <TableCell className='probeStatus'>
-                    <Tooltip title="Status">STA</Tooltip></TableCell>
+                    <Tooltip title="Status">
+                        <span>STA</span>
+                    </Tooltip>
+                </TableCell>
                 <TableCell className='total_module'>
-                    <Tooltip title="Total module">TM</Tooltip>
-                    </TableCell>
+                    <Tooltip title="Total module">
+                        <span>TM</span>
+                    </Tooltip>
+                </TableCell>
                 <TableCell className='status'>
                     <div className='status-container d-flex'>
                         <TableSortLabel

@@ -21,7 +21,7 @@ function App() {
         <div className='headerContainer' style={{ height: "80px" }}>
           <Header></Header>
         </div>
-        <main className='mainContainer d-flex' style={{ backgroundColor: "#0b0c24" }} >
+        <main className='mainContainer d-flex' style={{ backgroundColor: "#0b0c24",minHeight:"calc(100vh - 160px)" }} >
           <div className='sidebarContainer' style={{ width: isHideSideBar == false ? "10%" : "5%", backgroundColor: "transparent", height: "100%", transition: "width 0.5s" }}>
             <Sidebar isHide={isHideSideBar} setHideSideBar={setHideSideBar} ></Sidebar>
           </div>

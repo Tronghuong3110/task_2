@@ -1,7 +1,7 @@
-import React from 'react'
+import React,{memo} from 'react'
 import { Line } from 'react-chartjs-2'
 import styled from 'styled-components'
-export default function LineChart({ chartData,borderColor }) {
+function LineChart({ chartData,borderColor }) {
     return (
         <Line
             data={chartData}
@@ -30,14 +30,16 @@ export default function LineChart({ chartData,borderColor }) {
                             fontSize: 12,
                             stepSize:25,
                             callback: function(value){
-                                return value+"%"
+                                
+                                return value.toFixed(2)+"%"
                             }
                         },
                     },
 
-                },
+                }
             }}
             style={{height:"100%",width:"100%"}}
         ></Line>
     )
 }
+export default memo(LineChart)

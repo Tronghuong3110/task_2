@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect,memo } from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import '../../sass/ProbeDetails/AddProbeModule.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -170,6 +170,8 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
         setArg(argDefalt)
         setPath(pathDefault)
         setLogPath(pathLogDefault)
+        setEditedModule(selectedModule)
+        console.log(selectedModule)
     }
     const getModuleInfo = (id) => {
         let idModule = document.querySelector("#idModule")
@@ -234,6 +236,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                                                  value={modules.id}
                                                  path = {modules.pathDefault}
                                                  pathLog ={modules.pathLogDefault}
+                                                 selected={isEditedModule.idModule==modules.id}
                                                  >{modules.name}</option>
                                             )
                                         })
@@ -305,7 +308,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                             </div>
                             <div className='input_container-input'>
                                 <input className='commandInput inputModuleInfo' type='text' placeholder='Path...' id='path'
-                                    defaultValue={path}
+                                    defaultValue={id == null ? path : isEditedModule.path}
                                     onChange={(e) => {
                                         setPath(e.target.value)
                                     }}
@@ -313,7 +316,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                             </div>
                             <div className='input_container-input'>
                                 <input className='inputModuleInfo' type='text' placeholder='Log path here....' id='pathLog'
-                                    defaultValue={logPath}
+                                    defaultValue={id == null ? logPath : isEditedModule.pathLog}
                                     onChange={(e) => {
                                         setLogPath(e.target.value)
                                     }}
@@ -350,4 +353,4 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
         </div>
     )
 }
-export default AddProbeModule;
+export default memo(AddProbeModule);
