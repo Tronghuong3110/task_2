@@ -13,6 +13,15 @@ public class InfoProbe {
     private String subTopic;
     private String pubTopic;
     private Integer keepAlive;
+    private Integer idProbe;
+
+    public Integer getIdProbe() {
+        return idProbe;
+    }
+
+    public void setIdProbe(Integer idProbe) {
+        this.idProbe = idProbe;
+    }
 
     public String getBroker() {
         return broker;

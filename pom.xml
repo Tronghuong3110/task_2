@@ -14,8 +14,9 @@
 	<name>demo1</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
-		<java.version>18</java.version>
+		<java.version>11</java.version>
 	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -65,6 +66,61 @@
 			<version>1.16.22</version>
 			<optional>true</optional>
 		</dependency>
+
+		<dependency>
+			<groupId>com.github.oshi</groupId>
+			<artifactId>oshi-core</artifactId>
+			<version>5.3.2</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.fusesource/sigar -->
+		<dependency>
+			<groupId>org.fusesource</groupId>
+			<artifactId>sigar</artifactId>
+			<version>1.6.4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.java.dev.jna</groupId>
+			<artifactId>jna</artifactId>
+			<version>5.10.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.java.dev.jna</groupId>
+			<artifactId>jna-platform</artifactId>
+			<version>5.10.0</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.jolokia/jolokia-core -->
+		<dependency>
+			<groupId>org.jolokia</groupId>
+			<artifactId>jolokia-core</artifactId>
+			<version>1.7.2</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.textmagic.sdk/textmagic-java-sdk -->
+		<dependency>
+			<groupId>com.textmagic.sdk</groupId>
+			<artifactId>textmagic-java-sdk</artifactId>
+			<version>1.2.0</version>
+			<scope>runtime</scope>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.apache.sshd/sshd-core -->
+		<dependency>
+			<groupId>org.apache.sshd</groupId>
+			<artifactId>sshd-core</artifactId>
+			<version>2.11.0</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.jcraft/jsch -->
+		<dependency>
+			<groupId>com.jcraft</groupId>
+			<artifactId>jsch</artifactId>
+			<version>0.1.55</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

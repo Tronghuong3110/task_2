@@ -4,6 +4,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import java.util.List;
+
 public class JsonUtil {
     public static JSONObject parseJson(String jsonObject) {
         JSONParser parser = new JSONParser();
@@ -38,11 +40,21 @@ public class JsonUtil {
         }
     }
 
-    public static String createJsonStatus(String message, JSONArray jsonArray, String idProbe) {
+    public static String createJsonStatus(String message, JSONArray jsonArray, String idProbe, JSONArray memories) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("message", message);
         jsonObject.put("listStatus", jsonArray);
         jsonObject.put("idProbe", idProbe);
+        jsonObject.put("check", "true");
+        jsonObject.put("action", "getStatus");
+        jsonObject.put("memories", memories);
+        return jsonObject.toJSONString();
+    }
+
+    public static String createJsonGetCpu(JSONObject json) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("action", "getCPU");
+        jsonObject.put("cpuLoad", json);
         jsonObject.put("check", "true");
         return jsonObject.toJSONString();
     }

@@ -1,358 +1,185 @@
 package com.example.demo1;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.DecodedJWT;
-import com.auth0.jwt.interfaces.JWTVerifier;
-import com.example.demo1.util.JsonUtil;
-import org.apache.commons.cli.*;
-import org.eclipse.paho.client.mqttv3.*;
-import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-import org.json.simple.JSONObject;
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.stream.Stream;
-import java.lang.*;
+import oshi.SystemInfo;
+import oshi.hardware.CentralProcessor;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
+import java.lang.management.ThreadMXBean;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.nio.file.FileStore;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Enumeration;
+import java.util.Stack;
 
 public class Test {
-    private static String os = "";
-    private static String cmdId = "";
-    private static String moduleId = "";
-    private static String oldResponse = "";
+    public static void main(String[] args) {
+//        SystemInfo systemInfo = new SystemInfo();
+//        CentralProcessor processor = systemInfo.getHardware().getProcessor();
+//
+//            while(true) {
+//                long[][] current_ticks = processor.getProcessorCpuLoadTicks();
+//                System.out.println("CPU Load theo System info:");
+//                for (int i = 0; i < current_ticks.length; i++) {
+//                    long user =current_ticks[i][CentralProcessor.TickType.USER.getIndex()];
+//                    long nice =current_ticks[i][CentralProcessor.TickType.NICE.getIndex()];
+//                    long system =current_ticks[i][CentralProcessor.TickType.SYSTEM.getIndex()];
+//                    long idle =current_ticks[i][CentralProcessor.TickType.IDLE.getIndex()];
+//                    long total = user + nice + system + idle;
+//                    long cpu_performance = total - idle;
+//                    double cpuLoad = (double)cpu_performance / total;
+//                    System.out.println("Core " + i + ": " + (cpuLoad * 100) + "%");
+//
+//                }
+//                try {
+//                    Thread.sleep(5000);
+//                }
+//                catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+        // JavaSysMon: com.jezhumble.javasysmon.JavaSysMon;
+        // HypervisorDetector: org.vngx.jsch.HypervisorDetector;
 
-    private static String getArgument(String[] args) {
-        Options options = new Options();
-        Option input = new Option("f", "file", true, "input file path");
-        input.setRequired(true);
-        options.addOption(input);
-        CommandLineParser parser = new DefaultParser();
-        HelpFormatter formatter = new HelpFormatter();
-        CommandLine cmd = null;
-        try {
-            cmd = parser.parse(options, args);
-        } catch (ParseException e) {
-            System.out.println(e.getMessage());
-            formatter.printHelp("utility-name", options);
-            System.exit(1);
-        }
-        String inputFilePath = cmd.getOptionValue("file");
-        if(inputFilePath == null) {
-            return System.getProperty("user.dir");
-        }
-        return inputFilePath;
+        test();
     }
-    private static MqttClient connectBroker(InfoProbe infoProbe) {
-//		try {
+//
 
-
-        // MQTT connection option
-//			MqttConnectOptions connectOptions = new MqttConnectOptions();
-//			connectOptions.setUserName(infoProbe.getUsername());
-//			connectOptions.setPassword(infoProbe.getPassword().toCharArray());
-//			connectOptions.setKeepAliveInterval(infoProbe.getKeepAlive());
-//			connectOptions.setCleanSession(Boolean.valueOf(infoProbe.getCleanSession()));
-
-        // set callback
-        System.out.println("Subscribe = " + infoProbe.getSubTopic());
-
-//			return client;
-//		}
+    // đọc dung lượng bộ nhớ của máy
+    private static void readMemory() {
+        // lấy ra dung lượng còn trống của mỗi đĩa
+        for(Path root : FileSystems.getDefault().getRootDirectories()) {
+            System.out.print(root + " : "); // Tên disk
+            try {
+                FileStore store = Files.getFileStore(root);
+                System.out.print(String.format("Còn trống = %.1f", Double.valueOf(store.getUsableSpace()) / 1073741824));
+                System.out.println(String.format(", Tổng cộng = %.1f", Double.valueOf(store.getTotalSpace()) / 1073741824));
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    private static String getIpAddress() {
+        try {
+            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+            while (networkInterfaces.hasMoreElements()) {
+                NetworkInterface networkInterface = networkInterfaces.nextElement();
+//                if (networkInterface.getDisplayName().startsWith("Intel(R) Wireless")) {
+                    Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
+                    while (inetAddresses.hasMoreElements()) {
+                        InetAddress inetAddress = inetAddresses.nextElement();
+//                        if (inetAddress.isSiteLocalAddress()) {
+                            System.out.println("Name " + inetAddress.getHostName());
+                            System.out.println("Host address " + inetAddress.getHostAddress());
+                            System.out.println("IP Address: " + inetAddress.getHostAddress());
+                            System.out.println("===================================================");
+                            // Return the IP address if needed
+//                            return inetAddress.getHostAddress();
+//                        }
+                    }
+//                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return null;
     }
-    private static JSONObject deCodeToken(String token, String secretKey) {
-        try {
-            Algorithm algorithm = Algorithm.HMAC256(secretKey);
-            JWTVerifier verifier = JWT.require(algorithm).build();
-            DecodedJWT decodedJWT = verifier.verify(token);
-            String jsonObjectStr = decodedJWT.getClaim("data").asString();
-            JSONObject jsonObject = JsonUtil.parseJson(jsonObjectStr);
-            return jsonObject;
+    private static double[] getCPULoad() throws IOException {
+        Process process = Runtime.getRuntime().exec("mpstat -P ALL 1 1");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        String line = null;
+        String current_date = formatter.format(LocalDateTime.now());
+        while ((line = reader.readLine()) != null) {
+            if(!line.contains("Average") && !line.contains("all") && !line.contains("CPU") && !line.equals(" ")) {
+                String[] cpu_loads = line.trim().split("\\s+");
+                if(cpu_loads.length >= 4) {
+                    try {
+                        System.out.println("Thời gian " + current_date + " " + cpu_loads[0]);
+                        System.out.println("Core " + cpu_loads[1]);
+                        Double total = (double) Math.round((Double.valueOf(cpu_loads[cpu_loads.length - 1].trim().replaceAll(",", ".")) * 100) / 100);
+                        System.out.println("Cpu Load " + (100 - total));
+                        System.out.println("===========================================");
+//                        for(int i = 0; i < cpu_loads.length ; i++) {
+//                            System.out.println("Core " + i + " " + cpu_loads[i]);
+//                        }
+//                        System.out.println("Len " + cpu_loads.length);
+//                        System.out.println("Core " + cpu_loads[1]);
+//                        System.out.println(line);
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         }
-        catch (Exception e) {
-            System.out.println("Giải mã token lỗi rồi!");
-            e.printStackTrace();
-            return null;
-        }
+        return new double[100];
     }
-    private static Boolean checkModule(JSONObject jsonObject) {
-        String commandLine = "";
-        if(os.toLowerCase().contains("windows")) {
-            commandLine = (String) jsonObject.get("cmd_win");
-        }
-        else {
-            commandLine = (String) jsonObject.get("cmd_linux");
-        }
-        List<ProcessInfo> listProcess = getListProcess();
-        String finalCommandLine = commandLine;
-        return listProcess.stream()
-                .map(ProcessInfo :: getCommandLine)
-                .anyMatch(command -> command.equals(finalCommandLine));
-    }
-    private static String runModule(JSONObject jsonObject) {
-        boolean isWindows = os.toLowerCase().startsWith("windows");
+    private static void test() {
         try {
             ProcessBuilder builder = new ProcessBuilder();
-            String command = "";
-            if(isWindows) {
-                command = (String) jsonObject.get("cmd_win");
-                builder.command("cmd.exe", "/c", command);
-            }else {
-                command = (String) jsonObject.get("cmd_linux");
-                builder.command("sh", "-c", command);
-            }
+            String[] cmd = {"cat", "/proc/stat"};
+            builder.command(cmd);
             Process process = builder.start();
-            Boolean existsModule  = true;
-            for(int i = 1; i <= 2; i++) {
-                if(!checkModule(jsonObject)) {
-                    existsModule = false;
-                    break;
-                }
-                Thread.sleep(5);
-            }
-            if(existsModule) {
-                return "success";
-            }
-            return "fail";
-        }
-        catch (Exception e) {
-            System.out.println("Run command line error!");
-            e.printStackTrace();
-            return "fail";
-        }
-    }
-    private static List<ProcessInfo> getListProcess() {
-        List<ProcessInfo> listProcess = new ArrayList<>();
-        if(os.toLowerCase().contains("windows")) {
-            try {
-                ProcessBuilder processBuilder = new ProcessBuilder("powershell.exe",
-                        "wmic process get Caption,Processid,Commandline");
-                Process process = processBuilder.start();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    String[] parts = line.split("\\s+");
-                    String command = parts[0];
-                    String PID = parts[parts.length - 1];
-                    String commandLine = solveCommandLineInWindows(parts);
-                    listProcess.add(new ProcessInfo(Long.valueOf(PID), command, commandLine));
-                }
-            }
-            catch (Exception e) {
-                System.out.println("Get all process in windows error!");
-                e.printStackTrace();
-                return new ArrayList<>();
-            }
-        }
-        else {
-            try {
-                Stream<ProcessHandle> processes = ProcessHandle.allProcesses();
-                List<ProcessHandle> listProcessHandel = processes.toList();
-                for(ProcessHandle processHandle : listProcessHandel) {
-                    Long PID = processHandle.pid();
-                    String command = processHandle.info().command().orElse(null);
-                    String[] args = processHandle.info().arguments().orElse(null);
-                    String commandLine = processHandle.info().commandLine().orElse(null);
-                    String argument = "";
-                    for(String arg : args) {
-                        argument += arg + " ";
-                    }
-                    listProcess.add(new ProcessInfo(PID, command, commandLine, argument));
-                }
-            }
-            catch (Exception e) {
-                System.out.println("Get all process in linux error!");
-                e.printStackTrace();
-                return new ArrayList<>();
-            }
-        }
-        return listProcess;
-    }
-    private static String solveCommandLineInWindows(String[] commandLine) {
-        String command = "";
-        for(int i = 1; i < commandLine.length-1; i++) {
-            command += commandLine[i] + " ";
-        }
-        return command;
-    }
-    //	private static void sendMessage(InfoProbe infoProbe, String response, MqttClient client) {
-//		int qos = 0;
-//		try {
-//			MqttMessage message = new MqttMessage(response.getBytes());
-//			message.setQos(qos);
-//			client.publish(infoProbe.getPubTopic(), message);
-//		}
-//		catch (MqttException e) {
-//			System.out.print("Send message to server error");
-//		}
-//	}
-    private static InfoProbe readFile(String pathFile) {
-        try {
-            File file = new File(pathFile);
-            Properties properties = new Properties();
-            properties.load(new FileInputStream(file));
-            JSONObject jsonObject = deCodeToken(properties.getProperty("token"), "tronghuong");
-            InfoProbe infoProbe = new InfoProbe();
-            infoProbe.setBroker(properties.getProperty("broker"));
-            infoProbe.setClientId((String) jsonObject.get("clientId"));
-            infoProbe.setPassword((String) jsonObject.get("password"));
-            infoProbe.setCleanSession(properties.getProperty("cleanSession"));
-            infoProbe.setPubTopic((String) jsonObject.get("pubtopic"));
-            infoProbe.setSubTopic((String) jsonObject.get("subtopic"));
-            infoProbe.setConnectionTimeOut(Integer.parseInt(properties.getProperty("connectionTimeOut")));
-            infoProbe.setUsername(properties.getProperty("username"));
-            infoProbe.setKeepAlive(Integer.parseInt(properties.getProperty("keepAlive")));
-
-            String username = properties.getProperty("username");
-            System.out.println("username" + username);
-            return infoProbe;
-        }
-        catch (Exception e) {
-            System.out.println("Read file error");
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private static MqttConnectOptions createOption(InfoProbe infoProbe) {
-        try {
-            MqttConnectOptions connectOptions = new MqttConnectOptions();
-            connectOptions.setUserName(infoProbe.getUsername());
-            connectOptions.setPassword(infoProbe.getPassword().toCharArray());
-            connectOptions.setKeepAliveInterval(infoProbe.getKeepAlive());
-            connectOptions.setCleanSession(Boolean.valueOf(infoProbe.getCleanSession()));
-            return connectOptions;
-        }
-        catch (Exception e) {
-            System.out.println("Create connection error");
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public static void main(String[] args) throws Exception {
-        os = System.getProperty("os.name");
-//		String pathFile = getArgument(args);
-//		System.out.println("Đường dẫn tới file config: " + pathFile);
-//		InfoProbe infoProbe = readFile(pathFile); // lấy thông tin client từ file config
-        InfoProbe infoProbe = new InfoProbe();
-        infoProbe.setUsername("client1");
-        infoProbe.setKeepAlive(15);
-        infoProbe.setConnectionTimeOut(30);
-        infoProbe.setBroker("tcp://192.168.27.106:1883");
-        //		infoProbe.setSubTopic("server");
-        infoProbe.setPassword("1234");
-        infoProbe.setCleanSession("true");
-        infoProbe.setPubTopic("client_123456789");
-        infoProbe.setClientId("client1");
-        MqttConnectOptions connectOptions = createOption(infoProbe);
-//		while (true) {
-        try {
-            MemoryPersistence persistence = new MemoryPersistence();
-            MqttClient client = new MqttClient(infoProbe.getBroker(), infoProbe.getClientId(), persistence);
-            client.connect(connectOptions);
-            System.out.println(infoProbe.getUsername() + " " + infoProbe.getPassword() + " " + infoProbe.getClientId());
-            client.setCallback(new MqttCallback() {
-                @Override
-                public void connectionLost(Throwable throwable) {
-                    // reconnect
-                    while (!client.isConnected()) {
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+            while((line = bufferedReader.readLine()) != null) {
+                if(line.startsWith("cpu")) {
+                    System.out.println("================================================================");
+                    System.out.println(line);
+                    String[] tmp = line.split("\\s+");
+                    double total = 0;
+                    for(int i = 1; i < tmp.length; i++) {
                         try {
-                            System.out.println("Đang kết nối lại...");
-                            Thread.sleep(5000);
-                            connectOptions.setUserName(infoProbe.getUsername());
-                            connectOptions.setPassword(infoProbe.getPassword().toCharArray());
-                            client.connect(connectOptions);
-                            client.subscribe(infoProbe.getPubTopic());
-                            System.out.println("Kết nối lại thành công!!");
+                            double cpu = Double.parseDouble(tmp[i].trim());
+                            total += cpu;
                         }
-                        catch(InterruptedException | MqttException e) {
+                        catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
+                    System.out.println(tmp[0] + " " + ((Double.parseDouble(tmp[4]) / total ) * 100) );
+                    System.out.println(tmp[4]);
+                    System.out.println("================================================================");
                 }
-                @Override
-                public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
-                    String json = new String(mqttMessage.getPayload());
-                    JSONObject jsonObject = JsonUtil.parseJson(json);
-                    if(!jsonObject.containsKey("check") || (jsonObject.containsKey("check") && !jsonObject.get("check").equals("true"))) {
-                        System.out.println("Message " + json);
-                        // Xác nhân với server đã client đã nhận được lệnh
-//							JSONObject jsonObject = JsonUtil.parseJson(json);
-                        String messageToServer = "";
-//							String cmdIdCurrent = (String) jsonObject.get("idCmdHistory");
-//							String moduleIdCurrent = (String) jsonObject.get("idProbeModule");
-                        // Lần trước đó chưa nhận được lệnh có idCmd và idModule rồi
-                        String response = "";
-                        messageToServer = "Client đã nhận được lệnh ";
-//							if(os.toLowerCase().contains("windows")) {
-//								messageToServer.concat((String) jsonObject.get("cmd_win"));
-//							}
-//							else {
-//								messageToServer.concat((String) jsonObject.get("cmd_linux"));
-//							}
-//							if(!cmdId.equals(cmdIdCurrent) && !moduleId.equals(moduleIdCurrent)) {
-//								// gán lại để lần sau kiểm tra
-//								// status = ok: đã nhận được lệnh và lệnh chưa từng đc nhận trc đó
-//								cmdId = cmdIdCurrent;
-//								moduleId = moduleIdCurrent;
-//								response = JsonUtil.createJson(json, messageToServer, "OK", null, null, null);
-//							}
-//							else {
-//								Boolean checkModule = checkModule(jsonObject);
-//								// TH lệnh đang được chay
-//								if(checkModule) {
-//									// status = restart: đã nhận được lệnh, lệnh đó đã được nhận và đang chạy trước đó
-//									response = JsonUtil.createJson(json, messageToServer, "restart", null, null, null);
-//								}
-//								// TH lệnh nhận được chưa chạy
-//								else {
-//                        response = JsonUtil.createJson(json, messageToServer, "OK", null, null, null);
-//								}
-//							}
-                        //					// gửi thông báo đã nhận được lệnh tới server
-                        ////					sendMessage(infoProbe, response, client);
-                        System.out.println("response 1" + response);
-                        MqttMessage messageMqtt = new MqttMessage(response.getBytes());
-                        messageMqtt.setQos(2);
-                        client.publish(infoProbe.getPubTopic(), messageMqtt);
-                        Thread.sleep(5000);
-                        //					// chạy lệnh
-                        //					String message = runModule(jsonObject);
-                        //					String statusModule = message.equals("success") ? "1" : "3";
-//                        response = JsonUtil.createJson(json, "Hoàn thành", "true", "1", null, null);
-                        ////					sendMessage(infoProbe, response, client);
-                        if(!client.isConnected()) {
-                            try {
-                                client.reconnect();
-                            }
-                            catch (MqttException e) {
-                                System.out.println("Reconnect error");
-                                e.printStackTrace();
-                            }
-                        }
-                        System.out.println("response 2" + response);
-                        messageMqtt = new MqttMessage(response.getBytes());
-                        messageMqtt.setQos(2);
-                        client.publish(infoProbe.getPubTopic(), messageMqtt);
-                    }
-                }
-                @Override
-                public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
-                }
-            });
-            client.subscribe(infoProbe.getPubTopic());
+            }
         }
-        catch (MqttException me) {
-            System.out.println("reason " + me.getReasonCode());
-            System.out.println("msg " + me.getMessage());
-            System.out.println("loc " + me.getLocalizedMessage());
-            System.out.println("cause " + me.getCause());
-            System.out.println("excep " + me);
-            me.printStackTrace();
-//				return null;
+        catch (Exception e) {
+            e.printStackTrace();
         }
-//		}
     }
+
 }
+
+//try {
+//                Thread.sleep(1000); // Delay for 1 second
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+
+//            try {
+//                System.out.println("CPU theo mpstat: ");
+//                double[] cpuLoad = getCPULoad();
+//                System.out.println("CPU Load:");
+//                for (int i = 0; i < cpuLoad.length; i++) {
+////                    System.out.println("Core " + i + ": " + cpuLoad[i] + "%");
+//                }
+//            }
+//            catch (Exception e) {
+//                e.printStackTrace();
+//            }
+
+
+// chỉ dùng cho java 6
+//        JavaSysMon javaSysMon = new JavaSysMon();
+//        CpuTimes cpuTimes = javaSysMon.cpuTimes();
+//        for (int i = 0; i < cpuTimes.getCpuUsage().length; i++) {
+//            System.out.println("Core " + i + " Usage: " + cpuTimes.getCpuUsage()[i] * 100 + "%");
+//        }

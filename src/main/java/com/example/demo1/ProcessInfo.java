@@ -1,29 +1,29 @@
 package com.example.demo1;
 
 public class ProcessInfo {
-    private Long pId;
+    private String pId;
     private String command; // caption
     private String commandLine;
     private String argument;
 
-    public ProcessInfo(Long pId, String command, String commandLine, String argument) {
+    public ProcessInfo(String pId, String command, String commandLine, String argument) {
         this.pId = pId;
         this.command = command;
         this.commandLine = commandLine;
         this.argument = argument;
     }
 
-    public ProcessInfo(Long pId, String command, String commandLine) {
+    public ProcessInfo(String pId, String command, String commandLine) {
         this.pId = pId;
         this.command = command;
         this.commandLine = commandLine;
     }
 
-    public Long getpId() {
+    public String getpId() {
         return pId;
     }
 
-    public void setpId(Long pId) {
+    public void setpId(String pId) {
         this.pId = pId;
     }
 
