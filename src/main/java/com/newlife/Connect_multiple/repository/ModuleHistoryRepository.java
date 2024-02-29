@@ -38,7 +38,8 @@ public interface ModuleHistoryRepository extends JpaRepository<ModuleHistoryEnti
 
     // Tên module / tên probe / thời gian / đã được ACK hay chưa
     @Query(value = "select * from module_history where (:idProbeModule is null or id_probe_module = :idProbeModule) " +
-                    "and (:idProbe is null or id_probe = :idProbe) and ((at_time between :timeStart and :timeEnd ) or (:timeStart is null and :timeEnd is null) )" +
+                    "and (:idProbe is null or id_probe = :idProbe) and ((at_time between :timeStart and :timeEnd ) " +
+                    "or (:timeStart is null and :timeEnd is null)) " +
                     "and (:ack is null or ack = :ack ) and (:content is null or content like %:content%) and status = 'Failed' ", nativeQuery = true)
     Page<ModuleHistoryEntity> findAllByCondition(@Param("idProbeModule") Integer idProbeModule,
                                                  @Param("idProbe") Integer idProbe,
@@ -49,8 +50,8 @@ public interface ModuleHistoryRepository extends JpaRepository<ModuleHistoryEnti
                                                  Pageable pageable);
 
     @Query(value = "select count(*) from module_history where (:idProbeModule is null or id_probe_module = :idProbeModule) " +
-            "and (:idProbe is null or id_probe = :idProbe) and ((at_time between :timeStart and :timeEnd ) or (:timeStart is null and :timeEnd is null) )" +
-            "and (:ack is null or ack = :ack ) and (:content is null or content like %:content%) and status = 'Failed'", nativeQuery = true)
+                    "and (:idProbe is null or id_probe = :idProbe) and ((at_time between :timeStart and :timeEnd ) or (:timeStart is null and :timeEnd is null)) " +
+                    "and (:ack is null or ack = :ack ) and (:content is null or content like %:content%) and status = 'Failed' ", nativeQuery = true)
     Long count(@Param("idProbeModule") Integer idProbeModule,
                             @Param("idProbe") Integer idProbe,
                             @Param("timeStart") String timeStart,

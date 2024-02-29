@@ -25,10 +25,13 @@ public class MemoryController {
         }, executorService);
     }
 
-    @GetMapping("/performance")
-    public CompletableFuture<?> findAllPerformance(@RequestParam("probeId") Integer probeId) {
+    @GetMapping("/performance") // lấy ra 1 hàng gần nhất từ database
+    public CompletableFuture<?> findAllPerformance(@RequestParam("probeId") Integer probeId, @RequestParam("number") Integer number) {
         return CompletableFuture.supplyAsync(() -> {
-            return memoryService.findAllByTime(probeId);
+            return memoryService.findAllByTime(probeId, number);
         }, executorService);
     }
+
+    // lấy ra 10 hàng gần nhất trong database
+
 }

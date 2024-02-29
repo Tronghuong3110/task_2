@@ -9,5 +9,5 @@ import java.util.List;
 public interface IMemoryService {
     JSONArray findAllMemory(Integer probeId);
 
-    List<PerformanceCpu> findAllByTime(Integer probeId);
+    List<PerformanceCpu> findAllByTime(Integer probeId, Integer number);
 }

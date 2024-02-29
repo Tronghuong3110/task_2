@@ -49,6 +49,14 @@ public class ModuleHistoryService implements IModuleHistoryService {
     public List<ModuleHistoryDto> findAllModuleHistoryByCondition(Integer idProbeModule, Integer idProbe, String timeStart, String timeEnd, Integer ack, String content, Integer page) {
         Sort sort = Sort.by("at_time").descending();
         Pageable pageable = PageRequest.of(page, 10, sort);
+        if(timeStart != null) {
+            timeStart += " 00:00:00";
+        }
+        if(timeEnd != null) {
+            timeEnd += " 23:59:59";
+        }
+        System.out.println("Time start " + timeStart);
+        System.out.println("Time end " + timeEnd);
         Page<ModuleHistoryEntity> listModuleHistories = moduleHistoryRepository.findAllByCondition(idProbeModule, idProbe, timeStart, timeEnd, content, ack, pageable);
         List<ModuleHistoryDto> listModuleHistoriesDto = new ArrayList<>();
         Long totalRow = moduleHistoryRepository.count(idProbeModule, idProbe, timeStart, timeEnd, content, ack);

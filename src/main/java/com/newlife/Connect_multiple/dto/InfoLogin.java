@@ -14,4 +14,5 @@ public class InfoLogin {
     private Integer connectionTimeOut;
     private Integer keepAlive;
     private String login;
+    private Integer idProbe;
 }

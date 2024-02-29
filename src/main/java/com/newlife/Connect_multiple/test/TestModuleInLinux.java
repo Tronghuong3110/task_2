@@ -1,5 +1,4 @@
 package com.newlife.Connect_multiple.test;
-import org.json.JSONException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -13,14 +12,14 @@ public class TestModuleInLinux {
 //        for (int i = 0; i < process_list.size(); i++) {
 //            String command_text = process_list.get(i).info().command().orElse("").toString();
 //        }
-        try {
-            JSONParser jsonParser = new JSONParser();
-            JSONObject json = (JSONObject)jsonParser.parse(createJson());
-            System.out.print(json.get("id"));
-        }
-        catch (JSONException | ParseException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            JSONParser jsonParser = new JSONParser();
+//            JSONObject json = (JSONObject)jsonParser.parse(createJson());
+//            System.out.print(json.get("id"));
+//        }
+//        catch (JSONException | ParseException e) {
+//            e.printStackTrace();
+//        }
 
     }
 

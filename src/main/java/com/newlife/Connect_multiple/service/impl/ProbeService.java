@@ -18,19 +18,13 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.net.*;
-import java.nio.charset.Charset;
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Service
 public class ProbeService implements IProbeService {
@@ -77,11 +71,6 @@ public class ProbeService implements IProbeService {
             if(checkUsername(probeOptionEntity.getUserName())) {
                 // username đã tồn tại
                 responseProbe.setMessage("Username exists");
-                return responseProbe;
-            }
-            if(checkProbeName(probeEntity.getName())) {
-                // tên probe đã tồn tại
-                responseProbe.setMessage("Name probe exists");
                 return responseProbe;
             }
             if(checkIpAddress(probeEntity.getIpAddress())) {
@@ -358,7 +347,7 @@ public class ProbeService implements IProbeService {
                 probeHistoryEntity.setAtTime(new Timestamp(System.currentTimeMillis()));
                 probeEntity.setDeleted(0);
                 // username, name, ip
-                if(checkProbeName(probeEntity.getName()) || checkIpAddress(probeEntity.getIpAddress()) || checkUsername(probeEntity.getProbeOptionEntity().getUserName())) {
+                if(checkIpAddress(probeEntity.getIpAddress()) || checkUsername(probeEntity.getProbeOptionEntity().getUserName())) {
                     json.put("code", "0");
                     json.put("message", "Can not backup probe with name " + probeEntity.getName());
                     jsonArray.add(json);
@@ -417,6 +406,7 @@ public class ProbeService implements IProbeService {
             info.setConnectionTimeOut(probeOption.getConnectionTimeOut());
             System.out.println("CLIENT ID " + probe.getClientId());
             info.setClientId(probe.getClientId());
+            info.setIdProbe(probe.getId());
             return info;
         }
         catch (Exception e) {
@@ -514,13 +504,6 @@ public class ProbeService implements IProbeService {
             String clientId = System.nanoTime() + "_" + probeName.replaceAll(" ", "_");
             String topic = probeName.replaceAll(" ", "_") + "/" + clientId;
             String username = System.nanoTime() + probeName;
-            if(checkProbeName(probeName)) {
-                // tên probe đã tồn tại
-                jsonObject.put("code", 0);
-                jsonObject.put("message", "Ip " + ipAddress + " has been duplicated!!");
-                response.add(jsonObject);
-                continue;
-            }
             if(checkIpAddress(ipAddress)) {
                 // địa chỉ ip đã tồn tại
                 jsonObject.put("code", 0);
@@ -682,10 +665,6 @@ public class ProbeService implements IProbeService {
         return probeRepository.existsByIpAddressAndDeleted(ipAddress, 0);
     }
     // hướng
-    private Boolean checkProbeName(String probeName) {
-        return probeRepository.existsByNameAndDeleted(probeName, 0);
-    }
-    // hướng
     private Boolean checkValidateIpAddress(String ipAddress) {
         String[] ips = ipAddress.split("\\.");
         System.out.println("Len " +  ips.length + " " + ipAddress);
@@ -800,6 +779,23 @@ public class ProbeService implements IProbeService {
         catch (Exception e) {
             e.printStackTrace();
             return "Thêm lỗi rồi!!";
+        }
+    }
+
+    public void checkConnectFromProbeToBroker() {
+        try {
+            List<ProbeEntity> listProbeIsConnected = probeRepository.findProbeByDeletedAndStatus(0, "connected");
+            for(ProbeEntity probeEntity : listProbeIsConnected) {
+                Boolean checkConnect = ApiCheckConnect.checkExistClient(probeEntity.getClientId());
+                if(!checkConnect) {
+                    probeEntity.setStatus("error");
+                }
+            }
+            probeRepository.saveAll(listProbeIsConnected);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Kiểm tra trạng thái probe với broker lỗi rồi!!");
         }
     }
 }

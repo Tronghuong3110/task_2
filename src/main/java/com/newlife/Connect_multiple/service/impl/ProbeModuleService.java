@@ -1040,6 +1040,7 @@ public class ProbeModuleService implements IProbeModuleService {
                                 System.out.println("Lấy thông tin về cpu của từng core của probe có topic là " + topic);
                                 System.out.println(json);
                                 System.out.println("=====================================================================");
+                                saveLoadAverage((JSONObject) json.get("cpuLoad"));
                             }
                         });
                     }
@@ -1130,21 +1131,49 @@ public class ProbeModuleService implements IProbeModuleService {
     }
 
     // lưu thông tin tải trung bình CPU
-    private void saveLoadAverage(JSONObject jsonObject, Integer probeId) {
-        try {
-            // xóa dữ liệu sau 1 tuần
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            PerformanceCpu performanceCpu = new PerformanceCpu();
-            System.out.println("Time save performance " + new Timestamp(System.currentTimeMillis()));
-            List<PerformanceCpu> performanceCpuList = performanceRepository.findAllByModifiedTimeAndProbeId(formatter.format(LocalDateTime.now().minusWeeks(1)), probeId);
-            for(PerformanceCpu cpu: performanceCpuList) {
-                System.out.println("Xóa lịch sử CPU " + formatter.format(LocalDateTime.now().minusWeeks(1)));
-                performanceRepository.delete(cpu);
+    private void saveLoadAverage(JSONObject jsonObject) {
+        System.out.println("----------------------------------------");
+        System.out.println(jsonObject);
+        if(jsonObject != null) {
+            try {
+                Integer probeId = Integer.parseInt(jsonObject.get("id_probe").toString());
+                String time = jsonObject.get("time").toString();
+                String unixTime = jsonObject.get("unix_time").toString();
+                Integer check = Integer.parseInt(jsonObject.get("check").toString());
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+                LocalDateTime localDateTime = LocalDateTime.parse(time, formatter);
+                PerformanceCpu performanceCpu = new PerformanceCpu();
+
+                // xóa dữ liệu cpu trong thời gian cách thời gian hiện tại 1 tuần
+                performanceRepository.deletecpu(localDateTime.minusDays(7));
+                JSONArray listCpu = (JSONArray) jsonObject.get("list_cpu_core");
+
+                performanceCpu = convertFromJsonToEntity(performanceCpu, listCpu);
+                performanceCpu.setTime(localDateTime);
+                performanceCpu.setUnixTime(unixTime);
+                performanceCpu.setCheck(check);
+                performanceCpu.setIdProbe(probeId);
+                performanceRepository.save(performanceCpu);
             }
-            performanceRepository.save(performanceCpu);
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // set cacs giá trị cpu vào từng thuộc tính
+    private PerformanceCpu convertFromJsonToEntity(PerformanceCpu performanceCpu, JSONArray jsonArray) {
+        try {
+            for(Object object : jsonArray) {
+                JSONObject jsonObject = (JSONObject) object;
+                String name = jsonObject.get("name").toString();
+                Double cpuUsage = Double.parseDouble(jsonObject.get("cpu_usage").toString());
+                performanceCpu.getClass().getDeclaredField(name).set(performanceCpu, cpuUsage);
+            }
         }
         catch (Exception e) {
             e.printStackTrace();
         }
+        return performanceCpu;
     }
 }

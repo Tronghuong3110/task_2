@@ -10,6 +10,7 @@ import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.OrderBy;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -39,15 +40,28 @@ public class MemoryService implements IMemoryService {
     }
 
     @Override
-    public List<PerformanceCpu> findAllByTime(Integer probeId) {
+    public List<PerformanceCpu> findAllByTime(Integer probeId, Integer number) {
         try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss a");
+            DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             LocalDateTime time1 = LocalDateTime.now();
-            String beforeTime = formatter.format(time1.minusMinutes(10));
-            String afterTime = formatter.format(time1);
-//            String beforeTime = "2023-12-08 15:39:00";
-//            String afterTime = "2023-12-08 15:42:55";
-            List<PerformanceCpu> jsonArray = performanceRepository.findAllByModifiedTime(beforeTime, afterTime, probeId);
+            LocalDateTime beforeTime = null;
+
+            if(number == 1) {
+                beforeTime = time1.minusSeconds(6);
+            }
+            else {
+                beforeTime = time1.minusSeconds(50);
+            }
+            LocalDateTime afterTime = LocalDateTime.parse(formatter.format(time1), formatter);
+            beforeTime = LocalDateTime.parse(formatter.format(beforeTime), formatter);
+
+            System.out.println("=============================================================");
+            System.out.println("Before time " + formatter1.format(beforeTime));
+            System.out.println("After time " + formatter1.format(afterTime));
+            System.out.println("=============================================================");
+
+            List<PerformanceCpu> jsonArray = performanceRepository.findAllByModifiedTime(beforeTime, afterTime, probeId, number);
             return jsonArray;
         }
         catch (Exception e) {
