@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import { TableRow, Table, TableHead, TableCell, TableBody, Checkbox } from "@mui/material";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -6,7 +6,7 @@ import { faTrashCan } from '@fortawesome/free-regular-svg-icons'
 import { faArrowRotateLeft, faArrowRotateBack } from '@fortawesome/free-solid-svg-icons'
 import '../../../sass/RecycleBin/RecycleBinTable.scss'
 import { IP } from '../../Layout/constaints'
-import { ToastContainer, toast } from 'react-toastify';
+import {  toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import NotifyContainer from './NotifyContainer';
 import SmallConfirm from '../../action/SmallConfirm';
@@ -33,7 +33,7 @@ const RecycleBinTable = (props) => {
         else setSelectedProbes([])
     }
     const isSelected = (id) => {
-        if (selectedProbes.find(num => num == id) == undefined) return false;
+        if (selectedProbes.find(num => num === id) === undefined) return false;
         else return true;
     }
     const addOrRemoveToSelectedList = (event, checked, id) => {
@@ -47,7 +47,7 @@ const RecycleBinTable = (props) => {
         }
     }
     const notify = (message, status) => {
-        if (status == 1) {
+        if (status === 1) {
             toast.success(message, {
                 position: "top-center",
                 autoClose: 4000,
@@ -58,7 +58,7 @@ const RecycleBinTable = (props) => {
                 theme: "colored",
             })
         }
-        else if (status == 0) {
+        else if (status === 0) {
             toast.error(message, {
                 position: "top-center",
                 autoClose: 4000,
@@ -96,7 +96,7 @@ const RecycleBinTable = (props) => {
         else param = id
         console.log(param)
         let options = {
-            method: action == "remove" ? "DELETE" : "POST",
+            method: action === "remove" ? "DELETE" : "POST",
             headers: {
                 "Content-Type": "application/json"
             },
@@ -109,7 +109,7 @@ const RecycleBinTable = (props) => {
         fetch(api, options)
             .then(response => response.json())
             .then(data => {
-                if (data.length == 1) {
+                if (data.length === 1) {
                     notify(data[0].message, data[0].code)
                     setSelectedProbes([])
                     getProbesInBin(nameCondition)
@@ -142,7 +142,7 @@ const RecycleBinTable = (props) => {
     //     fetch("http://" + IP + "/api/v1/probe/remove", options)
     //         .then(response => response.json())
     //         .then(data => {
-    //             if (data.length == 1) {
+    //             if (data.length === 1) {
     //                 notify(data[0].message, data[0].code)
     //             }
     //             else {
@@ -161,7 +161,7 @@ const RecycleBinTable = (props) => {
         setAction({
             "module": arr,
             "action": action,
-            "note": action=="remove"?"The devices will be permanently deleted from the system":""
+            "note": action==="remove"?"The devices will be permanently deleted from the system":""
         })
         openConfirmWindow()
     }

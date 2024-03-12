@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import 'bootstrap/dist/css/bootstrap.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCube, faMagnifyingGlass, faClockRotateLeft, faArrowRotateBack } from '@fortawesome/free-solid-svg-icons';
+import { faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons';
 import '../../sass/Statistic/Statistic.scss'
-import { Checkbox, Pagination } from "@mui/material";
 import DropDownInput from "../action/DropDownInput";
 import { IP } from "../Layout/constaints";
 import { ToastContainer, toast } from 'react-toastify';
@@ -20,7 +19,7 @@ const Statistic = () => {
     const [modules, setModules] = useState([])
     const [conditions,setConditions] = useState(null)
     useEffect(() => {
-        fetch("http://" + IP + "/api/v1/probes?name=&location=&area=&vlan=")
+        fetch(IP + "/api/v1/probes?name=&location=&area=&vlan=")
             .then(response => response.json())
             .then(data => {
                 let arr = []
@@ -34,7 +33,7 @@ const Statistic = () => {
             })
     }, [])
     useEffect(() => {
-        fetch("http://" + IP + "/api/v1/modules")
+        fetch(IP + "/api/v1/modules")
             .then(response => response.json())
             .then(data => {
                 let arr = []
@@ -51,7 +50,7 @@ const Statistic = () => {
         getModuleHistory(conditions)
     }, [page])
     const getModuleHistory = (conditions) =>{
-        let api = "http://" + IP + "/api/v1/moduleHistories?page="+(page-1);
+        let api = IP + "/api/v1/moduleHistories?page="+(page-1);
         if(conditions!=null){
             for(let key in conditions){
                 if(conditions[key]!=""&&conditions[key]!=null) api+= "&"+key+"="+conditions[key]

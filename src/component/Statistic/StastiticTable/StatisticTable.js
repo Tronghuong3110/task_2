@@ -1,10 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
-import { TableRow, Table, TableHead, TableCell, TableBody,TableContainer,Tooltip,TablePagination } from "@mui/material";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { TableRow, Table, TableCell, TableBody,TableContainer,Tooltip,TablePagination } from "@mui/material";
 import '../../../sass/Statistic/StatisticTable/StatisticTable.scss'
-import { IP } from '../../Layout/constaints'
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import StatisticTableHeader from './StatisticTableHeader';
 const StatisticTable = (props) => {
@@ -50,42 +48,7 @@ const StatisticTable = (props) => {
         setRowPerPage(parseInt(event.target.value), 10)
         setPage(0)
     }
-    const notify = (message, status) => {
-        if (status == 1) {
-            toast.success(message, {
-                position: "top-center",
-                autoClose: 4000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored",
-            })
-        }
-        else if (status == 0) {
-            toast.error(message, {
-                position: "top-center",
-                autoClose: 4000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored",
-            })
-        }
-        else {
-            toast.warn(message, {
-                position: "top-center",
-                autoClose: 4000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored",
-            })
-        }
 
-    }
     return (
         <div className='Statistic_Table'>
             <TableContainer className='table-container'>

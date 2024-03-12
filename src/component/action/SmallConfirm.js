@@ -12,7 +12,6 @@ const SmallConfirm = (props) => {
     }
     const checkRender = (arr) =>{
         let result="";
-        console.log(arr)
         for(let i=0 ; i< arr.length ;i++){
             if(i<arr.length-1){
                 result+=arr[i]+", "
@@ -20,7 +19,6 @@ const SmallConfirm = (props) => {
             else result+=arr[i]
             
         }
-        console.log(result)
         return result;
     }
     return (

@@ -20,19 +20,19 @@ const AddModule = ({ handleCloseWindow, id }) => {
     })
     const [typeModule, setTypeModule] = useState([])
     useEffect(() => {
-        if (id != null) {
-            fetch("http://" + IP + "/api/v1/module?idModule=" + id)
+        if (id !== null) {
+            fetch( IP + "/api/v1/module?idModule=" + id)
                 .then(response => response.json())
                 .then(data => setEditModule(data))
                 .catch(err => console.log(err))
         }
-    }, [])
+    }, [id])
     useEffect(()=>{
-        fetch("http://" + IP + "/api/v1/typeModule")
+        fetch( IP + "/api/v1/typeModule")
                 .then(response => response.json())
                 .then(data => setTypeModule(data))
                 .catch(err => console.log(err))
-    },[])
+    },[id])
 
     // Thêm mới một module mẫu
     const addOrEditModule = (id) => {
@@ -42,10 +42,10 @@ const AddModule = ({ handleCloseWindow, id }) => {
             console.log(findEmptyFields(data))
             let message = "Field ";
             let arr = findEmptyFields(data);
-            if (arr.length == 1) message += arr[0] + " is empty"
+            if (arr.length === 1) message += arr[0] + " is empty"
             else {
                 for (let i = 0; i < arr.length; i++) {
-                    if (i != arr.length - 1) message += arr[i] + ", "
+                    if (i !== arr.length - 1) message += arr[i] + ", "
                     else message += arr[i]
                 }
                 message += " are empty"
@@ -55,17 +55,17 @@ const AddModule = ({ handleCloseWindow, id }) => {
         else {
             console.log(data)
             let options = {
-                method: id == null ? "POST" : "PUT",
+                method: id === null ? "POST" : "PUT",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify(data)
             }
-            if (id == null) {
-                fetch("http://" + IP + "/api/v1/module/import", options)
+            if (id === null) {
+                fetch( IP + "/api/v1/module/import", options)
                     .then(response => response.json())
                     .then(data => {
-                        if (data.code == 1) {
+                        if (data.code === 1) {
                             notify(data.message, data.code)
                             handleCloseWindow();
                         }
@@ -74,11 +74,11 @@ const AddModule = ({ handleCloseWindow, id }) => {
                     .catch(err => console.log(err))
             }
             else {
-                fetch("http://" + IP + "/api/v1/module", options)
+                fetch( IP + "/api/v1/module", options)
                     .then(response => response.json())
                     .then(data => {
                         console.log(data)
-                        if (data.code == 1) {
+                        if (data.code === 1) {
                             notify(data.message, data.code)
                             handleCloseWindow();
                         }
@@ -103,7 +103,7 @@ const AddModule = ({ handleCloseWindow, id }) => {
         }
     }
     const notify = (message, status) => {
-        if (status == 1) {
+        if (status === 1) {
             toast.success(message, {
                 position: "top-center",
                 autoClose: 3000,
@@ -114,7 +114,7 @@ const AddModule = ({ handleCloseWindow, id }) => {
                 theme: "colored",
             })
         }
-        else if (status == 0) {
+        else if (status === 0) {
             toast.error(message, {
                 position: "top-center",
                 autoClose: 3000,
@@ -142,9 +142,9 @@ const AddModule = ({ handleCloseWindow, id }) => {
         let emptyFields = [];
 
         for (let key in obj) {
-            if (key != "id") {
+            if (key !== "id") {
                 if (!obj[key]) {
-                    if(key!="note") emptyFields.push(key);
+                    if(key!=="note") emptyFields.push(key);
                 }
             }
         }

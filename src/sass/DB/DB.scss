@@ -1,0 +1,78 @@
+$primary: #0b0c24;
+$secondary: #27293d;
+$pink-color: #FF1CE8;
+$blue-color: #9747FF;
+$mixcolor: linear-gradient(90deg, $pink-color, $blue-color);
+
+.DB{
+    min-height: 78.5vh;
+    padding: 20px;
+    font-size: 0.8em !important;
+    width: 100%;
+    background-color: $secondary;
+    border-radius: 30px;
+    box-sizing: border-box;
+    position: relative;
+
+    &-action {
+        margin: 20px 0;
+        height: 30px;
+
+        &-buttonAdd {
+            button {
+                background-image: $mixcolor ;
+                font-size: 0.8em;
+                color: white;
+                border-radius: 20px;
+
+                svg {
+                    padding: 0 5px;
+                }
+            }
+        }
+
+        &-input {
+            position: relative;
+            width: 25%;
+
+            input {
+                border: 2px solid $pink-color;
+                width: 100%;
+                border-radius: 20px;
+                background-color: $primary;
+                color: white;
+                outline: none;
+                height: 100%;
+                padding-left: 5%;
+                padding-top: 5px;
+                padding-bottom: 5px;
+            }
+
+            .search-icon {
+                position: absolute;
+                top: 0;
+                height: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                left: 5%;
+            }
+        }
+
+        &-select {
+            margin-left: 10%;
+            width: 15%;
+            select {
+                width: 100%;
+                border-radius: 20px;
+                background-color: $primary;
+                color: white;
+                outline: none;
+                border: 2px solid $pink-color;
+                height: 100%;
+                padding: 5px;
+                padding-left: 5%;
+            }
+        }
+    }
+}

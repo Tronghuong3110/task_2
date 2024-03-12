@@ -1,0 +1,188 @@
+$primary: #0b0c24;
+$secondary: #27293d;
+$pink-color: #E14ECA;
+$blue-color: #9747FF;
+$mixcolor: linear-gradient(90deg, $pink-color, $blue-color);
+
+.CaptureTable {
+    width: 100%;
+    .searchBar {
+        // height: 40px;
+        width: 100%;
+        font-size: 0.8em;
+        margin-bottom: 20px;
+        .searchTitle {
+            width: 25%;
+            position: relative;
+            align-items: center;
+
+            input {
+                width: 100%;
+                background-color: $primary;
+                outline: none;
+                border: 2px solid $pink-color;
+                border-radius: 20px;
+                padding: 5px 0;
+                padding-left: 8%;
+                color: white;
+            }
+
+            svg {
+                position: absolute;
+                color: white;
+                top: 50%;
+                transform: translateY(-50%);
+                left: 3%;
+            }
+
+            .conditionTitle {
+                font-size: 1.2em;
+                color: white;
+                padding: 5px;
+            }
+        }
+
+        .searchDate {
+            width: 10%;
+
+            input {
+                width: 100%;
+                color-scheme: dark;
+                box-sizing: border-box;
+                color: white;
+                background-color: $primary;
+                padding: 5px 20px;
+                border: 2px solid $pink-color;
+                border-radius: 20px;
+                appearance: none;
+            }
+
+            .conditionTitle {
+                font-size: 1.2em;
+                color: white;
+                padding: 5px;
+            }
+        }
+
+        .searchProbe,
+        .chooseTimeRange {
+            
+            width: 13%;
+            .dropdown .select{
+                border: 2px solid $pink-color;
+            }
+            select {
+                width: 100%;
+                padding: 5px 20px;
+                border: 2px solid $pink-color;
+                border-radius: 20px;
+                background-color: $primary;
+                color: white;
+                appearance: none;
+                background-image: url("../../../assets/pic/arrow.png");
+                background-repeat: no-repeat;
+                background-position: right 5% top 50%;
+                background-size: 0.65rem auto;
+
+                &:hover {
+                    cursor: pointer;
+                }
+            }
+
+            .conditionTitle {
+                font-size: 1.2em;
+                color: white;
+                padding: 5px;
+            }
+        }
+        .SearchServer{
+            width: 20%;
+        }
+        .searchButton {
+            padding: 5px 15px;
+            background: $mixcolor;
+            border: none;
+            border-radius: 20px;
+            color: white;
+            transition: ease-in-out 3000;
+
+
+            &-icon {
+                padding: 0 5px;
+            }
+        }
+    }
+
+    .CaptureTableContainer {
+        height: 400px;
+        background-color: transparent;
+        width: 100%;
+        border-radius: 10px;
+
+        table {
+
+            width: 120%;
+            table-layout: fixed;
+
+            thead {
+                tr {
+                    th {
+                        color: white;
+                        text-align: center;
+                        background-color: $primary;
+                    }
+                }
+            }
+
+            tbody {
+                tr {
+                    td {
+                        color: white;
+                        text-align: center;
+                        font-size: 1em;
+
+                        .action {
+                            display: flex !important;
+                            justify-content: center;
+                            align-items: center;
+
+                            button {
+                                background-color: transparent;
+                                outline: none;
+                                border: none;
+
+                                svg {
+                                    font-size: 1.2em;
+                                }
+                            }
+                        }
+                        div{
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .dbServerPagnitation {
+        margin: 20px 0;
+
+        ul {
+            display: flex;
+            justify-content: center;
+
+            li {
+                button {
+                    color: white;
+                }
+
+                div {
+                    color: white;
+                }
+            }
+        }
+    }
+}

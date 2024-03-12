@@ -2,15 +2,14 @@ import { useState, useEffect } from "react";
 import 'bootstrap/dist/css/bootstrap.css';
 import '../../sass/ProbeDetails/ProbeDetails.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDisplay, faMapPin, faLocationDot, faChartArea, faCube, faMagnifyingGlass, faWaveSquare } from '@fortawesome/free-solid-svg-icons';
+import { faDisplay, faMapPin, faLocationDot, faChartArea, faWaveSquare, faWindowMaximize } from '@fortawesome/free-solid-svg-icons';
 import {
     faFloppyDisk,
     faPenToSquare,
     faStickyNote,
-    faSquarePlus
 } from '@fortawesome/free-regular-svg-icons';
 import DropdownWithInput from "../action/DropdownWithInput";
-import Probe_Modules from "./ProbeDetailsTable/Probe_Modules";
+import ProbeModules from "./ProbeDetailsTable/ProbeModules";
 import AddProbeModule from './AddProbeModule';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -18,6 +17,7 @@ import { useParams } from "react-router-dom";
 import { IP } from "../Layout/constaints";
 import ProbeCPUChart from "./ProbeStatistic/ProbeCPUChart";
 import DiskContainer from "./ProbeStatistic/DiskContainer";
+import ProbeInterface from "./ProbeInterface/ProbeInterface";
 
 const ProbeDetails = () => {
     const { id } = useParams();
@@ -32,25 +32,25 @@ const ProbeDetails = () => {
     //Hàm hiển thị select location và area
     const handleOptionSelectLocation = (selectedValue) => {
         setSelectedLocation(selectedValue);
-        let locationChoosen = location.find(element => element.name == selectedValue)
+        let locationChoosen = location.find(element => element.name === selectedValue)
         setSelectedArea(locationChoosen.listArea[0])
     };
     const handleOptionSelectArea = (selectedValue) => {
         setSelectedArea(selectedValue);
     };
     useEffect(() => {
-        fetch("http://" + IP + "/api/v1/locations")
+        fetch(IP + "/api/v1/locations")
             .then(response => response.json())
             .then(data => setLocation(data))
             .catch(err => console.log(err))
     }, [])
     useEffect(() => {
         if (selectedLocation) {
-            if (selectedLocation == "---.---") {
+            if (selectedLocation === "---.---") {
                 setArea([])
             }
             else {
-                let locationChoosen = location.find(element => element.name == selectedLocation)
+                let locationChoosen = location.find(element => element.name === selectedLocation)
                 setArea(locationChoosen.listArea)
             }
         }
@@ -65,7 +65,7 @@ const ProbeDetails = () => {
     }
     //Hàm hiển thị thông tin probe
     useEffect(() => {
-        fetch("http://" + IP + "/api/v1/probe?idProbe=" + id)
+        fetch(IP + "/api/v1/probe?idProbe=" + id)
             .then(response => response.json())
             .then(data => setProbeDetails(data))
             .catch(err => console.log(err))
@@ -125,13 +125,13 @@ const ProbeDetails = () => {
     }
     const handleSaveInformations = (id) => {
         let data = getInfomationEdited()
-        if (findEmptyFields(data) != 0) {
+        if (findEmptyFields(data) !== 0) {
             let message = "Field ";
             let arr = findEmptyFields(data);
-            if (arr.length == 1) message += arr[0] + " is empty"
+            if (arr.length === 1) message += arr[0] + " is empty"
             else {
                 for (let i = 0; i < arr.length; i++) {
-                    if (i != arr.length - 1) message += arr[i] + ", "
+                    if (i !== arr.length - 1) message += arr[i] + ", "
                     else message += arr[i]
                 }
                 message += " are empty"
@@ -151,10 +151,10 @@ const ProbeDetails = () => {
                 },
                 body: JSON.stringify(info)
             }
-            fetch("http://" + IP + "/api/v1/probe", options)
+            fetch(IP + "/api/v1/probe", options)
                 .then(response => response.json())
                 .then(data => {
-                    if (data.code == 1) {
+                    if (data.code === 1) {
                         notify(data.message, data.code)
                         var infomation = getInput();
                         var element = infomation.elements;
@@ -187,7 +187,7 @@ const ProbeDetails = () => {
 
     // Hiển thị thông báo
     const notify = (message, status) => {
-        if (status == 1) {
+        if (status === 1) {
             toast.success(message, {
                 position: "top-center",
                 autoClose: 4000,
@@ -198,7 +198,7 @@ const ProbeDetails = () => {
                 theme: "colored",
             })
         }
-        else if (status == 0) {
+        else if (status === 0) {
             toast.error(message, {
                 position: "top-center",
                 autoClose: 4000,
@@ -224,24 +224,7 @@ const ProbeDetails = () => {
     }
     return (
         <div className="probeDetails">
-            <div className="infos">
-                <div className="info">
-                    <div className="info-title d-flex align-items-center">
-                        <div className="info-title-icon">
-                            <FontAwesomeIcon icon={faWaveSquare}></FontAwesomeIcon>
-                        </div>
-                        <div className="info-title-text">PERFORMANCE AND MEMORIES</div>
-                    </div>
-                </div>
-                <div className="statisticContainer d-flex justify-content-between">
-                    <div className="chartContainer">
-                        <ProbeCPUChart probeId={id} ></ProbeCPUChart>
-                    </div>
-                    <div className="diskContainer">
-                        <DiskContainer probeId={id}></DiskContainer>
-                    </div>
-                </div>
-            </div>
+
             <div className="infos d-flex justify-content-between align-items-center">
                 <div className="info probe_name">
                     <div className="info-title d-flex align-items-center">
@@ -320,8 +303,40 @@ const ProbeDetails = () => {
                 </div>
 
             </div>
-
-            <Probe_Modules id={id} status={probeDetails.status}   ></Probe_Modules>
+            <div className="infos">
+                <div className="info">
+                    <div className="info-title d-flex align-items-center">
+                        <div className="info-title-icon">
+                            <FontAwesomeIcon icon={faWaveSquare}></FontAwesomeIcon>
+                        </div>
+                        <div className="info-title-text">PERFORMANCE AND MEMORIES</div>
+                    </div>
+                </div>
+                <div className="statisticContainer d-flex justify-content-between">
+                    <div className="chartContainer">
+                        <ProbeCPUChart probeId={id} ></ProbeCPUChart>
+                    </div>
+                    <div className="diskContainer">
+                        <DiskContainer probeId={id}></DiskContainer>
+                    </div>
+                </div>
+            </div>
+            <div className="infos">
+                <div className="info">
+                    <div className="info-title d-flex align-items-center">
+                        <div className="info-title-icon">
+                            <FontAwesomeIcon icon={faWindowMaximize}></FontAwesomeIcon>
+                        </div>
+                        <div className="info-title-text">INTERFACE</div>
+                    </div>
+                </div>
+                <div className="interfaceContainer d-flex justify-content-between">
+                    <div className="interfaces">
+                        <ProbeInterface id={id} />
+                    </div>
+                </div>
+            </div>
+            <ProbeModules id={id} status={probeDetails.status}   ></ProbeModules>
             {isOpen && <AddProbeModule idProbe={id} id={null} handleCloseWindow={handleCloseWindow}></AddProbeModule>}
         </div>
     )

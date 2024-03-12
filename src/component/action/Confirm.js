@@ -4,9 +4,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
 
 } from '@fortawesome/free-regular-svg-icons'
-import { faCheck, faQuestion, faX } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faX } from '@fortawesome/free-solid-svg-icons';
 const Confirm = (props) => {
-    const {confirmContent,listDelete,setOpenDeleteScreen,handleFunction,object} = props
+    const {confirmContent,listDelete,setOpenDeleteScreen,handleFunction} = props
     const handleCancel = () =>{
         setOpenDeleteScreen(false);
     }

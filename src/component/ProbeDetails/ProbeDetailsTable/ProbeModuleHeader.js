@@ -1,10 +1,10 @@
-import { React, useState, useEffect } from 'react';
+import { React } from 'react';
 import { TableCell, Tooltip, TableSortLabel } from '@mui/material';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import '../../../sass/ProbeDetails/ProbeDetailsTable/Probe_Module_Header.scss';
 
-const Probe_Module_Header = (props) => {
+const ProbeModuleHeader = (props) => {
     const { valueToOrderBy, orderDirection, handleRequestSort,selectOrRemoveALL } = props;
     const createSortHandler = (property) => (event) => {
         handleRequestSort(event, property)
@@ -41,4 +41,4 @@ const Probe_Module_Header = (props) => {
         </TableHead>
     )
 }
-export default Probe_Module_Header;
+export default ProbeModuleHeader;

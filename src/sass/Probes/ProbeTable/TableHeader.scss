@@ -40,31 +40,36 @@ $blue-color: #9747FF;
             }
         }
 
-        .id {
-            width: 4%;
-        }
-
         .probe_name {
-            width: 9%;
+
+
+            &-container {
+                svg {
+                    font-size: 0.7rem;
+                }
+
+                .Mui-active {
+                    color: white;
+
+                    .MuiTableSortLabel-icon {
+                        color: white;
+                    }
+                }
+
+                span {
+                    display: flex;
+                    justify-content: center;
+
+                    &:hover {
+                        color: white;
+                    }
+                    padding-left:14%;
+                }
+            }
         }
 
-        .ip_address {
-            width: 9%;
-        }
-
-        .location,
-        .area,
-        .vlan,
-        .total_module {
-            width: 5%;
-        }
-
-        .probeStatus {
-            width: 3%;
-        }
 
         .status {
-            width: 16%;
 
             &-container {
                 svg {
@@ -88,18 +93,6 @@ $blue-color: #9747FF;
                     }
                 }
             }
-        }
-
-        .last_online {
-            width: 12%;
-        }
-
-        .description {
-            width: 15%;
-        }
-
-        .actions {
-            width: 12%;
         }
     }
 }

@@ -1,9 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../../sass/DropDownInput.scss';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-    faLocationDot, faChartArea, faNetworkWired
-} from '@fortawesome/free-solid-svg-icons'
+
 const DropDownInput = (props) => {
     const {defaultContent,inputOptions,handleSelect,needAll} = props
     const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -51,7 +48,7 @@ const DropDownInput = (props) => {
                 {renderInputValue||defaultContent}
             </div>
             {isPopupOpen && (
-                <div className="popup" style={{ zIndex: "2" }}>
+                <div className="popup" style={{ zIndex: "3" }}>
                     <div className='filterInput'>
                         <input
                             type="text"
@@ -63,14 +60,14 @@ const DropDownInput = (props) => {
                     </div>
                     <div className="options">
                         { !needAll && (<div
-                            key={"---.---"}
+                            key={"All"}
                             className="option"
                             onClick={() => handleOptionSelect({
                                 value: null,
-                                label: "---.---"
+                                label: "All"
                             })}
                         >
-                            {"---.---"}
+                            {"All"}
                         </div>)}
                         {filteredOptions.map(option => (
                             <div

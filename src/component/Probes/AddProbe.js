@@ -1,16 +1,19 @@
-import { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import '../../sass/Probes/AddProbe.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleXmark, faNoteSticky } from '@fortawesome/free-regular-svg-icons'
 import {
-    faDisplay, faLocationDot, faUser, faCaretDown, faChartArea, faMapPin, faLock, faBolt, faWifi, faSeedling, faBroom, faBan, faFloppyDisk
+    faDisplay, faLocationDot, faUser, faCaretDown,
+     faChartArea, faMapPin, faLock, faBolt, faWifi, faSeedling,
+      faBroom, faBan, faFloppyDisk, faUsersViewfinder, faInbox, faShieldHalved
 } from '@fortawesome/free-solid-svg-icons'
 import DropdownWithInput from '../action/DropdownWithInput';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { ProbesContext } from './ProbesTable/ProbesContext';
 import { IP } from '../Layout/constaints';
+import { faLinux } from '@fortawesome/free-brands-svg-icons';
 
 const AddProbe = ({ handleCloseWindow }) => {
     const [isOpen, openCloseWindow] = useState(true)
@@ -30,7 +33,7 @@ const AddProbe = ({ handleCloseWindow }) => {
         setSelectedArea(selectedValue);
     };
     useEffect(() => {
-        fetch("http://"+IP+"/api/v1/locations")
+        fetch(IP+"/api/v1/locations")
             .then(response => response.json())
             .then(data => setLocation(data))
             .catch(err => console.log(err))
@@ -143,6 +146,10 @@ const AddProbe = ({ handleCloseWindow }) => {
             "description": document.getElementById("note").value,
             "location": (document.querySelector("#locationInput .dropdown .select").textContent === 'Choose the location' || document.querySelector("#locationInput .dropdown .select").textContent === '---.---') ? '' : document.querySelector("#locationInput .dropdown .select").textContent,
             "area": (document.querySelector("#areaInput .dropdown .select").textContent === 'Choose the area' || document.querySelector("#areaInput .dropdown .select").textContent === '---.---') ? '' : document.querySelector("#areaInput .dropdown .select").textContent,
+            "sshAccount": document.getElementById("sshAccount").value,
+            "sshPass": document.getElementById("sshPass").value,
+            "sshPort": document.getElementById("sshPort").value,
+            "sudoPass": document.getElementById("sudoPass").value
         }
         return probe;
     }
@@ -186,16 +193,16 @@ const AddProbe = ({ handleCloseWindow }) => {
                                 <div className='input_container-icon-text'>PROBE NAME</div>
                             </div>
                             <div className='input_container-input'>
-                                <input id='probe_name' type='text' placeholder='Type probe name....'></input>
+                                <input id='probe_name' type='text' autoComplete='off' placeholder='Type probe name....'></input>
                             </div>
                         </div>
                         <div className='input_container'>
                             <div className='input_container-icon d-flex align-items-center'>
                                 <FontAwesomeIcon icon={faUser} />
-                                <div className='input_container-icon-text'>USERNAME</div>
+                                <div className='input_container-icon-text'>BROKER USERNAME</div>
                             </div>
                             <div className='input_container-input'>
-                                <input type='text' placeholder='Type username here....' id="username"></input>
+                                <input type='text' autoComplete='off' placeholder='Type username here....' id="username"></input>
                             </div>
                         </div>
                     </div>
@@ -207,16 +214,58 @@ const AddProbe = ({ handleCloseWindow }) => {
                                 <div className='input_container-icon-text'>IP ADDRESS</div>
                             </div>
                             <div className='input_container-input'>
-                                <input type='text' placeholder='Type ip address ....' id='ip_address'></input>
+                                <input type='text' autoComplete='off'  placeholder='Type ip address ....' id='ip_address'></input>
                             </div>
                         </div>
                         <div className='input_container'>
                             <div className='input_container-icon d-flex align-items-center'>
                                 <FontAwesomeIcon icon={faLock} />
-                                <div className='input_container-icon-text'>PASSWORD</div>
+                                <div className='input_container-icon-text'>BROKER PASSWORD</div>
                             </div>
                             <div className='input_container-input'>
-                                <input type='text' placeholder='Type password ....' id='password'></input>
+                                <input type='text' autoComplete='off' placeholder='Type password ....' id='password'></input>
+                            </div>
+                        </div>
+                    </div>
+                    {/* SSH USER NAME & SSH PORT */}
+                    <div className="field d-flex justify-content-between">
+                        <div className='input_container'>
+                            <div className='input_container-icon d-flex align-items-center'>
+                                <FontAwesomeIcon icon={faUsersViewfinder} />
+                                <div className='input_container-icon-text'>SSH USERNAME</div>
+                            </div>
+                            <div className='input_container-input'>
+                                <input type='text' autoComplete='off' placeholder='Type ssh username ....' id='sshAccount'></input>
+                            </div>
+                        </div>
+                        <div className='input_container'>
+                            <div className='input_container-icon d-flex align-items-center'>
+                                <FontAwesomeIcon icon={faInbox} />
+                                <div className='input_container-icon-text'>SSH PORT</div>
+                            </div>
+                            <div className='input_container-input'>
+                                <input type='text' autoComplete='off' placeholder='Type ssh port ....' id='sshPort'></input>
+                            </div>
+                        </div>
+                    </div>
+                    {/* SSH PASSWORD & SUDO PASSWORD */}
+                    <div className="field d-flex justify-content-between">
+                        <div className='input_container'>
+                            <div className='input_container-icon d-flex align-items-center'>
+                                <FontAwesomeIcon icon={faShieldHalved} />
+                                <div className='input_container-icon-text'>SSH PASSWORD</div>
+                            </div>
+                            <div className='input_container-input'>
+                                <input type='text' autoComplete='off' placeholder='Type ssh password ....' id='sshPass'></input>
+                            </div>
+                        </div>
+                        <div className='input_container'>
+                            <div className='input_container-icon d-flex align-items-center'>
+                                <FontAwesomeIcon icon={faLinux} size='lg' />
+                                <div className='input_container-icon-text'>SUDO PASSWORD</div>
+                            </div>
+                            <div className='input_container-input'>
+                                <input type='text' autoComplete='off' placeholder='Type sudo password ....' id='sudoPass'></input>
                             </div>
                         </div>
                     </div>
@@ -253,7 +302,7 @@ const AddProbe = ({ handleCloseWindow }) => {
                                     <div className='input_container-icon-text'>OLT</div>
                                 </div>
                                 <div className='input_container-input'>
-                                    <input type='text' placeholder='Type OLT ....' id="olt"></input>
+                                    <input type='text' autoComplete='off' placeholder='Type OLT ....' id="olt"></input>
                                 </div>
                             </div>
                             <div className='input_container-mini'>
@@ -262,7 +311,7 @@ const AddProbe = ({ handleCloseWindow }) => {
                                     <div className='input_container-icon-text'>VLAN</div>
                                 </div>
                                 <div className='input_container-input'>
-                                    <input type='text' placeholder='Type VLAN ....' id='vlanInput' ></input>
+                                    <input type='text' autoComplete='off' placeholder='Type VLAN ....' id='vlanInput' ></input>
                                 </div>
                             </div>
                         </div>
@@ -277,7 +326,7 @@ const AddProbe = ({ handleCloseWindow }) => {
                                     <div className='input_container-icon-text'>KEEP ALIVE(s)</div>
                                 </div>
                                 <div className='input_container-input'>
-                                    <input type='text' defaultValue={3} id='keep_alive'></input>
+                                    <input type='text' autoComplete='off' defaultValue={3} id='keep_alive'></input>
                                 </div>
                             </div>
                             <div className='input_container-mini'>
@@ -300,7 +349,7 @@ const AddProbe = ({ handleCloseWindow }) => {
                                     <div className='input_container-icon-text'>CONNECTION TIMEOUT(s)</div>
                                 </div>
                                 <div className='input_container-input'>
-                                    <input type='text' placeholder='Type connection timeout ....' defaultValue={10} id='connection_timeout'></input>
+                                    <input type='text' autoComplete='off' placeholder='Type connection timeout ....' defaultValue={10} id='connection_timeout'></input>
                                 </div>
                             </div>
                         </div>

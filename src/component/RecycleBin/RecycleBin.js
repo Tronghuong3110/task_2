@@ -19,7 +19,7 @@ const RecycleBin = () => {
     }, [page,nameCondition])
     const getProbesInBin = (nameCondition) => {
         const fetchData = () => {
-            let api = "http://" + IP + "/api/v1/probes/recycle?page=" + (page - 1);
+            let api = IP + "/api/v1/probes/recycle?page=" + (page - 1);
             if (nameCondition != "") {
                 api += "&name=" + nameCondition;
             }

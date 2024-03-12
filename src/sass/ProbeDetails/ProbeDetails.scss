@@ -136,6 +136,18 @@ $mixcolor: linear-gradient(90deg, $pink-color, $blue-color);
                 overflow-y: scroll;
             }
         }
+        .interfaceContainer{
+            margin: 10px 0;
+            .interfaces{
+                padding: 20px;
+                height: 100%;
+                width: 100%;
+                background-color: $primary;
+                border-radius: 10px;
+                border: 2px solid $pink-color;
+                display: flex;
+            }
+        }
     
     }
 }

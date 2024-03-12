@@ -1,5 +1,5 @@
 import { Box, Typography } from '@mui/material'
-import React, { useEffect, useState, useRef } from 'react'
+import React from 'react'
 
 import ChartDisPlay from './ChartDisPlay'
 function Core({ number, percent, cpu, probeId, activeCore, setActiveCore }) {
@@ -8,7 +8,6 @@ function Core({ number, percent, cpu, probeId, activeCore, setActiveCore }) {
         else if (percent < 80) return "#ffd233";
         else return "#ff1c1c";
     };
-
     const handleClick = () => {
         if (activeCore === cpu) {
             setActiveCore(null); // Ẩn popup nếu core đã được chọn trước đó
@@ -40,6 +39,7 @@ function Core({ number, percent, cpu, probeId, activeCore, setActiveCore }) {
                     cpu={cpu}
                     probeId={probeId}
                     setChartDisplay={setActiveCore}
+                    
                 />
             )}
         </div>

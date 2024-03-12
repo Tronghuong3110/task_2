@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import { TableRow, Table, TableHead, TableCell, TableBody, Checkbox } from "@mui/material";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleCheck as regularFaCircleCheck, faTrashCan } from '@fortawesome/free-regular-svg-icons'
-import { faCircleCheck as solidFaCircleCheck, faClockRotateLeft, faArrowRotateBack } from '@fortawesome/free-solid-svg-icons'
+import { faCircleCheck as solidFaCircleCheck, faArrowRotateBack } from '@fortawesome/free-solid-svg-icons'
 import '../../../sass/ModuleHistory/ModuleHistoryTable.scss'
 import { IP } from '../../Layout/constaints'
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 const ModuleHistoryTable = (props) => {
     const { moduleHistories, getModuleHistory,conditions } = props
@@ -15,7 +15,7 @@ const ModuleHistoryTable = (props) => {
         let options = {
             method: "PUT"
         }
-        fetch("http://" + IP + "/api/v1//moduleHistory?idModuleHistory=" + id, options)
+        fetch( IP + "/api/v1//moduleHistory?idModuleHistory=" + id, options)
             .then(respose => respose.text())
             .then(data => {
                 getModuleHistory(conditions)
@@ -33,7 +33,7 @@ const ModuleHistoryTable = (props) => {
         else setSelectedModuleHistory([])
     }
     const isSelected = (id) => {
-        if (selectedModuleHistory.find(num => num == id) == undefined) return false;
+        if (selectedModuleHistory.find(num => num === id) === undefined) return false;
         else return true;
     }
     const addOrRemoveToSelectedList = (event, checked, id) => {
@@ -42,8 +42,8 @@ const ModuleHistoryTable = (props) => {
             console.log([...selectedModuleHistory, id])
         }
         else {
-            setSelectedModuleHistory(selectedModuleHistory.filter(item => item != id))
-            console.log(selectedModuleHistory.filter(item => item != id))
+            setSelectedModuleHistory(selectedModuleHistory.filter(item => item !== id))
+            console.log(selectedModuleHistory.filter(item => item !== id))
         }
     }
     const removeModuleHistory = (id) => {
@@ -62,7 +62,7 @@ const ModuleHistoryTable = (props) => {
                 idsStr: param
             })
         }
-        fetch("http://" + IP + "/api/v1/module/history", options)
+        fetch( IP + "/api/v1/module/history", options)
             .then(response => response.json())
             .then(data => {
                 console.log(data)
@@ -72,7 +72,7 @@ const ModuleHistoryTable = (props) => {
             .catch(err => console.log(err))
     }
     const notify = (message, status) => {
-        if (status == 1) {
+        if (status === 1) {
             toast.success(message, {
                 position: "top-center",
                 autoClose: 4000,
@@ -83,7 +83,7 @@ const ModuleHistoryTable = (props) => {
                 theme: "colored",
             })
         }
-        else if (status == 0) {
+        else if (status === 0) {
             toast.error(message, {
                 position: "top-center",
                 autoClose: 4000,

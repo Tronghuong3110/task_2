@@ -1,6 +1,5 @@
 import { React, useState, useEffect, useContext } from 'react';
 import { TableBody, TableCell, Tooltip, TablePagination } from '@mui/material';
-import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Table from '@mui/material/Table';
 import '../../../sass/Probes/ProbeTable/ProbesTable.scss';
@@ -8,13 +7,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faTrashCan, faCircleRight, faCirclePlay, faCircleStop, faHourglassHalf
 } from '@fortawesome/free-regular-svg-icons'
-import { faCircle, faDownload } from '@fortawesome/free-solid-svg-icons';
+import { faCircle } from '@fortawesome/free-solid-svg-icons';
 import TableHeader from './TableHeader';
 import { ProbesContext } from './ProbesContext';
 import ConfigFileGenerator from '../../action/download';
-import { Routes, Route, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Confirm from '../../action/Confirm';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { IP } from '../../Layout/constaints';
 const ProbesTable = () => {
@@ -47,7 +46,7 @@ const ProbesTable = () => {
                     'Content-Type': 'application/json'
                 }
             };
-            fetch("http://" + IP + "/api/v1/probe?id=" + id, options)
+            fetch(IP + "/api/v1/probe?id=" + id, options)
                 .then(response => response.json())
                 .then(data => {
                     const newArray = probes.filter(item => item.id !== id);
@@ -64,10 +63,10 @@ const ProbesTable = () => {
         setOrderDirection(isAscending ? 'desc' : 'asc')
     }
     function descendingComparator(a, b, orderBy) {
-        if (b[orderBy] < a[orderBy]) {
+        if (parseInt(b[orderBy]) < parseInt(a[orderBy])) {
             return -1;
         }
-        if (b[orderBy] > a[orderBy]) {
+        if (parseInt(b[orderBy]) > parseInt(a[orderBy])) {
             return 1;
         }
         return 0;
@@ -94,14 +93,14 @@ const ProbesTable = () => {
         setRowsPerPage(parseInt(event.target.value), 10)
         setPage(0)
     }
-    const handleOnSwitch = (id, status,property) => {
+    const handleOnSwitch = (id, status, property) => {
         console.log("PUT")
-        const body = property==='status'?({
+        const body = property === 'status' ? ({
             "id": id,
-            "status" : status == 'connected' ? "disconnected" : "connected"
-        }):({
+            "status": status === 'connected' ? "disconnected" : "connected"
+        }) : ({
             "id": id,
-            "pending" : status == false ? true : false
+            "pending": status === false ? true : false
         })
         const requestOptions = {
             method: 'PUT',
@@ -110,15 +109,15 @@ const ProbesTable = () => {
             },
             body: JSON.stringify(body)
         };
-        fetch("http://" + IP + "/api/v1/probe", requestOptions)
+        fetch(IP + "/api/v1/probe", requestOptions)
             .then(respone => respone.json())
             .then(data => {
                 console.log(data)
-                if (data.code == "1") {
+                if (data.code === "1") {
                     const updatedItems = probesContext.probes.map(item => {
                         if (item.id === id) {
-                            if(property=="status") return { ...item, status: status == 'connected' ? "disconnected" : "connected" };
-                            else return { ...item, pending: status == false ? true : false};
+                            if (property === "status") return { ...item, status: status === 'connected' ? "disconnected" : "connected" };
+                            else return { ...item, pending: status === false ? true : false };
                         }
                         return item;
                     })
@@ -132,7 +131,7 @@ const ProbesTable = () => {
             .catch(err => console.log(err))
     }
     const setIconConnect = (status) => {
-        if (status == "connected") {
+        if (status === "connected") {
             return (
                 <FontAwesomeIcon icon={faCircleStop} style={{ color: "#9A8383", }} />
             )
@@ -152,7 +151,7 @@ const ProbesTable = () => {
         })
     }
     const notify = (message, status) => {
-        if (status == 1) {
+        if (status === 1) {
             toast.success(message, {
                 position: "top-center",
                 autoClose: 4000,
@@ -163,7 +162,7 @@ const ProbesTable = () => {
                 theme: "colored",
             })
         }
-        else if (status == 0) {
+        else if (status === 0) {
             toast.error(message, {
                 position: "top-center",
                 autoClose: 4000,
@@ -197,7 +196,7 @@ const ProbesTable = () => {
                 ></TableHeader>
                 <TableBody>
                     {
-                        probesContext.probes.length != 0 ? (sortedProbes(probes, getComparator(orderDirection, valueToOrderBy))
+                        probesContext.probes.length !== 0 ? (sortedProbes(probes, getComparator(orderDirection, valueToOrderBy))
                             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                             .map((probe, index) => {
                                 return (
@@ -230,24 +229,40 @@ const ProbesTable = () => {
                                                 <div className='status-name failed' key="numberFailedModule">{probe.numberFailedModule}</div>
                                             </div>
                                         </TableCell>
-                                        <TableCell className='last_online' >
-                                            <div>{probe.connectAt}</div></TableCell>
+                                        <TableCell className='interface'>
+                                            <Link to={`/interface/${probe.id}`} style={{color:"white", textDecoration:'none'}}>
+                                                <div className='interface-container d-flex'>
+                                                    <Tooltip title={`Up interfaces : ${probe.numberInterfaceUp}`}>
+                                                        <div className='interfaceStatus d-flex '>
+                                                            <div className='interfaceStatus-status up'></div>
+                                                            <div className='interfaceStatus-quantity'>{probe.numberInterfaceUp}</div>
+                                                        </div>
+                                                    </Tooltip>
+                                                    <Tooltip title={`Down interfaces : ${probe.numberInterfaceDown}`} >
+                                                        <div className='interfaceStatus d-flex'>
+                                                            <div className='interfaceStatus-status down'></div>
+                                                            <div className='interfaceStatus-quantity'>{probe.numberInterfaceDown}</div>
+                                                        </div>
+                                                    </Tooltip>
+                                                </div>
+                                            </Link>
+                                        </TableCell>
                                         <TableCell className='description' >
                                             <Tooltip title={probe.description}><div>{probe.description}</div></Tooltip>
                                         </TableCell>
                                         <TableCell className='actions' >
                                             <div className='actions-container d-flex justify-content-around'>
                                                 <div className='action'  >
-                                                    <Tooltip title={probe.status==='connected'?'Ngắt kết nối':'Kết nối'}>
+                                                    <Tooltip title={probe.status === 'connected' ? 'Ngắt kết nối' : 'Kết nối'}>
                                                         <button onClick={() => { handleOnSwitch(probe.id, probe.status, 'status') }}>
                                                             {setIconConnect(probe.status)}
                                                         </button>
                                                     </Tooltip>
                                                 </div>
                                                 <div className='action'  >
-                                                    <Tooltip title={probe.pending===false?'Kích hoạt nhận trạng thái pending':'Hủy nhận trạng thái pending'}>
-                                                        <button onClick={() => { handleOnSwitch(probe.id, probe.pending,'pending') }}>
-                                                            <FontAwesomeIcon icon={faHourglassHalf} style={{ color: probe.pending===false?'#9A8383':"#e1ff00"}} />
+                                                    <Tooltip title={probe.pending === false ? 'Kích hoạt nhận trạng thái pending' : 'Hủy nhận trạng thái pending'}>
+                                                        <button onClick={() => { handleOnSwitch(probe.id, probe.pending, 'pending') }}>
+                                                            <FontAwesomeIcon icon={faHourglassHalf} style={{ color: probe.pending === false ? '#9A8383' : "#e1ff00" }} />
                                                         </button>
                                                     </Tooltip>
                                                 </div>

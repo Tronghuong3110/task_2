@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import '../../../sass/Module/ModuleTable/ModuleTable.scss'
 import AddModule from '../AddModule';
+import { TableRow, Table, TableHead, TableCell, TableBody, TablePagination } from "@mui/material";
 import { faCube, faMagnifyingGlass, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { faPlusSquare } from '@fortawesome/free-regular-svg-icons';
-import { TableRow, Table, TableHead, TableCell, TableBody, TablePagination } from "@mui/material";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPenToSquare, faTrashCan } from '@fortawesome/free-regular-svg-icons'
 import {
@@ -53,7 +53,7 @@ const ModuleTable = () => {
         getModules()
     }
     const getModules = () => {
-        fetch("http://" + IP + "/api/v1/modules")
+        fetch( IP + "/api/v1/modules")
             .then(respone => respone.json())
             .then(data => {
                 let renderData = data.filter(module => module.name.toLowerCase().includes(keyword.toLowerCase()));
@@ -87,7 +87,7 @@ const ModuleTable = () => {
                     "Content-Type": "application/json",
                 }
             };
-            fetch("http://" + IP + "/api/v1/module?id=" + id, options)
+            fetch( IP + "/api/v1/module?id=" + id, options)
                 .then(response => response.json())
                 .then(data => {
                     console.log(data)

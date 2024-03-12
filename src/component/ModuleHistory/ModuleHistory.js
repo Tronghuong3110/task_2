@@ -1,14 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import 'bootstrap/dist/css/bootstrap.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCube, faMagnifyingGlass, faClockRotateLeft, faArrowRotateBack } from '@fortawesome/free-solid-svg-icons';
-import { faPlusSquare, faTrashCan } from '@fortawesome/free-regular-svg-icons';
+import { faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons';
 import '../../sass/ModuleHistory/ModuleHistory.scss'
 import ModuleHistoryTable from "./ModuleHistoryTable/ModuleHistoryTable";
-import { Checkbox, Pagination } from "@mui/material";
+import { Pagination } from "@mui/material";
 import DropDownInput from "../action/DropDownInput";
 import { IP } from "../Layout/constaints";
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useParams } from "react-router-dom";
 const ModuleHistory = () => {
@@ -54,7 +53,7 @@ const ModuleHistory = () => {
     const intervalRef = useRef(null);
     
     useEffect(() => {
-        fetch("http://" + IP + "/api/v1/probes?name=&location=&area=&vlan=")
+        fetch(IP + "/api/v1/probes?name=&location=&area=&vlan=")
             .then(response => response.json())
             .then(data => {
                 let arr = []
@@ -69,7 +68,7 @@ const ModuleHistory = () => {
     }, [])
     useEffect(() => {
         if (selectedProbe != "" && selectedProbe != null) {
-            fetch("http://" + IP + "/api/v1/probe/modules?idProbe=" + selectedProbe + "&&name=&&status=")
+            fetch(IP + "/api/v1/probe/modules?idProbe=" + selectedProbe + "&&name=&&status=")
                 .then(response => response.json())
                 .then(data => {
                     let arr = []
@@ -90,7 +89,7 @@ const ModuleHistory = () => {
     }, [page,conditions])
     const getModuleHistory = (conditions) => {
         const fetchData = async () => {
-            let api = "http://" + IP + "/api/v1/moduleHistories?page=" + (page - 1);
+            let api = IP + "/api/v1/moduleHistories?page=" + (page - 1);
             if (conditions != null) {
                 for (let key in conditions) {
                     if (conditions[key] != "" && conditions[key] != null) api += "&" + key + "=" + conditions[key]

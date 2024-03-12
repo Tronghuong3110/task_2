@@ -7,7 +7,7 @@ import {
     faClockRotateLeft,
     faCube,
     faDisplay,
-    faHouse,faBars, faRecycle
+    faHouse,faBars, faRecycle, faServer, faHardDrive, faWarehouse, faDatabase
 } from '@fortawesome/free-solid-svg-icons'
 import { Link } from 'react-router-dom';
 const Sidebar = (props) => {
@@ -82,6 +82,38 @@ const Sidebar = (props) => {
                             <FontAwesomeIcon icon={faChartLine} style={{ color: "#ffffff", fontSize: "1em" }} />
                         </div>
                         <div className="selection-text sidebar-text">Statistic</div>
+                    </Link>
+                </div>
+                <div className="selection d-flex" id="dbServer">
+                    <Link to={"/dbserver"}>
+                        <div className="selection-symbol d-flex align-items-center">
+                            <FontAwesomeIcon icon={faServer} style={{ color: "#ffffff", fontSize: "1em" }} />
+                        </div>
+                        <div className="selection-text sidebar-text">DB Server</div>
+                    </Link>
+                </div>
+                <div className="selection d-flex" id="dbServer">
+                    <Link to={"/db"}>
+                        <div className="selection-symbol d-flex align-items-center">
+                            <FontAwesomeIcon icon={faDatabase} style={{ color: "#ffffff", fontSize: "1em" }} />
+                        </div>
+                        <div className="selection-text sidebar-text">Database</div>
+                    </Link>
+                </div>
+                <div className="selection d-flex" id="nas">
+                    <Link to={"/nas"}>
+                        <div className="selection-symbol d-flex align-items-center">
+                            <FontAwesomeIcon icon={faHardDrive} style={{ color: "#ffffff", fontSize: "1em" }} />
+                        </div>
+                        <div className="selection-text sidebar-text">NAS</div>
+                    </Link>
+                </div>
+                <div className="selection d-flex" id="capture">
+                    <Link to={"/capture"}>
+                        <div className="selection-symbol d-flex align-items-center">
+                            <FontAwesomeIcon icon={faWarehouse} style={{ color: "#ffffff", fontSize: "1em" }} />
+                        </div>
+                        <div className="selection-text sidebar-text">Capture</div>
                     </Link>
                 </div>
                 <div className="selection d-flex" id="recycleBin">

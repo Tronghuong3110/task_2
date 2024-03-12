@@ -8,13 +8,14 @@ $blue-color: #9747FF;
         margin-top: 20px !important;
         table-layout: fixed;
         position: relative;
+
         tbody {
             tr {
                 td {
-                    font-size: 0.7rem ;
+                    font-size: 0.7rem;
                     color: white !important;
                     text-align: center !important;
-                    padding: 5px ;
+                    padding: 5px;
                     height: fit-content;
                     border: none !important;
                     line-height: 1rem;
@@ -65,51 +66,37 @@ $blue-color: #9747FF;
                             }
                         }
                     }
+
+                    .interface {
+                        &-container {
+                            .interfaceStatus {
+                                width: 50%;
+                                justify-content: center;
+                                align-items: center;
+                                &-status {
+                                    height: 1em;
+                                    width: 1em;
+                                    border-radius: 50%;
+                                    margin: 0 3px;
+                                }
+                                .up{
+                                    background-image: linear-gradient(135deg,#EDFF1C,#349911);
+                                }
+                                .down{
+                                    background-color: gray;
+                                }
+                            }
+                        }
+
+                    }
                 }
 
-                .id {
-                    width: 4%;
-                }
-
-                .probe_name {
-                    width: 9%;
-                }
-
-                .ip_address {
-                    width: 9%;
-                }
-
-                .location,
-                .area,
-                .vlan,
-                .total_module {
-                    width: 5%;
-                }
-
-                .probeStatus {
-                    width: 3%;
-                }
-
-                .status {
-                    width: 16%;
-                }
-
-                .last_online {
-                    width: 12%;
-                }
-
-                .description {
-                    width: 15%;
-                }
-
-                .actions {
-                    width: 12%;
-                }
             }
         }
 
-        
+
     }
+
     .css-jtlhu6-MuiTablePagination-root {
         position: absolute;
         bottom: 0;

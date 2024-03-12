@@ -1,5 +1,5 @@
-import { Box, Typography } from '@mui/material'
-import React, { useEffect, useState, useRef } from 'react'
+import { Box } from '@mui/material'
+import React, { useEffect, useState } from 'react'
 import { IP } from '../../../Layout/constaints'
 import LineChart from './LineChart'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -47,7 +47,7 @@ function ChartDisPlay(props) {
         return () => {
             clearInterval(intervalId);
         };
-    }, [])
+    }, [cpu, probeId])
     return (
         <Box sx={style.chartContainer}>
             <Box sx={style.btnContainer}>

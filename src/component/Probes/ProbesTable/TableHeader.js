@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from 'react';
+import { React } from 'react';
 import { TableCell, Tooltip, TableSortLabel } from '@mui/material';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
@@ -12,31 +12,41 @@ const TableHeader = (props) => {
     return (
         <TableHead className='Probe_Header'>
             <TableRow>
-                <TableCell className='id'>ID</TableCell>
-                <TableCell className='probe_name' >PROBE NAME</TableCell>
-                <TableCell className='ip_address'>IP ADDRESS</TableCell>
-                <TableCell className='location'>
+                <TableCell className='id' width="4%">ID</TableCell>
+                <TableCell className='probe_name' width="14%" >
+                    <div className='probe_name-container'>
+                        <TableSortLabel
+                            active={valueToOrderBy === "name"}
+                            direction={valueToOrderBy === "name" ? orderDirection : 'asc'}
+                            onClick={createSortHandler('name')}
+                        >
+                            <div key="name" >PROBE NAME</div>
+                        </TableSortLabel>
+                    </div>
+                </TableCell>
+                <TableCell className='ip_address' width="10%" >IP ADDRESS</TableCell>
+                <TableCell className='location' width="5%">
                     <Tooltip title="Location">
                         <span>LO</span>
                     </Tooltip>
                 </TableCell>
-                <TableCell className='area'>
+                <TableCell className='area' width="5%">
                     <Tooltip title="Area">
                         <span>AR</span>
                     </Tooltip>
                 </TableCell>
-                <TableCell className='vlan'>VLAN</TableCell>
-                <TableCell className='probeStatus'>
+                <TableCell className='vlan' width="5%">VLAN</TableCell>
+                <TableCell className='probeStatus' width="5%">
                     <Tooltip title="Status">
                         <span>STA</span>
                     </Tooltip>
                 </TableCell>
-                <TableCell className='total_module'>
+                <TableCell className='total_module' width="5%">
                     <Tooltip title="Total module">
                         <span>TM</span>
                     </Tooltip>
                 </TableCell>
-                <TableCell className='status'>
+                <TableCell className='status' width='13%'>
                     <div className='status-container d-flex'>
                         <TableSortLabel
                             className='status-name running'
@@ -64,9 +74,9 @@ const TableHeader = (props) => {
                         ><Tooltip title="Failed"><div key="numberFailedModule" className='statusModule' >SF</div></Tooltip></TableSortLabel>
                     </div>
                 </TableCell>
-                <TableCell className='last_online'>LAST ONLINE</TableCell>
-                <TableCell className='description'>DESCRIPTION</TableCell>
-                <TableCell className='actions'>ACTION</TableCell>
+                <TableCell className='interface' width="8%">INTERFACE</TableCell>
+                <TableCell className='description' width="18%">DESCRIPTION</TableCell>
+                <TableCell className='actions' width="13%">ACTION</TableCell>
             </TableRow>
         </TableHead>
     )

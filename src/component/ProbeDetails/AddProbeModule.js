@@ -4,10 +4,10 @@ import '../../sass/ProbeDetails/AddProbeModule.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBookmark, faCircleXmark, faFolderOpen, faNoteSticky } from '@fortawesome/free-regular-svg-icons'
 import {
-    faFloppyDisk, faCube, faTerminal, faPlug, faArrowRightFromBracket, faArrowRightToBracket, faList
+    faFloppyDisk, faCube, faTerminal, faArrowRightToBracket, faList
 } from '@fortawesome/free-solid-svg-icons'
 import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { IP } from '../Layout/constaints';
 
 const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
@@ -22,11 +22,11 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
     const [logPath, setLogPath] = useState("")
     const [typeModule, setTypeModule] = useState([])
     useEffect(() => {
-        fetch("http://" + IP + "/api/v1/modules")
+        fetch( IP + "/api/v1/modules")
             .then(response => response.json())
             .then(data => {
                 setListSampleModule(data)
-                if (id == null) {
+                if (id === null) {
                     setCommandValue(data[0].caption + " " + data[0].argDefalt);
                     setCaption(data[0].caption)
                     setArg(data[0].argDefalt)
@@ -35,10 +35,10 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                 }
             })
             .catch(err => console.log(err))
-    }, [])
+    }, [id])
     useEffect(() => {
         if (id != null) {
-            fetch("http://" + IP + "/api/v1/probe/module?idProbeModule=" + id)
+            fetch( IP + "/api/v1/probe/module?idProbeModule=" + id)
                 .then(response => response.json())
                 .then(data => {
                     console.log(data)
@@ -48,9 +48,9 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                 .catch(err => console.log(err))
         }
 
-    }, [])
+    }, [id])
     useEffect(() => {
-        fetch("http://" + IP + "/api/v1/typeModule")
+        fetch( IP + "/api/v1/typeModule")
             .then(response => response.json())
             .then(data => setTypeModule(data))
             .catch(err => console.log(err))
@@ -58,10 +58,10 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
     const addOrEditModule = (id) => {
         let inputData = getModuleInfo(id).inputValue
         let fullData = getModuleInfo(id).fullValue
-        if (findEmptyFields(inputData).length != 0) {
+        if (findEmptyFields(inputData).length !== 0) {
             let message = "Field ";
             let arr = findEmptyFields(inputData);
-            if (arr.length == 1) message += arr[0] + " is empty"
+            if (arr.length === 1) message += arr[0] + " is empty"
             else {
 
                 for (let i = 0; i < arr.length; i++) {
@@ -81,17 +81,17 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                 },
                 body: JSON.stringify(fullData)
             }
-            if (fullData.id == null) {
+            if (fullData.id === null) {
                 console.log("POST NOW")
-                fetch("http://" + IP + "/api/v1/probeModule/import", options)
+                fetch( IP + "/api/v1/probeModule/import", options)
                     .then(response => response.json())
                     .then(data => {
                         console.log(data)
-                        if (data.code == 1) {
+                        if (data.code === 1) {
                             notify(data.message, data.code)
                             handleCloseWindow()
                         }
-                        else if (data.code == 0) {
+                        else if (data.code === 0) {
                             notify(data.message, 0)
                         }
                         else {
@@ -102,15 +102,15 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
             }
             else {
                 console.log("PUT NOW")
-                fetch("http://" + IP + "/api/v1/probe/module", options)
+                fetch( IP + "/api/v1/probe/module", options)
                     .then(response => response.json())
                     .then(data => {
                         console.log(data)
-                        if (data.code == 1) {
+                        if (data.code === 1) {
                             notify(data.message, 1)
                             handleCloseWindow()
                         }
-                        else if (data.code == 0) {
+                        else if (data.code === 0) {
                             notify(data.message, 0)
                         }
                         else {
@@ -122,7 +122,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
         }
     }
     const notify = (message, status) => {
-        if (status == 1) {
+        if (status === 1) {
             toast.success(message, {
                 position: "top-center",
                 autoClose: 3000,
@@ -133,7 +133,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                 theme: "colored",
             })
         }
-        else if (status == 0) {
+        else if (status === 0) {
             toast.error(message, {
                 position: "top-center",
                 autoClose: 3000,
@@ -175,7 +175,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
     }
     const getModuleInfo = (id) => {
         let idModule = document.querySelector("#idModule")
-        let caption = id == null ? idModule.options[idModule.selectedIndex].getAttribute("caption") : isEditedModule.caption
+        let caption = id === null ? idModule.options[idModule.selectedIndex].getAttribute("caption") : isEditedModule.caption
         let listInfo = document.querySelectorAll(".input_container .input_container-input .inputModuleInfo")
         let infoObject = {};
         listInfo.forEach(element => {
@@ -202,7 +202,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
 
         for (let key in obj) {
             if (!obj[key]) {
-                if(key!="note") emptyFields.push(key);
+                if(key!=="note") emptyFields.push(key);
             }
         }
 
@@ -236,7 +236,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                                                  value={modules.id}
                                                  path = {modules.pathDefault}
                                                  pathLog ={modules.pathLogDefault}
-                                                 selected={isEditedModule.idModule==modules.id}
+                                                 selected={isEditedModule.idModule===modules.id}
                                                  >{modules.name}</option>
                                             )
                                         })
@@ -264,7 +264,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                                 <select id="moduleType">
                                     {typeModule.map(ele => {
                                         return (
-                                            <option selected={isEditedModule.codeTypeModule==ele.code} value={ele.code}>{ele.name}</option>
+                                            <option selected={isEditedModule.codeTypeModule===ele.code} value={ele.code}>{ele.name}</option>
                                         )
                                     })}
                                 </select>
@@ -290,7 +290,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                                     className='commandInput exception inputModuleInfo'
                                     type='text' placeholder='Your argument'
                                     id='arg'
-                                    defaultValue={id == null ? arg : isEditedModule.arg}
+                                    defaultValue={id === null ? arg : isEditedModule.arg}
                                     onChange={(e) => {
                                         if (id != null) setCommandValue(isEditedModule.caption + " " + e.target.value)
                                         else setCommandValue(caption + " " + e.target.value)
@@ -308,7 +308,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                             </div>
                             <div className='input_container-input'>
                                 <input className='commandInput inputModuleInfo' type='text' placeholder='Path...' id='path'
-                                    defaultValue={id == null ? path : isEditedModule.path}
+                                    defaultValue={id === null ? path : isEditedModule.path}
                                     onChange={(e) => {
                                         setPath(e.target.value)
                                     }}
@@ -316,7 +316,7 @@ const AddProbeModule = ({ handleCloseWindow, idProbe, id }) => {
                             </div>
                             <div className='input_container-input'>
                                 <input className='inputModuleInfo' type='text' placeholder='Log path here....' id='pathLog'
-                                    defaultValue={id == null ? logPath : isEditedModule.pathLog}
+                                    defaultValue={id === null ? logPath : isEditedModule.pathLog}
                                     onChange={(e) => {
                                         setLogPath(e.target.value)
                                     }}

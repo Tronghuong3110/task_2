@@ -1,0 +1,53 @@
+$primary: #0b0c24;
+$secondary: #27293d;
+$pink-color: #E14ECA;
+$blue-color: #9747FF;
+$mixcolor: linear-gradient(90deg, $pink-color, $blue-color);
+.InterfaceTable {
+    width: 100%;
+
+    .InterfaceTableContainer {
+        height: 400px;
+        overflow-y: none;
+        background-color: $primary;
+        border-radius: 10px;
+
+        thead {
+            tr {
+                th {
+                    color: white;
+                    text-align: center;
+                    padding: 10px 0;
+                    background-color: $primary;
+                }
+            }
+        }
+
+        tbody {
+            tr {
+                td {
+                    color: white;
+                    text-align: center;
+                    padding: 5px 0;
+                    font-size: 1em;
+
+                    .action {
+                        display: flex !important;
+                        justify-content: center;
+                        align-items: center;
+
+                        button {
+                            background-color: transparent;
+                            outline: none;
+                            border: none;
+
+                            svg {
+                                font-size: 1.2em;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -24,7 +24,6 @@ const ProbesProvider = ({ children }) => {
         const fetchData = async () => {
             let { name, location, area, vlan } = conditions;
             let url =
-                "http://" +
                 IP +
                 "/api/v1/probes?" +
                 (name ? "name=" + name : "") +

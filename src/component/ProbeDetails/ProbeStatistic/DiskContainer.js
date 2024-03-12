@@ -7,11 +7,11 @@ function DiskContainer(props) {
   const { probeId } = props
   const [diskList, setDiskList] = useState([])
   useEffect(() => {
-    fetch("http://" + IP + "/api/v1/memories?probeId=" + probeId)
+    fetch(IP + "/api/v1/memories?probeId=" + probeId)
       .then(response => response.json())
       .then(data => setDiskList(data))
       .catch(err => console.log(err))
-  }, [])
+  }, [probeId])
 
 
   return (

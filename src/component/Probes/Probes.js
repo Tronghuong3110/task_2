@@ -13,9 +13,9 @@ import {
 import DropdownWithInput from "../action/DropdownWithInput";
 import ProbesTable from "./ProbesTable/ProbesTable";
 import AddProbe from './AddProbe';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { ProbesProvider, ProbesContext } from "./ProbesTable/ProbesContext";
+import {  ProbesContext } from "./ProbesTable/ProbesContext";
 import Confirm from '../action/Confirm'
 import { IP } from "../Layout/constaints";
 import DuplicateProbe from './DuplicateProbe'
@@ -30,7 +30,7 @@ const Probes = () => {
     const probesContext = useContext(ProbesContext)
     //Hàm hiển thị select location và area
     useEffect(() => {
-        fetch("http://" + IP + "/api/v1/locations")
+        fetch(IP + "/api/v1/locations")
             .then(response => response.json())
             .then(data => setLocation(data))
             .catch(err => console.log(err))

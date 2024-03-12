@@ -1,0 +1,24 @@
+$primary: #0b0c24;
+$secondary: #27293d;
+$pink-color: #E14ECA;
+$blue-color: #9747FF;
+.InterfaceEditableInput{
+    display: flex;
+    justify-content: space-around;
+    input{
+        background: $secondary;
+        color: white;
+        width: 90%;
+        border: none;
+        padding: 3px 10px;
+        &:focus{
+            background-color:white;
+            color: black;
+        }
+    }
+    button{
+        background-color: transparent;
+        border: none;
+        
+    }
+}

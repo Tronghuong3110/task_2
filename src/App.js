@@ -12,20 +12,24 @@ import Statistic from './component/Statistic/Statistic'
 import { ProbesProvider } from "./component/Probes/ProbesTable/ProbesContext";
 import { Routes, Route } from 'react-router-dom'
 import RecycleBin from './component/RecycleBin/RecycleBin';
+import DBServer from './component/DBServer/DBServer';
+import NASManager from './component/Nas/NASManager';
+import DB from './component/DB/DB';
+import Capture from './component/Capture/Capture';
+import InterfaceManager from './component/InterfaceManage/InterfaceManager';
 function App() {
   const [isHideSideBar, setHideSideBar] = useState(false)
   return (
     <React.Fragment>
-
       <div className="App" style={{ padding: 0, margin: 0, backgroundColor: "#0b0c24" }}>
         <div className='headerContainer' style={{ height: "80px" }}>
           <Header></Header>
         </div>
         <main className='mainContainer d-flex' style={{ backgroundColor: "#0b0c24",minHeight:"calc(100vh - 160px)" }} >
-          <div className='sidebarContainer' style={{ width: isHideSideBar == false ? "10%" : "5%", backgroundColor: "transparent", height: "100%", transition: "width 0.5s" }}>
+          <div className='sidebarContainer' style={{ width: isHideSideBar === false ? "10%" : "5%", backgroundColor: "transparent", height: "100%", transition: "width 0.5s" }}>
             <Sidebar isHide={isHideSideBar} setHideSideBar={setHideSideBar} ></Sidebar>
           </div>
-          <div className='dataContainer' style={{ width: isHideSideBar == true ? "95%" : "90%", backgroundColor: "transparent", padding: "0 30px", transition: "width 0.5s" }} >
+          <div className='dataContainer' style={{ width: isHideSideBar === true ? "95%" : "90%", backgroundColor: "transparent", padding: "0 30px", transition: "width 0.5s" }} >
 
             <Routes>
               <Route path='/' exact element={<Dashboard></Dashboard>}></Route>
@@ -35,6 +39,11 @@ function App() {
               <Route path='/module_history/:id' exact={true} element={<ModuleHistory></ModuleHistory>}></Route>
               <Route path='/statistic' exact={true} element={<Statistic></Statistic>}></Route>
               <Route path='/bin' exact={true} element={<RecycleBin></RecycleBin>}></Route>
+              <Route path='/dbserver' exact={true} element={<DBServer></DBServer>}></Route>
+              <Route path='/nas' exact element={<NASManager />} ></Route>
+              <Route path='/db' exact element={<DB />}></Route>
+              <Route path='/capture' exact element={<Capture />}></Route>
+              <Route path='/interface/:id' exact element={<InterfaceManager />}></Route>
             </Routes>
           </div>
         </main>

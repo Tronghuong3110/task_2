@@ -1,9 +1,7 @@
 import React from 'react'
 import 'bootstrap/dist/css/bootstrap.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHardDrive } from '@fortawesome/free-solid-svg-icons';
 import '../../../../sass/ProbeDetails/ProbeStatistic/components/Disk.scss'
-import { ClarityHardDiskLine, IconParkSolidStateDisk } from './DiskImg';
+import { ClarityHardDiskLine } from './DiskImg';
 function Disk(props) {
     const {disk} = props
     const setColorForUsage =(disk)=>{
