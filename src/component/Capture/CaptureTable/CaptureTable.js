@@ -202,7 +202,7 @@ function CaptureTable() {
       if (restoreInfo !== null) {
         let tmp = [...JSON.parse(restoreInfo)]
         tmp = tmp.map(item => {
-          if (processId.processId.databaseName.concat(processId.processId.ipDbRunning) === item.capture_id) {
+          if (data.dbName.concat(data.ipDbRunning) === item.capture_id) {
             return {
               ...item,
               'restoreAfterBackup': 0
