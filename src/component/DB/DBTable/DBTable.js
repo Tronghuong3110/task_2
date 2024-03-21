@@ -93,7 +93,6 @@ function DBTable() {
                     </TableBody>
                 </Table>
             </TableContainer>
-            <Pagination className='dbServerPagnitation' count={10} color="secondary" />
             <ToastContainer></ToastContainer>
         </div>
     )

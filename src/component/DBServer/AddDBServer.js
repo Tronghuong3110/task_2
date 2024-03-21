@@ -16,6 +16,7 @@ const AddDBServer = ({ handleCloseWindow, id, rerender }) => {
     const [confirmScreen, setOpenConfirmScreen] = useState(false)
     const [passwordType1, setPasswordType1] = useState(true)
     const [passwordType2, setPasswordType2] = useState(true)
+    const [passwordSudo, setPasswordSudo] = useState(true)
     const [nasList, setNasList] = useState([])
     const [action, setAction] = useState({
         "module": null,
@@ -42,6 +43,7 @@ const AddDBServer = ({ handleCloseWindow, id, rerender }) => {
     )
     const [testingDB, setTestingDB] = useState(false)
     const [testingSSH, setTestingSSH] = useState(false)
+    const [saving, setSaving] = useState(false)
 
     useEffect(() => {
         if (id !== null) {
@@ -58,6 +60,9 @@ const AddDBServer = ({ handleCloseWindow, id, rerender }) => {
                 setNasList(data)
             })
             .catch(err => console.log(err))
+    }, [])
+    useEffect(() => {
+
     }, [])
     const setPasswordType = (value) => {
         if (value === true) return 'password'
@@ -119,6 +124,7 @@ const AddDBServer = ({ handleCloseWindow, id, rerender }) => {
             notify(message, 2)
         }
         else {
+            setSaving(true)
             console.log(data)
             let options = {
                 method: id === null ? "POST" : "PUT",
@@ -133,6 +139,7 @@ const AddDBServer = ({ handleCloseWindow, id, rerender }) => {
                     .then(data => {
                         if (data.code === 1) {
                             notify(data.message, data.code)
+                            setSaving(false)
                             handleCloseWindow();
                             rerender()
                         }
@@ -188,7 +195,8 @@ const AddDBServer = ({ handleCloseWindow, id, rerender }) => {
             "sshPass": document.getElementById("sshPass").value,
             "nasId": document.getElementById("nasId").options[document.getElementById("nasId").selectedIndex].value,
             "nasName": document.getElementById("nasId").options[document.getElementById("nasId").selectedIndex].textContent,
-            "portNumber": document.getElementById("portNumber").value
+            "portNumber": document.getElementById("portNumber").value,
+            'passSudo': document.getElementById("passSudo").value
         }
     }
     function findEmptyFields(obj) {
@@ -197,7 +205,7 @@ const AddDBServer = ({ handleCloseWindow, id, rerender }) => {
         for (let key in obj) {
             if (key !== "id") {
                 if (!obj[key]) {
-                    if (key !== "note") emptyFields.push(key);
+                    if (key !== "description") emptyFields.push(key);
                 }
             }
         }
@@ -267,6 +275,7 @@ const AddDBServer = ({ handleCloseWindow, id, rerender }) => {
             notify(message, 2)
         }
         else {
+            setTestingSSH(true)
             let options = {
                 method: "POST",
                 headers: {
@@ -276,7 +285,10 @@ const AddDBServer = ({ handleCloseWindow, id, rerender }) => {
             }
             fetch(IP + "/api/v1/test/connect/ssh", options)
                 .then(response => response.json())
-                .then(data => notify(data.message, data.code))
+                .then(data => {
+                    notify(data.message, data.code)
+                    setTestingSSH(false)
+                })
                 .then(err => console.log(err))
         }
     }
@@ -387,15 +399,27 @@ const AddDBServer = ({ handleCloseWindow, id, rerender }) => {
                             </div>
                         </div>
                     </div>
-                    {/* Description & SSH Password */}
+                    {/* SUDO Password & SSH Password */}
                     <div className="field d-flex justify-content-between">
-                        <div className='input_container'>
+                        {/* <div className='input_container'>
                             <div className='input_container-icon d-flex align-items-center'>
                                 <FontAwesomeIcon icon={faNoteSticky} />
                                 <div className='input_container-icon-text'>DESCRIPTION</div>
                             </div>
                             <div className='input_container-input'>
                                 <input type='text' placeholder='Type description ....' id='description' defaultValue={isEditedServer.description}></input>
+                            </div>
+                        </div> */}
+                        <div className='input_container'>
+                            <div className='input_container-icon d-flex align-items-center'>
+                                <FontAwesomeIcon icon={faShieldHalved} />
+                                <div className='input_container-icon-text'>SUDO PASSWORD</div>
+                            </div>
+                            <div className='input_container-input'>
+                                <input type={setPasswordType(passwordSudo).toString()} placeholder='Type sudo password ....' id='passSudo' defaultValue={isEditedServer.passSudo}></input>
+                                {passwordSudo === true ?
+                                    (<FontAwesomeIcon icon={faEyeSlash} style={{ color: "#ffffff", }} className='eye' onClick={() => setPasswordSudo(false)} />)
+                                    : (<FontAwesomeIcon icon={faEye} style={{ color: "#ffffff" }} className='eye' onClick={() => setPasswordSudo(true)} />)}
                             </div>
                         </div>
                         <div className='input_container'>
@@ -411,12 +435,24 @@ const AddDBServer = ({ handleCloseWindow, id, rerender }) => {
                             </div>
                         </div>
                     </div>
+                    {/*Description*/}
+                    <div className="field d-flex justify-content-between">
+                        <div className='input_container exception'>
+                            <div className='input_container-icon d-flex align-items-center'>
+                                <FontAwesomeIcon icon={faNoteSticky} />
+                                <div className='input_container-icon-text'>DESCRIPTION</div>
+                            </div>
+                            <div className='input_container-input'>
+                                <textarea placeholder='Take description here...' id='description' defaultValue={isEditedServer.description}></textarea>
+                            </div>
+                        </div>
+                    </div>
                     {/* Button */}
                     <div className='btn-container d-flex justify-content-end'>
                         <button className='btn btn-danger d-flex align-items-center'
                             style={{ marginRight: '1rem' }}
                             onClick={testDbConnection}
-                            disabled={testingDB}
+                            disabled={testingDB || testingSSH ||saving}
                         >
                             <div className='btn-icon d-flex align-items-center' >
                                 {!testingDB && <FontAwesomeIcon icon={faPlay} />}
@@ -427,7 +463,7 @@ const AddDBServer = ({ handleCloseWindow, id, rerender }) => {
                         <button className='btn btn-primary d-flex align-items-center'
                             style={{ marginRight: '1rem' }}
                             onClick={testSSHConnection}
-                            disabled={testingSSH}
+                            disabled={testingDB || testingSSH ||saving}
                         >
                             <div className='btn-icon d-flex align-items-center' >
                                 {!testingSSH && <FontAwesomeIcon icon={faPlay} />}
@@ -437,10 +473,11 @@ const AddDBServer = ({ handleCloseWindow, id, rerender }) => {
                         </button>
                         <button className='btn btn-success d-flex align-items-center'
                             onClick={() => addOrEditDBServer(id)}
-                            disabled={testingDB||testingSSH}
+                            disabled={testingDB || testingSSH ||saving}
                         >
                             <div className='btn-icon d-flex align-items-center' >
-                                <FontAwesomeIcon icon={faFloppyDisk} />
+                                {!saving && <FontAwesomeIcon icon={faFloppyDisk} />}
+                                {saving && <FontAwesomeIcon icon={faSpinner} spinPulse style={{ color: "#ffffff", }} />}
                             </div>
                             <div className='btn-text' >Save</div>
                         </button>

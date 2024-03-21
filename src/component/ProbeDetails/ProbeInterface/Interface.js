@@ -12,7 +12,7 @@ const Interface = ({ name, status }) => {
     };
 
     return (
-        <div className='interface' >
+        <div className='interface' style={{marginLeft: '7.5%'}} >
             <div className='interfaceImg' style={setStatus()}>
                 <img src={ethernet} ></img>
             </div>

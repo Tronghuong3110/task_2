@@ -13,6 +13,7 @@ import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import { Box } from '@mui/material';
 import LinearWithValueLabel from '../action/LinearProgressWithLabel';
+import { json } from 'react-router-dom';
 
 const RestoreWindow = ({ handleCloseWindow, id, data }) => {
     const [isOpen, openCloseAddWindow] = useState(true)
@@ -109,11 +110,23 @@ const RestoreWindow = ({ handleCloseWindow, id, data }) => {
                 }
             }
             fetch(IP + "/api/v1/capture/restore?idInfoDatabase=" + choosenDb.value + "&idServer=" + choosenServer.value, options)
-            setRestoring(true)
+            let restoreInfo = sessionStorage.getItem("restoreInfo")
+            if(restoreInfo!==null){
+                let tmp = [...JSON.parse(restoreInfo)]
+                tmp = tmp.map(item =>{
+                    if(data.id === item.capture_id){
+                        return {
+                            ...item,
+                            'idRestore': choosenDb.value
+                        }
+                    }
+                    else return item;
+                })
+                sessionStorage.setItem("restoreInfo",JSON.stringify(tmp))
+            }
+            handleCloseWindow()
         }
-        console.log(data)
     }
-
 
     return (
         <React.Fragment>
@@ -200,29 +213,6 @@ const RestoreWindow = ({ handleCloseWindow, id, data }) => {
                             }}
                             renderInput={(params) => <TextField {...params} label="Choose restore database" />}
                         />
-                        {isRestoring && (
-                            <React.Fragment>
-                                <div className="field d-flex justify-content-between">
-                                    <div className='input_container'>
-                                        <div className='input_container-icon d-flex align-items-center'>
-                                            <FontAwesomeIcon icon={faSpinner} />
-                                            <div className='input_container-icon-text'>PROCESS</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <Box sx={{ width: "100%", padding: "8px" }}>
-                                    <LinearWithValueLabel
-                                        processId={
-                                            {
-                                                "databaseName": data.dbName,
-                                                "idRestore": choosenDb.value
-                                            }
-                                        }
-                                        
-                                    />
-                                </Box>
-                            </React.Fragment>
-                        )}
                         {/* Button */}
                         <div className='btn-container d-flex justify-content-end'>
                             <button className='btn d-flex align-items-center'

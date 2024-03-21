@@ -9,6 +9,8 @@ import BackupWindow from '../BackupWindow';
 import RestoreWindow from '../RestoreWindow';
 import { IP } from '../../Layout/constaints';
 import SimpleDialogDemo from '../../action/SimpleDialog';
+import LinearWithValueLabel from '../../action/LinearProgressWithLabel';
+import BackUpProgress from '../../action/BackUpProgress';
 function CaptureTable() {
   const [captureList, setCaptrueList] = useState([])
   const [displayCaptureList, setDisplayCaptrueList] = useState([])
@@ -35,28 +37,40 @@ function CaptureTable() {
   ])
   const [backupData, setBackupData] = useState({});
   const [restoreData, setRestoreData] = useState({});
-
   useEffect(() => {
     fetch(IP + "/api/v1/captures")
       .then(response => response.json())
       .then(data => {
         setCaptrueList(data)
         setDisplayCaptrueList(data)
+        if (sessionStorage.getItem("restoreInfo") === null) {
+          let restoreInfo = []
+          data.forEach(item => {
+            if (item.dbName !== null && item.ipDbRunning !== null) {
+              restoreInfo.push({
+                'capture_id': item.dbName.concat(item.ipDbRunning),
+                'dbName': item.dbName,
+                'idRestore': null,
+                "isBackuping": 0,
+                "restoreAfterBackup":0
+              })
+            }
+          })
+          sessionStorage.setItem("restoreInfo", JSON.stringify(restoreInfo))
+        }
       })
       .catch(err => console.log(err))
-  }, [])
-  useEffect(() => {
     const interval = setInterval(() => {
       fetch(IP + "/api/v1/captures")
         .then(response => response.json())
         .then(data => {
           setCaptrueList(data)
+          getCapTureListByCondition(data)
         })
         .catch(err => console.log(err))
-      getCapTureListByCondition()
     }, 5000);
     return () => {
-      sessionStorage.clear()
+      sessionStorage.removeItem("condition")
       clearInterval(interval);
     }
   }, []);
@@ -83,36 +97,31 @@ function CaptureTable() {
       "backupStatus": document.getElementById('backupStatus').value === "" ? null : document.getElementById('backupStatus').value
     }
     sessionStorage.setItem("condition", JSON.stringify(condition))
-    getCapTureListByCondition()
+    getCapTureListByCondition(captureList)
   }
-  const getCapTureListByCondition = () => {
+  const getCapTureListByCondition = (data) => {
     let condition = JSON.parse(sessionStorage.getItem("condition"))
     if (condition !== null) {
-      let displayCaptureList = captureList.filter((item) => {
-        return (!condition.probeName || item.probeName.toLowerCase().includes(condition.probeName.toLowerCase())) &&
+      let displayCaptureList = data.filter((item) => {
+        return (condition.probeName === null || item.probeName.toLowerCase().includes(condition.probeName.toLowerCase())) &&
           (!condition.dbServer || item.idServer === condition.dbServer) &&
           (!condition.province || item.province === condition.province) &&
-          (!condition.monitorStatus || item.monitorStatus === condition.monitorStatus) &&
+          (!condition.monitorStatus || item.statusMonitor === condition.monitorStatus || condition.monitorStatus === "") &&
           (!condition.backupStatus || (item.backupStatus !== null && item.backupStatus.toLowerCase().includes(condition.backupStatus.toLowerCase()))); // Sửa ở đây
       });
-      console.log(displayCaptureList)
       setDisplayCaptrueList(displayCaptureList)
     }
-    // else {
-    //   fetch(IP + "/api/v1/captures?monitorStatus=2" + "&province=" + "&backupStatus=" + "&probeName=")
-    //     .then(response => response.json())
-    //     .then(data => setCaptrueList(data))
-    //     .catch(err => console.log(err))
-    // }
-    console.log(condition)
-
+    else {
+      setDisplayCaptrueList(data)
+    }
   }
-  const getBackupData = (idServer, dbName, idInfo, ipDbLevel1) => {
+  const getBackupData = (idServer, dbName, idInfo, ipDbLevel1, ipDbRunning) => {
     return {
       "idServer": idServer,
       "dbName": dbName,
       "idInfo": idInfo,
-      "ipDbLevel1": ipDbLevel1
+      "ipDbLevel1": ipDbLevel1,
+      "id": dbName.concat(ipDbRunning),
     }
   }
 
@@ -142,14 +151,40 @@ function CaptureTable() {
     openCloseRestoreWindow(false)
   }
   //Ham set color for ipdb
-  const setColorForIpDb = (text) => {
+  const setColorForIpDb = (text,status) => {
+    if(status!==null) return "red"
     if (text != null) {
       let check = text.includes("Deleted")
       if (check === false) return "#00FF1A"
     }
+
     return "#FFF61C"
   }
 
+  const setiIdRestore = (dbName, ipDbRunning) => {
+    if (dbName !== null && ipDbRunning !== null) {
+      const id = dbName.concat(ipDbRunning)
+      if ((sessionStorage.getItem("restoreInfo") !== null)) {
+        let restoreInfo = sessionStorage.getItem("restoreInfo")
+        restoreInfo = JSON.parse(restoreInfo)
+        let ob = restoreInfo.find(item => item.capture_id === id)
+        return ob.idRestore
+      }
+    }
+    return null;
+  }
+  const checkBackuping = (dbName, ipDbRunning) => {
+    if (dbName !== null && ipDbRunning !== null) {
+      const id = dbName.concat(ipDbRunning)
+      if ((sessionStorage.getItem("restoreInfo") !== null)) {
+        let restoreInfo = sessionStorage.getItem("restoreInfo")
+        restoreInfo = JSON.parse(restoreInfo)
+        let ob = restoreInfo.find(item => item.capture_id === id && item.restoreAfterBackup===1 )
+        if(ob!== undefined) return ob.restoreAfterBackup;
+      }
+    }
+    return 0;
+  }
   return (
     <div className='CaptureTable'>
       <div className='searchBar d-flex justify-content-between align-items-end'>
@@ -200,18 +235,19 @@ function CaptureTable() {
         }} >
           <TableHead>
             <TableRow>
-              <TableCell width="3%" >No</TableCell>
+              <TableCell width="4%" >No</TableCell>
               <TableCell width="11%" >Probe name</TableCell>
               <TableCell width="8%" >DB name</TableCell>
-              <TableCell width="5%">Province</TableCell>
+              <TableCell width="6%">Province</TableCell>
               <TableCell width="9%" >IP DB Level 1</TableCell>
               <TableCell width="9%">IP DB Level 2</TableCell>
               <TableCell width="9%">IP DB Running</TableCell>
               <TableCell width="8%">Monitor Status</TableCell>
-              <TableCell width="6%">Volume (GB)</TableCell>
+              <TableCell width="6%">Volume</TableCell>
               <TableCell width="7%">Start time</TableCell>
               <TableCell width="7%">Stop time</TableCell>
               <TableCell width="14%">Backup Status</TableCell>
+              <TableCell width="14%">Restore Status</TableCell>
               <TableCell width="10%">Action</TableCell>
             </TableRow>
           </TableHead>
@@ -225,8 +261,8 @@ function CaptureTable() {
                       <TableCell>
                         <div className='d-flex justify-content-around align-items-center'>
                           {data.status_connect !== null &&
-                            <Tooltip title="The connection to clickhouse server is lost">
-                              <FontAwesomeIcon icon={faCircleExclamation} beatFade style={{ color: "#e91607", }} />
+                            <Tooltip title={data.message}>
+                              <FontAwesomeIcon icon={faCircleExclamation} beatFade style={{ color: "#e91607", }} size='xs' />
                             </Tooltip>
                           }
                           <span className='d-flex justify-content-around align-items-center'>
@@ -247,12 +283,12 @@ function CaptureTable() {
                       <TableCell>{data.province}</TableCell>
                       <TableCell>
                         <Tooltip title={<div>{data.ipDbLevel1}</div>}>
-                          <div style={{ color: setColorForIpDb(data.ipDbLevel1) }} >{data.ipDbLevel1}</div>
+                          <div style={{ color: setColorForIpDb(data.ipDbLevel1,data.status_connect) }} >{data.ipDbLevel1}</div>
                         </Tooltip>
                       </TableCell>
                       <TableCell>
                         <Tooltip title={<div>{data.ipDbLevel2}</div>}>
-                          <div style={{ color: setColorForIpDb(data.ipDbLevel2) }} >{data.ipDbLevel2}</div>
+                          <div style={{ color: setColorForIpDb(data.ipDbLevel2,data.status_connect) }} >{data.ipDbLevel2}</div>
                         </Tooltip>
                       </TableCell>
                       <TableCell>{data.ipDbRunning}</TableCell>
@@ -261,25 +297,49 @@ function CaptureTable() {
                       <TableCell>{data.startTime}</TableCell>
                       <TableCell>{data.stopTime}</TableCell>
                       <TableCell>
-                        <Tooltip title={<div>{data.backupStatus}</div>}>
-                          <div>{data.backupStatus}</div>
-                        </Tooltip>
+                        {checkBackuping(data.dbName, data.ipDbRunning)!==0?(<BackUpProgress
+                          processId={
+                            {
+                              "databaseName": data.dbName,
+                              "idRestore": setiIdRestore(data.dbName,data.ipDbRunning),
+                              "ipDbRunning": data.ipDbRunning,
+                              'isRestoreAfterBackup':  checkBackuping(data.dbName, data.ipDbRunning)
+                            }
+                          }
+                        />):data.backupStatus}
+                      </TableCell>
+                      <TableCell>
+                        <LinearWithValueLabel
+                          processId={
+                            {
+                              "databaseName": data.dbName,
+                              "idRestore": setiIdRestore(data.dbName, data.ipDbRunning),
+                              "ipDbRunning": data.ipDbRunning
+                            }
+                          }
+                        />
                       </TableCell>
                       <TableCell>
                         <div className='d-flex justify-content-evenly'>
                           <div className='action'>
-                            <button
-                              onClick={() => { handleOpenBackupWindow(getBackupData(data.idServer, data.dbName, data.id_info_capture_setting, data.ipDbLevel1)) }}
-                            >
-                              <FontAwesomeIcon icon={faDiagramNext} style={{ color: "#699BF7" }} />
-                            </button>
+                            <Tooltip title={data.status_connect !== null ? "Lost connection" : setColorForIpDb(data.ipDbLevel1) === "#FFF61C" ? "Deleted" : "Backup"}>
+                              <button
+                                disabled={data.status_connect !== null || setColorForIpDb(data.ipDbLevel1) === "#FFF61C"}
+                                onClick={() => { handleOpenBackupWindow(getBackupData(data.idServer, data.dbName, data.id_info_capture_setting, data.ipDbLevel1, data.ipDbRunning)) }}
+                              >
+                                <FontAwesomeIcon icon={faDiagramNext} style={{ color: data.status_connect !== null || setColorForIpDb(data.ipDbLevel1) === "#FFF61C" ? "gray" : "#699BF7" }} />
+                              </button>
+                            </Tooltip>
                           </div>
                           <div className='action'>
-                            <button
-                              onClick={() => { handleOpenRestoreWindow(getBackupData(data.idServer, data.dbName, data.id_info_capture_setting)) }}
-                            >
-                              <FontAwesomeIcon icon={faWindowRestore} style={{ color: "#FFD233" }} />
-                            </button>
+                            <Tooltip title={data.status_connect !== null ? "Lost connection" : "Restore"}>
+                              <button
+                                disabled={data.status_connect !== null}
+                                onClick={() => { handleOpenRestoreWindow(getBackupData(data.idServer, data.dbName, data.id_info_capture_setting, null, data.ipDbRunning)) }}
+                              >
+                                <FontAwesomeIcon icon={faWindowRestore} style={{ color: data.status_connect !== null ? "gray" : "#FFD233" }} />
+                              </button>
+                            </Tooltip>
                           </div>
                           <div className='action'>
                             <SimpleDialogDemo ipDbLevel1={data.ipDbLevel1} ipDbLevel2={data.ipDbLevel2}

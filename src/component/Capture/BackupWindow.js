@@ -4,9 +4,9 @@ import '../../sass/Capture/BackUpWindow.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleXmark, faHardDrive } from '@fortawesome/free-regular-svg-icons'
 import {
- faDatabase, faServer, faTerminal, faDiagramNext
+    faDatabase, faServer, faTerminal, faDiagramNext
 } from '@fortawesome/free-solid-svg-icons'
-import {  toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { IP } from '../Layout/constaints';
 import CustomDateTimePicker from '../action/CustomDateTimePicker.js';
@@ -109,17 +109,17 @@ const BackupWindow = ({ handleCloseWindow, data }) => {
             "doRestore": doRestore,
             "doDeleteAfterBackup": doDeleteAfterBackup,
             "schedule": schedule,
-            "idServerRestore": doRestore===true&&serverRestore!=null?serverRestore.value:null
+            "idServerRestore": doRestore === true && serverRestore != null ? serverRestore.value : null
         }
 
     }
     const backUpDb = (data) => {
         let command = getInfoToBackUp();
         let restore = false
-        let dlt = command.doDeleteAfterBackup===true?1:0
+        let dlt = command.doDeleteAfterBackup === true ? 1 : 0
         if (command.doRestore === true && command.schedule === "") restore = true;
-        if(command.idServerRestore===null&&restore===true){
-            notify("Please choose server to restore",2)
+        if (command.idServerRestore === null && restore === true) {
+            notify("Please choose server to restore", 2)
             return;
         }
         let options = {
@@ -130,14 +130,27 @@ const BackupWindow = ({ handleCloseWindow, data }) => {
             body: JSON.stringify({
                 "scheduleRestore": command.schedule === "" ? null : command.schedule,
                 "idServerRestore": command.idServerRestore,
-                "ipServer": dlt===1?data.ipDbLevel1:null
+                "ipServer": dlt === 1 ? data.ipDbLevel1 : null
             })
         }
-        fetch(IP + "/api/v1/capture/backup?idServer=" + data.idServer + "&databaseName=" + data.dbName + "&idInfo=" + data.idInfo + "&restore=" + restore +"&delete="+ dlt, options)
+        fetch(IP + "/api/v1/capture/backup?idServer=" + data.idServer + "&databaseName=" + data.dbName + "&idInfo=" + data.idInfo + "&restore=" + restore + "&delete=" + dlt, options)
+        let restoreInfo = sessionStorage.getItem("restoreInfo")
+        if (restoreInfo !== null) {
+            let tmp = JSON.parse(restoreInfo)
+            let result = tmp.map(item => {
+                if (data.id === item.capture_id) {
+                    return {
+                        ...item,
+                        'isBackuping':1,
+                        'restoreAfterBackup': restore===false?0:1
+                    }
+                }
+                else return item;
+            })
+            sessionStorage.setItem("restoreInfo", JSON.stringify(result))
+        }
         handleCloseWindow()
     }
-
-
     return (
         <div>
             {isOpen && (<div className='backUpWindowScreen'>
