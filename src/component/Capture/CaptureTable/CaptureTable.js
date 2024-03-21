@@ -197,7 +197,7 @@ function CaptureTable() {
         }
       />)
     }
-    if (data.statusRestore.includes("Finished") || data.statusRestore.includes("error")) {
+    if (data.statusRestore.includes("Finished") || data.statusRestore.includes("error")|| data.statusRestore.includes("IDLE")) {
       let restoreInfo = sessionStorage.getItem("restoreInfo")
       if (restoreInfo !== null) {
         let tmp = [...JSON.parse(restoreInfo)]
