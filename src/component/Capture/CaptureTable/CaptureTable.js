@@ -12,6 +12,7 @@ import SimpleDialogDemo from '../../action/SimpleDialog';
 import LinearWithValueLabel from '../../action/LinearProgressWithLabel';
 import BackUpProgress from '../../action/BackUpProgress';
 function CaptureTable() {
+  var timer = 1000
   const [captureList, setCaptrueList] = useState([])
   const [displayCaptureList, setDisplayCaptrueList] = useState([])
   const [isOpenBackupWindow, openCloseBackupWindow] = useState(false);
@@ -43,32 +44,35 @@ function CaptureTable() {
       .then(data => {
         setCaptrueList(data)
         setDisplayCaptrueList(data)
-        if (sessionStorage.getItem("restoreInfo") === null) {
-          let restoreInfo = []
-          data.forEach(item => {
-            if (item.dbName !== null && item.ipDbRunning !== null) {
-              restoreInfo.push({
-                'capture_id': item.dbName.concat(item.ipDbRunning),
-                'dbName': item.dbName,
-                'idRestore': null,
-                "isBackuping": 0,
-                "restoreAfterBackup": 0
-              })
-            }
-          })
-          sessionStorage.setItem("restoreInfo", JSON.stringify(restoreInfo))
-        }
+        // if (sessionStorage.getItem("restoreInfo") === null) {
+        //   let restoreInfo = []
+        //   data.forEach(item => {
+        //     if (item.dbName !== null && item.ipDbRunning !== null) {
+        //       restoreInfo.push({
+        //         'capture_id': item.dbName.concat(item.ipDbRunning),
+        //         'dbName': item.dbName,
+        //         'idRestore': null,
+        //         "isBackuping": 0,
+        //         "restoreAfterBackup": 0
+        //       })
+        //     }
+        //   })
+        //   sessionStorage.setItem("restoreInfo", JSON.stringify(restoreInfo))
+        // }
       })
       .catch(err => console.log(err))
     const interval = setInterval(() => {
       fetch(IP + "/api/v1/captures")
         .then(response => response.json())
         .then(data => {
+          const check = data.find(item => item.backupStatus.includes("Processing") || item.statusRestore.includes("Processing"))
+          // if(check!==undefined) timer= 5000;
+          // else timer =1000
           setCaptrueList(data)
           getCapTureListByCondition(data)
         })
         .catch(err => console.log(err))
-    }, 5000);
+    }, timer);
     return () => {
       sessionStorage.removeItem("condition")
       clearInterval(interval);
@@ -173,48 +177,52 @@ function CaptureTable() {
     }
     return null;
   }
-  const checkBackuping = (dbName, ipDbRunning) => {
-    if (dbName !== null && ipDbRunning !== null) {
-      const id = dbName.concat(ipDbRunning)
-      if ((sessionStorage.getItem("restoreInfo") !== null)) {
-        let restoreInfo = sessionStorage.getItem("restoreInfo")
-        restoreInfo = JSON.parse(restoreInfo)
-        let ob = restoreInfo.find(item => item.capture_id === id && item.restoreAfterBackup === 1)
-        if (ob !== undefined) return ob.restoreAfterBackup;
-      }
+  // const checkBackuping = (dbName, ipDbRunning) => {
+  //   if (dbName !== null && ipDbRunning !== null) {
+  //     const id = dbName.concat(ipDbRunning)
+  //     if ((sessionStorage.getItem("restoreInfo") !== null)) {
+  //       let restoreInfo = sessionStorage.getItem("restoreInfo")
+  //       restoreInfo = JSON.parse(restoreInfo)
+  //       let ob = restoreInfo.find(item => item.capture_id === id && item.isBackuping === 1)
+  //       if (ob !== undefined) {
+  //         console.log("This is ob: ",ob)
+  //         return ob.isBackuping;
+  //       }
+
+  //     }
+  //   }
+  //   return 0;
+  // }
+  const renderBackupStatus = (data) => {
+    if (data.backupStatus.includes("Processing")) {
+      return (<BackUpProgress
+        processId={
+          {
+            // "databaseName": data.dbName,
+            // "idRestore": setiIdRestore(data.dbName, data.ipDbRunning),
+            // "ipDbRunning": data.ipDbRunning,
+            // 'isRestoreAfterBackup': checkBackuping(data.dbName, data.ipDbRunning),
+            "backupStatus":data.processBackup
+          }
+        }
+      />)
     }
-    return 0;
+    return data.backupStatus;
   }
   const renderRestoreStatus = (data) => {
     if (data.statusRestore.includes("Processing")) {
       return (<LinearWithValueLabel
         processId={
           {
-            "databaseName": data.dbName,
-            "idRestore": setiIdRestore(data.dbName, data.ipDbRunning),
-            "ipDbRunning": data.ipDbRunning
+            "restoreProcess":data.processRestore,
+            // "databaseName": data.dbName,
+            // "idRestore": setiIdRestore(data.dbName, data.ipDbRunning),
+            // "ipDbRunning": data.ipDbRunning
           }
         }
       />)
     }
-    if (data.statusRestore.includes("Finished") || data.statusRestore.includes("error")|| data.statusRestore.includes("IDLE")) {
-      let restoreInfo = sessionStorage.getItem("restoreInfo")
-      if (restoreInfo !== null) {
-        let tmp = [...JSON.parse(restoreInfo)]
-        tmp = tmp.map(item => {
-          if (data.dbName.concat(data.ipDbRunning) === item.capture_id) {
-            return {
-              ...item,
-              'restoreAfterBackup': 0
-            }
-          }
-          return item;
-        })
-        sessionStorage.setItem("restoreInfo", JSON.stringify(tmp))
-      }
-      return data.statusRestore;
-    }
-    return "Waiting for restore"
+    return data.statusRestore;
   }
   return (
     <div className='CaptureTable'>
@@ -328,16 +336,7 @@ function CaptureTable() {
                       <TableCell>{data.startTime}</TableCell>
                       <TableCell>{data.stopTime}</TableCell>
                       <TableCell>
-                        {checkBackuping(data.dbName, data.ipDbRunning) !== 0 ? (<BackUpProgress
-                          processId={
-                            {
-                              "databaseName": data.dbName,
-                              "idRestore": setiIdRestore(data.dbName, data.ipDbRunning),
-                              "ipDbRunning": data.ipDbRunning,
-                              'isRestoreAfterBackup': checkBackuping(data.dbName, data.ipDbRunning)
-                            }
-                          }
-                        />) : data.backupStatus}
+                        {renderBackupStatus(data)}
                       </TableCell>
                       <TableCell>
                         {renderRestoreStatus(data)}

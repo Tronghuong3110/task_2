@@ -30,38 +30,39 @@ export default function BackUpProgress(processId) {
     const [progress, setProgress] = React.useState(0);
     const [backupMessage, setBackupMessage] = React.useState("")
     React.useEffect(() => {
-        const timer = setInterval(() => {
-            fetch(IP + "/api/v1/list/infoDatabase?databaseName=" + processId.processId.databaseName)
-                .then((response) => response.json())
-                .then((data) => {
-                    console.log(processId)
-                    setProgress(data.backupProcess)
-                    if (data.backupProcess === 100) {
-                        console.log(data.backupProcess)
-                        setBackupMessage(data.backupStatus)
-                        let restoreInfo = sessionStorage.getItem("restoreInfo")
-                        if (restoreInfo !== null) {
-                            let tmp = [...JSON.parse(restoreInfo)]
-                            tmp = tmp.map(item => {
-                                if (processId.processId.databaseName.concat(processId.processId.ipDbRunning) === item.capture_id) {
-                                    return {
-                                        ...item,
-                                        'idRestore': data.id ,
-                                        'isBackuping': 0
-                                    }
-                                }
-                                else return item;
-                            })
-                            sessionStorage.setItem("restoreInfo", JSON.stringify(tmp))
-                        }
-                    }
-                });
-        }, 1000);
-        console.log(backupMessage,backupMessage.includes("Finished"))
-        if(backupMessage.includes("Finished") || backupMessage.includes("error")) clearInterval(timer)
-        return () => {
-            clearInterval(timer);
-        };
+        // const timer = setInterval(() => {
+        //     fetch(IP + "/api/v1/list/infoDatabase?databaseName=" + processId.processId.databaseName)
+        //         .then((response) => response.json())
+        //         .then((data) => {
+        //             console.log(processId)
+        //             setProgress(data.backupProcess)
+        //             if (data.backupProcess === 100) {
+        //                 console.log(data.backupProcess)
+        //                 setBackupMessage(data.backupStatus)
+        //                 let restoreInfo = sessionStorage.getItem("restoreInfo")
+        //                 if (restoreInfo !== null) {
+        //                     let tmp = [...JSON.parse(restoreInfo)]
+        //                     tmp = tmp.map(item => {
+        //                         if (processId.processId.databaseName.concat(processId.processId.ipDbRunning) === item.capture_id) {
+        //                             return {
+        //                                 ...item,
+        //                                 'idRestore': data.id ,
+        //                                 'isBackuping': 0
+        //                             }
+        //                         }
+        //                         else return item;
+        //                     })
+        //                     sessionStorage.setItem("restoreInfo", JSON.stringify(tmp))
+        //                 }
+        //             }
+        //         });
+        // }, 1000);
+        // console.log(backupMessage,backupMessage.includes("Finished"))
+        // if(backupMessage.includes("Finished") || backupMessage.includes("error")) clearInterval(timer)
+        // return () => {
+        //     clearInterval(timer);
+        // };
+        setProgress(processId.processId.backupStatus)
     }, [processId]);
 
     return (

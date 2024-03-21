@@ -34,8 +34,8 @@ export default function LinearWithValueLabel(processId) {
     const [progress, setProgress] = React.useState(0);
     const [restoreMessage, setRestoreMessage] = React.useState("")
     React.useEffect(() => {
-        if (processId.processId.idRestore !== null) {
-            let percent = 0;
+        // if (processId.processId.idRestore !== null) {
+            // let percent = 0;
             // fetch(
             //     IP +
             //     "/api/v1/info/database/restore?databaseName=" +
@@ -69,48 +69,50 @@ export default function LinearWithValueLabel(processId) {
             //             }
             //         }
             //     });
-            const timer = setInterval(() => {
-                fetch(
-                    IP +
-                    "/api/v1/info/database/restore?databaseName=" +
-                    processId.processId.databaseName +
-                    "&idRestore=" +
-                    processId.processId.idRestore
-                )
-                    .then((response) => response.json())
-                    .then((data) => {
-                        const record = data.find(item => item.id === processId.processId.idRestore)
-                        if (record !== undefined) percent = record.restoreProcess;
-                        setProgress(percent);
-                        if (record !== undefined) {
-                            if (percent === 100 || (record.restoreStatus !== "Processing")) {
-                                setRestoreMessage(record.restoreStatus)
-                                let restoreInfo = sessionStorage.getItem("restoreInfo")
-                                if (restoreInfo !== null) {
-                                    let tmp = [...JSON.parse(restoreInfo)]
-                                    tmp = tmp.map(item => {
-                                        if (processId.processId.databaseName.concat(processId.processId.ipDbRunning) === item.capture_id) {
-                                            return {
-                                                ...item,
-                                                'idRestore': null
-                                            }
-                                        }
-                                        else return item;
-                                    })
-                                    sessionStorage.setItem("restoreInfo", JSON.stringify(tmp))
-                                }
-                            }
-                            if(record === undefined){
-                                setRestoreMessage("Error")
-                            } 
-                        }
-                    });
-            }, 1000);
-            if(restoreMessage.includes("Finished") ||restoreMessage.includes("error") ) clearInterval(timer)
-            return () => {
-                clearInterval(timer);
-            };
-        }
+            // const timer = setInterval(() => {
+            //     fetch(
+            //         IP +
+            //         "/api/v1/info/database/restore?databaseName=" +
+            //         processId.processId.databaseName +
+            //         "&idRestore=" +
+            //         processId.processId.idRestore
+            //     )
+            //         .then((response) => response.json())
+            //         .then((data) => {
+            //             const record = data.find(item => item.id === processId.processId.idRestore)
+            //             if (record !== undefined) percent = record.restoreProcess;
+            //             setProgress(percent);
+            //             if (record !== undefined) {
+            //                 if (percent === 100 || (record.restoreStatus !== "Processing")) {
+            //                     setRestoreMessage(record.restoreStatus)
+            //                     let restoreInfo = sessionStorage.getItem("restoreInfo")
+            //                     if (restoreInfo !== null) {
+            //                         let tmp = [...JSON.parse(restoreInfo)]
+            //                         tmp = tmp.map(item => {
+            //                             if (processId.processId.databaseName.concat(processId.processId.ipDbRunning) === item.capture_id) {
+            //                                 return {
+            //                                     ...item,
+            //                                     'idRestore': null
+            //                                 }
+            //                             }
+            //                             else return item;
+            //                         })
+            //                         sessionStorage.setItem("restoreInfo", JSON.stringify(tmp))
+            //                     }
+            //                 }
+            //                 if(record === undefined){
+            //                     setRestoreMessage("Error")
+            //                 } 
+            //             }
+            //         });
+            // }, 1000);
+            // if(restoreMessage.includes("Finished") ||restoreMessage.includes("error") ) clearInterval(timer)
+            // return () => {
+            //     clearInterval(timer);
+            // };
+        // }
+        setProgress(processId.processId.restoreProcess)
+
     }, [processId]);
 
     return (

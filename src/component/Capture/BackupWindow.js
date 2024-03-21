@@ -134,21 +134,21 @@ const BackupWindow = ({ handleCloseWindow, data }) => {
             })
         }
         fetch(IP + "/api/v1/capture/backup?idServer=" + data.idServer + "&databaseName=" + data.dbName + "&idInfo=" + data.idInfo + "&restore=" + restore + "&delete=" + dlt, options)
-        let restoreInfo = sessionStorage.getItem("restoreInfo")
-        if (restoreInfo !== null) {
-            let tmp = JSON.parse(restoreInfo)
-            let result = tmp.map(item => {
-                if (data.id === item.capture_id) {
-                    return {
-                        ...item,
-                        'isBackuping':1,
-                        'restoreAfterBackup': restore===false?0:1
-                    }
-                }
-                else return item;
-            })
-            sessionStorage.setItem("restoreInfo", JSON.stringify(result))
-        }
+        // let restoreInfo = sessionStorage.getItem("restoreInfo")
+        // if (restoreInfo !== null) {
+        //     let tmp = JSON.parse(restoreInfo)
+        //     let result = tmp.map(item => {
+        //         if (data.id === item.capture_id) {
+        //             return {
+        //                 ...item,
+        //                 'isBackuping':1,
+        //                 'restoreAfterBackup': restore===false?0:1
+        //             }
+        //         }
+        //         else return item;
+        //     })
+        //     sessionStorage.setItem("restoreInfo", JSON.stringify(result))
+        // }
         handleCloseWindow()
     }
     return (
