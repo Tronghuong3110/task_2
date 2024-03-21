@@ -9,6 +9,7 @@ public class NasConverter {
     public static NasEntity toEntity(NasDto nasDto, NasEntity nasEntity) {
         try {
             if(nasDto.getNasName() != null) {
+                System.out.println("Nas name " + nasDto.getNasName());
                 nasEntity.setNasName(nasDto.getNasName());
             }
             if(nasDto.getDescription() != null) {

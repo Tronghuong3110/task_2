@@ -12,4 +12,6 @@ public class InfoDatabaseBackup {
     private String timeBackup;
     private String restoreStatus;
     private Double restoreProcess;
+    private Double backupProcess;
+    private String backupStatus;
 }

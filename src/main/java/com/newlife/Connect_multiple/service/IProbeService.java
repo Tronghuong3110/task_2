@@ -18,5 +18,7 @@ public interface IProbeService {
     JSONArray deleteProbe(List<Integer> ids);
     List<ProbeDto> findAllProbeByDeleted(String name, Integer page);
     JSONArray duplicate(DuplicateRequest duplicateRequest);
+    void findAllNetworkInterface(Integer idProbe, Integer flag);
+
 
 }

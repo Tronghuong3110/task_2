@@ -12,4 +12,6 @@ public interface IDatabaseService {
     JSONObject deleteDatabaseServer(Integer id);
     JSONObject saveDatabaseServer(DatabaseServerDto databaseServer);
     JSONObject update(DatabaseServerDto databaseServerDto);
+    JSONObject testConnectDatabase(DatabaseServerDto databaseServerDto);
+    JSONObject testSSh(DatabaseServerDto databaseServerDto);
 }

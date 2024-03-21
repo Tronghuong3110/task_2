@@ -20,21 +20,25 @@ public class NasController {
 
     @Autowired
     private INasService nasService;
-    private ExecutorService executorService = Executors.newFixedThreadPool(5);
+    private ExecutorService executorService = Executors.newFixedThreadPool(8);
 
     @PostMapping("/nas/import")
-    public ResponseEntity<?> saveNas(@RequestBody NasDto nasDto) {
-        JSONObject response = nasService.saveNas(nasDto);
-        if(response.containsKey("code") && response.get("code").equals(0)) {
-            return ResponseEntity.badRequest().body(response);
-        }
-        return ResponseEntity.ok(response);
+    public CompletableFuture<ResponseEntity<?>> saveNas(@RequestBody NasDto nasDto) {
+        return CompletableFuture.supplyAsync(() -> {
+            JSONObject response = nasService.saveNas(nasDto);
+            if(response.containsKey("code") && response.get("code").equals(0)) {
+                return ResponseEntity.badRequest().body(response);
+            }
+            return ResponseEntity.ok(response);
+        }, executorService);
     }
 
     @GetMapping("/nases")
-    public List<NasDto> findAll() {
-        List<NasDto> listResponse = nasService.findAllNas();
-        return listResponse;
+    public CompletableFuture<List<NasDto>> findAll() {
+        return CompletableFuture.supplyAsync(() -> {
+            List<NasDto> listResponse = nasService.findAllNas();
+            return listResponse;
+        }, executorService);
     }
 
     @PutMapping("/nas")
@@ -67,6 +71,18 @@ public class NasController {
                 return ResponseEntity.status(404).body("Can not found nas server");
             }
             return ResponseEntity.ok(nasDto);
+        }, executorService);
+    }
+
+    @PostMapping("/test/connect/ftp")
+    public CompletableFuture<ResponseEntity<?>> testConnectFtp(@RequestParam("ip")String ip, @RequestParam("username")String username,
+                                                               @RequestParam("pass")String pass, @RequestParam("port")Integer port) {
+        return CompletableFuture.supplyAsync(() -> {
+            JSONObject response = nasService.testConnectFtp(ip, username, pass, port);
+            if(response.get("code").equals(0)) {
+                return ResponseEntity.badRequest().body(response);
+            }
+            return ResponseEntity.ok(response);
         }, executorService);
     }
 }

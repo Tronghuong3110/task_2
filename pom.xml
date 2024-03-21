@@ -14,13 +14,10 @@
 	<name>Connect_multiple</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
-		<java.version>11</java.version>
+		<java.version>1.8</java.version>
 		<frontend-maven-plugin.version>1.14.2</frontend-maven-plugin.version>
 		<node.version>v16.17.0</node.version>
 		<yarn.version>v1.12.1</yarn.version>
-<!--		<frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>-->
-<!--		<node.version>v16.17.0</node.version>-->
-<!--		<yarn.version>v1.12.1</yarn.version>-->
 	</properties>
 	<dependencies>
 		<dependency>
@@ -146,6 +143,26 @@
 			<artifactId>jsch</artifactId>
 			<version>0.1.55</version>
 		</dependency>
+
+		<dependency>
+			<groupId>ru.yandex.clickhouse</groupId>
+			<artifactId>clickhouse-jdbc</artifactId>
+			<version>0.3.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-net</groupId>
+			<artifactId>commons-net</artifactId>
+			<version>3.9.0</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/net.sourceforge.expectj/expectj -->
+		<dependency>
+			<groupId>net.sourceforge.expectj</groupId>
+			<artifactId>expectj</artifactId>
+			<version>2.0.7</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

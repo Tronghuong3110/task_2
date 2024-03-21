@@ -51,6 +51,9 @@ public interface ProbeRepository extends JpaRepository<ProbeEntity, Integer> {
     List<ProbeEntity> findByName(@Param("name") String name,
                                  @Param("deleted") Integer deleted,
                                  Pageable pageable);
+
+    @Query(value = "select * from probe where (id_probe = :idProbe or :idProbe is null)", nativeQuery = true)
+    List<ProbeEntity> findAllById(@Param("idProbe") Integer id);
 }
 
 

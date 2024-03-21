@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigInteger;
 import java.sql.Date;
 import java.sql.Timestamp;
 
@@ -29,4 +30,10 @@ public class ProbeDto {
     private String message;
     private Long totalPage;
     private Boolean pending;
+    private BigInteger numberInterfaceUp;
+    private BigInteger numberInterfaceDown;
+    private String sshAccount;
+    private String sshPass;
+    private Integer sshPort;
+    private String sudoPass;
 }

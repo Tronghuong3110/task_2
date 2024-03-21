@@ -12,4 +12,5 @@ public interface INasService {
     JSONObject deleteNas(Integer idNas);
     JSONObject updateNas(NasDto nasDto);
     NasDto findOne(Integer id);
+    JSONObject testConnectFtp(String ip, String username, String pass, Integer port);
 }

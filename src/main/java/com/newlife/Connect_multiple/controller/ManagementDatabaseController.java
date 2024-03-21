@@ -54,9 +54,9 @@ public class ManagementDatabaseController {
         return CompletableFuture.supplyAsync(() -> {
             JSONObject response = databaseService.deleteDatabaseServer(id);
             if(response.get("code").equals(1)) {
-                return ResponseEntity.ok("Delete database server with id = " + id + " success");
+                return ResponseEntity.ok(response);
             }
-            return ResponseEntity.badRequest().body("Delete database server fail");
+            return ResponseEntity.badRequest().body(response);
         }, executorService);
     }
 
@@ -68,6 +68,27 @@ public class ManagementDatabaseController {
                 return ResponseEntity.ok(response);
             }
             return ResponseEntity.badRequest().body(response);
+        }, executorService);
+    }
+
+    @PostMapping("/test/connect/database")
+    public CompletableFuture<ResponseEntity<?>> testConnectDatabase(@RequestBody DatabaseServerDto databaseServerDto) {
+        return CompletableFuture.supplyAsync(() -> {
+            JSONObject response = databaseService.testConnectDatabase(databaseServerDto);
+            if (response.get("code").equals(0)) {
+                return ResponseEntity.badRequest().body(response);
+            }
+            return ResponseEntity.ok(response);
+        }, executorService);
+    }
+    @PostMapping("/test/connect/ssh")
+    public CompletableFuture<ResponseEntity<?>> testConnectSSH(@RequestBody DatabaseServerDto databaseServerDto) {
+        return CompletableFuture.supplyAsync(() -> {
+            JSONObject response = databaseService.testSSh(databaseServerDto);
+            if (response.get("code").equals(0)) {
+                return ResponseEntity.badRequest().body(response);
+            }
+            return ResponseEntity.ok(response);
         }, executorService);
     }
 }

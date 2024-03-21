@@ -1,5 +1,8 @@
 package com.newlife.Connect_multiple.service.impl;
 
+import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.Session;
 import com.newlife.Connect_multiple.api.ApiAddInfoToBroker;
 import com.newlife.Connect_multiple.api.ApiCheckConnect;
 import com.newlife.Connect_multiple.converter.ProbeConverter;
@@ -21,7 +24,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.math.BigInteger;
 import java.net.*;
 import java.sql.Timestamp;
 import java.util.*;
@@ -43,6 +50,8 @@ public class ProbeService implements IProbeService {
     private BrokerRepository brokerRepository;
     @Autowired
     private ModuleProbeRepository moduleProbeRepository;
+    @Autowired
+    private INetworkInterfaceRepository networkInterfaceRepository;
 
     // hân
     @Override
@@ -188,21 +197,33 @@ public class ProbeService implements IProbeService {
     // lấy ra toàn bộ probe không có trong thùng rác
     @Override
     public List<ProbeDto> findAllProbe(String name, String location, String area, String vlan) {
-        List<ProbeEntity> listProbe = probeRepository.findByNameOrLocationOrAreaOrVlan(name, location, area, vlan, 0);
-        List<JSONObject> countStatusOfModuleByProbe = countStatus();
-        List<ProbeDto> listProbeDto = new ArrayList<>();
-        for(ProbeEntity entity : listProbe) {
-            ProbeDto probe = ProbeConverter.toDto(entity);
-            JSONObject json = findStatusByProbe(entity.getId(), countStatusOfModuleByProbe);
-            if(json != null) {
-                probe.setNumberFailedModule(json.containsKey("Failed") ? json.get("Failed").toString() : "0");
-                probe.setNumberPendingModule(json.containsKey("Pending") ? json.get("Pending").toString() : "0");
-                probe.setNumberStopedModule(json.containsKey("Stopped") ? json.get("Stopped").toString() : "0");
-                probe.setNumberRunningModule(json.containsKey("Running") ? json.get("Running").toString() : "0");
+        try {
+            List<ProbeEntity> listProbe = probeRepository.findByNameOrLocationOrAreaOrVlan(name, location, area, vlan, 0);
+            List<JSONObject> countStatusOfModuleByProbe = countStatus();
+            List<ProbeDto> listProbeDto = new ArrayList<>();
+            for(ProbeEntity entity : listProbe) {
+                ProbeDto probe = ProbeConverter.toDto(entity);
+                JSONObject json = findStatusByProbe(entity.getId(), countStatusOfModuleByProbe);
+                JSONObject numberStatus = countNumberInterfaceUpOrDown(entity.getId());
+                if(json != null) {
+                    probe.setNumberFailedModule(json.containsKey("Failed") ? json.get("Failed").toString() : "0");
+                    probe.setNumberPendingModule(json.containsKey("Pending") ? json.get("Pending").toString() : "0");
+                    probe.setNumberStopedModule(json.containsKey("Stopped") ? json.get("Stopped").toString() : "0");
+                    probe.setNumberRunningModule(json.containsKey("Running") ? json.get("Running").toString() : "0");
+                }
+                if(numberStatus != null) {
+                    probe.setNumberInterfaceUp((BigInteger) numberStatus.get(1));
+                    probe.setNumberInterfaceDown((BigInteger) numberStatus.get(0));
+                    System.out.println("Status: " + numberStatus.get(1));
+                }
+                listProbeDto.add(probe);
             }
-            listProbeDto.add(probe);
+            return listProbeDto;
         }
-        return listProbeDto;
+        catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
@@ -640,6 +661,75 @@ public class ProbeService implements IProbeService {
         return response;
     }
 
+    // Thêm mới các interface tìm được của các probe vào database mysql server
+    @Override
+    @Transactional
+    public void findAllNetworkInterface(Integer idProbe, Integer flag) {
+        try {
+            List<ProbeEntity> probes = probeRepository.findAllById(idProbe);
+            if(flag == 0 && idProbe == null) {
+                networkInterfaceRepository.deleteAll();
+            }
+            for(ProbeEntity probe : probes) {
+                List<NetworkInterfaceEntity> interfaces = new ArrayList<>();
+                JSch jSch = new JSch();
+                Session session = jSch.getSession(probe.getSshAccount(), probe.getIpAddress(), probe.getSshPort());
+                session.setPassword(CreateTokenUtil.deCodePass(probe.getSshPass()));
+                session.setConfig("StrictHostKeyChecking", "no");
+                session.connect();
+
+                ChannelExec channel = (ChannelExec) session.openChannel("exec");
+                String command = "nmcli dev status";
+                channel.setCommand(command);
+                channel.setInputStream(null);
+                channel.connect();
+//                System.out.println("Command change description: " + command);
+                BufferedReader input = new BufferedReader(new InputStreamReader(channel.getInputStream()));
+                // bo qua dong đầu tiên
+                String line = input.readLine();
+                // TH đồng bộ của 1 probe
+                if(idProbe != null) {
+                    networkInterfaceRepository.deleteAllByIdProbe(idProbe);
+                }
+
+                while ((line = input.readLine()) != null) {
+                    // Trường hợp đồng bộ
+                    String[] parts = line.split("\\s++");
+//                    System.out.println("Result: " + line);
+                    NetworkInterfaceEntity networkInterface;
+                    if(flag == 0) { // TH chạy list 1 lần
+                        networkInterface = new NetworkInterfaceEntity();
+                        networkInterface.setMonitor(1);
+                    }
+                    // TH kiểm tra trạng thái interface bình thường
+                    else {
+                        networkInterface = networkInterfaceRepository.findByInterfaceNameAndIdProbeAndMonitor(parts[0], probe.getId(), 1).orElse(null);
+                    }
+                    // TH phát hiện interface mới khi chưa đồng bộ
+                    if(networkInterface == null) {
+                        continue;
+                    }
+                    networkInterface.setInterfaceName(parts[0]);
+                    networkInterface.setIdProbe(probe.getId());
+                    // up: 1, down: 0
+                    networkInterface.setStatus(parts[2].equals("connected")?1:0);
+                    String des = "";
+                    for(int i =3; i < parts.length; i++) {
+                        des += parts[i] + " ";
+                    }
+                    networkInterface.setDescription(des.trim());
+                    interfaces.add(networkInterface);
+                }
+                networkInterfaceRepository.saveAll(interfaces);
+                channel.disconnect();
+                session.disconnect();
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     // đếm số lượng module theo probe và status
     private List<JSONObject> countStatus() {
         List<JSONObject> result = probeRepository.countStatusByProbe();
@@ -667,23 +757,23 @@ public class ProbeService implements IProbeService {
     // hướng
     private Boolean checkValidateIpAddress(String ipAddress) {
         String[] ips = ipAddress.split("\\.");
-        System.out.println("Len " +  ips.length + " " + ipAddress);
+//        System.out.println("Len " +  ips.length + " " + ipAddress);
         if(ips.length != 4) {
-            System.out.println(0);
+//            System.out.println(0);
             return false;
         }
         for(String ip : ips) {
             try {
                 Integer subIp = Integer.parseInt(ip);
-                System.out.println("Sub IP " + subIp);
+//                System.out.println("Sub IP " + subIp);
                 // subIp không nằm trong vùng hợp lệ của địa chỉ ip
                 if(subIp <= 0 || subIp > 255) {
-                    System.out.println(1);
+//                    System.out.println(1);
                     return false;
                 }
                 // subIp có chứa chữ số 0 ở đầu(001) ==> 1
                 if(subIp.toString().length() != ip.length()) {
-                    System.out.println(2);
+//                    System.out.println(2);
                     return false;
                 }
             }
@@ -722,26 +812,6 @@ public class ProbeService implements IProbeService {
             return null;
         }
         return probe.getId();
-    }
-
-    private String getIpAddress() {
-        try {
-            Enumeration<NetworkInterface> networkInterfaceEnumeration = NetworkInterface.getNetworkInterfaces();
-            for(NetworkInterface net : Collections.list(networkInterfaceEnumeration)) {
-                Enumeration<InetAddress> inetAddresses = net.getInetAddresses();
-                for(InetAddress ipAddress : Collections.list(inetAddresses)) {
-                    if(ipAddress.isSiteLocalAddress() && net.getDisplayName().startsWith("Intel(R) Wireless")) {
-                        System.out.println("Name " + net.getDisplayName());
-                        System.out.println("IP local " + ipAddress.getHostAddress());
-                        return ipAddress.getHostAddress();
-                    }
-                }
-            }
-        } catch (SocketException e) {
-            e.printStackTrace();
-            return null;
-        }
-        return null;
     }
 
     public String saveServer(ServerEntity server, ProbeOptionEntity optionEntity) {
@@ -796,6 +866,23 @@ public class ProbeService implements IProbeService {
         catch (Exception e) {
             e.printStackTrace();
             System.out.println("Kiểm tra trạng thái probe với broker lỗi rồi!!");
+        }
+    }
+
+    private JSONObject countNumberInterfaceUpOrDown(Integer idProbe) {
+        try {
+            JSONObject response = new JSONObject();
+            List<Map<String, Object>> tmp = networkInterfaceRepository.countAllByStatus(idProbe);
+            for(Map<String, Object> row : tmp) {
+                Integer status = (Integer) row.get("status");
+                BigInteger count = (BigInteger) row.get("cnt");
+                response.put(status, count);
+            }
+            return response;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }

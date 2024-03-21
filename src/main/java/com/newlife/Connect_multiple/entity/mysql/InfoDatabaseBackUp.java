@@ -15,7 +15,7 @@ public class InfoDatabaseBackUp {
     private String databaseName;
     @Column(name = "time_backup")
     private String timeBackup;
-    @Column(name = "restore_status")
+    @Column(name = "restore_status", columnDefinition = "text")
     private String restoreStatus;
     @Column(name = "restore_process")
     private Double restoreProcess;
@@ -23,4 +23,10 @@ public class InfoDatabaseBackUp {
     private String timeEndRestore;
     @Column(name = "time_start_restore")
     private String timeStartRestore;
+    @Column(name = "backup_process")
+    private Double backupProcess;
+    @Column(name = "total_table")
+    private Integer totalTable;
+    @Column(name = "backup_status", columnDefinition = "text")
+    private String backupStatus;
 }

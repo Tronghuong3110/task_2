@@ -7,6 +7,7 @@ import com.newlife.Connect_multiple.entity.ProbeEntity;
 import com.newlife.Connect_multiple.entity.ProbeOptionEntity;
 import com.newlife.Connect_multiple.entity.ServerEntity;
 import com.newlife.Connect_multiple.service.IProbeModuleService;
+import com.newlife.Connect_multiple.service.impl.InfoCaptureSettingService;
 import com.newlife.Connect_multiple.service.impl.ProbeModuleService;
 import com.newlife.Connect_multiple.service.impl.ProbeService;
 import com.newlife.Connect_multiple.util.ConstVariable;
@@ -46,14 +47,14 @@ public class ConnectMultipleApplication {
 		// Thêm mới probe(Server)
 		String mesage = probeService.saveServer(createServer(), createProbeOption());
 		ProbeModuleService probeModuleService = applicationContext.getBean(ProbeModuleService.class);
-
 		CaptureController captureController = applicationContext.getBean(CaptureController.class);
+		InfoCaptureSettingService infoCaptureSettingService = applicationContext.getBean(InfoCaptureSettingService.class);
 		// lấy trạng thaái module theo chu kì
 		CompletableFuture.runAsync(() -> {
 			while (true) {
 				try {
 					probeModuleService.getStatusModulePeriodically();
-					System.out.println("Test");
+//					System.out.println("Test");
 					Thread.sleep(15000);
 				}
 				catch (Exception e) {
@@ -63,18 +64,18 @@ public class ConnectMultipleApplication {
 			}
 		}, executorService);
 		// lấy thông tin cpu theo chu kì
-//		CompletableFuture.runAsync(() -> {
-//			while (true) {
-//				try {
-//					Thread.sleep(2000);
+		CompletableFuture.runAsync(() -> {
+			while (true) {
+				try {
+					Thread.sleep(2000);
 //					System.out.println("Lấy thông tin cpu theo chu kì");
-//					probeModuleService.getCpuUsage();
-//				}
-//				catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		}, executorService);
+					probeModuleService.getCpuUsage();
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}, executorService);
 		// Kiểm tra trạng thái kết nối của probe
 		CompletableFuture.runAsync(() -> {
 			try {
@@ -85,13 +86,39 @@ public class ConnectMultipleApplication {
 				e.printStackTrace();
 			}
 		}, executorService);
-
+		// gọi để check lịch trình restore
 		CompletableFuture.runAsync(() -> {
 			try {
 				captureController.solveRestoreTime();
 			}
 			catch (Exception e) {
 				e.printStackTrace();
+			}
+		}, executorService);
+		// gọi để lấy thông tin info_capture_setting theo chu kì để lưu vào database mysql
+		CompletableFuture.runAsync(() -> {
+			while(true) {
+				try {
+					infoCaptureSettingService.findAll();
+					Thread.sleep(6000);
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}, executorService);
+		// gọi để kiểm tra trạng thái của các Interface theo chu kỳ
+		CompletableFuture.runAsync(() -> {
+			// đồng bộ lần đầu để list danh sách các interface
+			probeService.findAllNetworkInterface(null, 0);
+			while (true) {
+				try {
+					Thread.sleep(20000);
+					probeService.findAllNetworkInterface(null, 1);
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		}, executorService);
 	}
@@ -108,8 +135,10 @@ public class ConnectMultipleApplication {
 				else if (lines[0].trim().toLowerCase().equals("password")){
 					ConstVariable.SECRET_KEY_BROKER = lines[1].trim();
 				} else if (lines[0].trim().toLowerCase().equals("ip")){
-					System.out.print("IPADDRESS " + lines[1]);
 					ConstVariable.IPADDRESS = lines[1].trim();
+				}
+				else if(lines[0].trim().toLowerCase().equals("path_file_config")) {
+					ConstVariable.PATH_FILE_CONFIG = lines[1].trim();
 				}
 			}
 		}

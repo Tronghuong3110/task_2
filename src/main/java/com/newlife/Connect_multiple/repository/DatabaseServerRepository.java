@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 public interface DatabaseServerRepository extends JpaRepository<DatabaseServerMysql, Integer> {
 
-    @Query(value = "select * from database_server where ip_server like %:key% or server_name like %:key% ", nativeQuery = true)
+    @Query(value = "select * from database_server where (ip_server like %:key% or server_name like %:key%) and active = 1", nativeQuery = true)
     List<DatabaseServerMysql> findAllDatabaseServerByKey(@Param("key") String key);
 
     Boolean existsByPortNumber(Integer portNumber);
@@ -20,4 +20,8 @@ public interface DatabaseServerRepository extends JpaRepository<DatabaseServerMy
     Boolean existsByIpServer(String ipServer);
 
     Optional<DatabaseServerMysql> findByIpServer(String ipServer);
+
+    @Query(value = "select * from database_server where ip_server like %:ip% and type like %:typeStr% and active = 1", nativeQuery = true)
+    List<DatabaseServerMysql> findByIpOrType(@Param("ip") String ip,
+                                             @Param("typeStr") String type);
 }

@@ -8,12 +8,16 @@ import com.newlife.Connect_multiple.repository.NasRepository;
 import com.newlife.Connect_multiple.service.INasService;
 import com.newlife.Connect_multiple.util.CreateTokenUtil;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPReply;
+import org.apache.commons.net.ftp.FTPSClient;
 import org.json.simple.JSONObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,6 +60,7 @@ public class NasService implements INasService {
             for(NasEntity nas : listNasEntity) {
                 NasDto nasDto = new NasDto();
                 BeanUtils.copyProperties(nas, nasDto);
+                nasDto.setPassword(null);
                 listResponse.add(nasDto);
             }
             return listResponse;
@@ -86,7 +91,7 @@ public class NasService implements INasService {
     public JSONObject updateNas(NasDto nasDto) {
         JSONObject response = new JSONObject();
         try {
-            NasEntity nasEntity = nasRepository.findByIp(nasDto.getIp()).orElse(null);
+            NasEntity nasEntity = nasRepository.findById(nasDto.getId()).orElse(null);
             // Th không phải nas server đang chỉnh sửa
             if(nasEntity == null || nasEntity.getId().equals(nasDto.getId())) {
                 nasEntity = NasConverter.toEntity(nasDto, nasEntity);
@@ -121,11 +126,54 @@ public class NasService implements INasService {
                 return null;
             }
             BeanUtils.copyProperties(nas, nasDto);
+            nasDto.setPassword(null);
             return nasDto;
         }
         catch (Exception e) {
             e.printStackTrace();
             return new NasDto();
+        }
+    }
+
+    @Override
+    public JSONObject testConnectFtp(String ip, String username, String pass, Integer port) {
+        FTPClient ftpClient = new FTPSClient();
+        JSONObject response = new JSONObject();
+        try {
+            ftpClient.setDefaultTimeout(10000);
+            ftpClient.connect(ip, port);
+            ftpClient.enterLocalPassiveMode();
+            if (!FTPReply.isPositiveCompletion(ftpClient.getReplyCode())) {
+                if (ftpClient != null && ftpClient.isConnected()) {
+                    try {
+                        ftpClient.logout();
+                        ftpClient.disconnect();
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+                response.put("code", 0);
+                response.put("message", "FTP server not respond!");
+                return response;
+            }
+            ftpClient.setSoTimeout(10000);
+            // login ftp server
+            if (!ftpClient.login(username, pass)) {
+                response.put("code", 0);
+                response.put("message", "Username or password is incorrect!");
+                return response;
+            }
+            ftpClient.setDataTimeout(10000);
+            System.out.println("connected");
+            response.put("code", 1);
+            response.put("message", "Connect success");
+            return response;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            response.put("code", 0);
+            response.put("message", e.getMessage());
+            return response;
         }
     }
 }

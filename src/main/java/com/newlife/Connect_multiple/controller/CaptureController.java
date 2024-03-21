@@ -31,22 +31,9 @@ public class CaptureController {
     private PriorityQueue<ScheduleRestore> requestRestoreQueue = null;
 
     @GetMapping("/captures")
-    public CompletableFuture<ResponseEntity<?>> findAllCaptureSetting(@RequestParam("probeName")Optional<String> probeName, @RequestParam("province") Optional<String> province,
-                                                                      @RequestParam("backupStatus") Optional<String> backupStatus, @RequestParam("monitorStatus")Integer monitorStatus)  {
+    public CompletableFuture<ResponseEntity<?>> findAllCaptureSetting()  {
         return CompletableFuture.supplyAsync(() -> {
-            Boolean[] test;
-            if(monitorStatus.equals(0)) { // tim kiem theo monitor
-                test = new Boolean[]{false};
-            }
-            else if(monitorStatus.equals(1)) { // tim kiem theo no monitor
-                test = new Boolean[]{true};
-            }
-            else { // khong tim kiem theo gia tri nao
-                test = new Boolean[]{true, false};
-            }
-            List<InfoCaptureSetting> listResponse = infoCaptureSettingService.findAll(probeName.orElse(""), province.orElse(""),
-                    test, backupStatus.orElse(""));
-
+            List<InfoCaptureSetting> listResponse = infoCaptureSettingService.findAllInfoCaptureSetting();
             if(listResponse == null) {
                 return ResponseEntity.badRequest().body("Find all database error");
             }
@@ -65,13 +52,15 @@ public class CaptureController {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
             String timeScheduleStr = scheduleRestore.getScheduleRestore().orElse(null);
             String ipServer = scheduleRestore.getIpServer().orElse(null);
-            JSONObject response = infoCaptureSettingService.backUpDatabase(idServer, databaseName, idInfo);
+            JSONObject response = infoCaptureSettingService.backUpDatabase(idServer, databaseName, idInfo, restore);
+            System.out.println("Ket qua backup: " + response.get("code"));
             if(response.get("code").equals(0)) {
                 return ResponseEntity.status(500).body(response);
             }
             // TH backup thành công và yêu cầu restore lại ngay sau khi backup
-            Integer id_info_database_backup = Integer.parseInt(response.get("id_info_database_backup").toString());
+            System.out.println("Restore now " + restore);
             if(restore.equals("true")) {
+                Integer id_info_database_backup = Integer.parseInt(response.get("id_info_database_backup").toString());
                 System.out.println("yeu cau resstore ngay " + restore);
                 infoCaptureSettingService.restoreDatabase(scheduleRestore.getIdServerRestore(), id_info_database_backup);
 //                return ResponseEntity.ok("Success");
@@ -81,6 +70,7 @@ public class CaptureController {
                 Long timeSchedule = ZonedDateTime.of(LocalDateTime.parse(timeScheduleStr, formatter), ZoneId.systemDefault()).toInstant().toEpochMilli();
                 Long currentTime = System.currentTimeMillis();
                 Long delay = timeSchedule - currentTime;
+                Integer id_info_database_backup = Integer.parseInt(response.get("id_info_database_backup").toString());
                 if(delay > 0) { // TH backup xong và thực hiện đặt lịch để restore
                     scheduleRestore.setScheduleRestoreTime(LocalDateTime.parse(timeScheduleStr, formatter));
                     scheduleRestore.setId_info_database_backup(id_info_database_backup);
@@ -100,7 +90,6 @@ public class CaptureController {
                     JSONObject jsonObject = infoCaptureSettingService.deleteDatabase(ipServer, databaseName, idInfo);
                 }
             }
-
             return ResponseEntity.ok(response);
         }, executorService);
     }
@@ -158,6 +147,13 @@ public class CaptureController {
         }, executorService);
     }
 
+    @GetMapping("/list/infoDatabase")
+    public CompletableFuture<ResponseEntity<?>> findAllInfoDatabaseBackup(@RequestParam("databaseName")String databaseName) {
+        return CompletableFuture.supplyAsync(() -> {
+            return ResponseEntity.ok(infoCaptureSettingService.findAllByDatabaseNameAndTimeBackup(databaseName).get(0));
+        }, executorService);
+    }
+
     // thực hiện restore theo lịch đã được đặt trước
     public void solveRestoreTime() {
 //        CompletableFuture.runAsync(() -> {
@@ -175,7 +171,7 @@ public class CaptureController {
                         Long currentTime = System.currentTimeMillis();
                         System.out.println("Time " + (timeSchedule - currentTime));
                         Long delay = Math.abs(timeSchedule - currentTime);
-                        if(schedule != null && schedule.getScheduleRestoreTime().equals(LocalDateTime.now()) || (0 <= delay && delay <= 10000)) {
+                        if(schedule != null && schedule.getScheduleRestoreTime().equals(LocalDateTime.now()) || (0 <= delay && delay <= 60000)) {
                             CompletableFuture.runAsync(() -> {
                                 System.out.println("Start restore " + LocalDateTime.now());
                                 infoCaptureSettingService.restoreDatabase(schedule.getIdServerRestore(), schedule.getId_info_database_backup());

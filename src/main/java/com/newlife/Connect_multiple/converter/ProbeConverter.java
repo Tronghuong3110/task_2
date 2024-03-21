@@ -2,6 +2,7 @@ package com.newlife.Connect_multiple.converter;
 
 import com.newlife.Connect_multiple.dto.ProbeDto;
 import com.newlife.Connect_multiple.entity.ProbeEntity;
+import com.newlife.Connect_multiple.util.CreateTokenUtil;
 import org.modelmapper.ModelMapper;
 
 public class ProbeConverter {
@@ -16,6 +17,10 @@ public class ProbeConverter {
             probeEntity.setNumberRunningModule(0);
             probeEntity.setNumberStopedModule(0);
             probeEntity.setPending(false);
+            probeEntity.setSshPass(CreateTokenUtil.enCodePass(probeDto.getSshPass()));
+            if(probeDto.getSshPort() == null) {
+                probeEntity.setSshPort(22);
+            }
             return probeEntity;
         }
         catch (Exception e) {
@@ -59,6 +64,15 @@ public class ProbeConverter {
             }
             if(dto.getPending() != null && !dto.getPending().equals(entity.getPending())) {
                 entity.setPending(dto.getPending());
+            }
+            if(dto.getSshAccount() != null && !dto.getSshAccount().equals(entity.getSshAccount())) {
+                entity.setSshAccount(dto.getSshAccount());
+            }
+            if(dto.getSshPass() != null) {
+                entity.setSshPass(CreateTokenUtil.enCodePass(dto.getSshPass()));
+            }
+            if(dto.getSshPort() != null) {
+                entity.setSshPort(dto.getSshPort());
             }
             return entity;
         }

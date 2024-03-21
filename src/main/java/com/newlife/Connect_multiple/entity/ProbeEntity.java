@@ -60,7 +60,14 @@ public class ProbeEntity {
     private String token;
     @Column(name = "pending")
     private Boolean pending;
-
+    @Column(name = "ssh_account")
+    private String sshAccount;
+    @Column(name = "ssh_pass")
+    private String sshPass;
+    @Column(name = "ssh_port")
+    private Integer sshPort;
+    @Column(name = "sudo_pass")
+    private String sudoPass;
     @OneToOne
     @JoinColumn(name = "id_probe_option")
     private ProbeOptionEntity probeOptionEntity;

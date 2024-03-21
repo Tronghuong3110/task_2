@@ -33,8 +33,9 @@ public class CreateTokenUtil {
         }
         catch (Exception e) {
             e.printStackTrace();
+            System.out.println("Decode error!!!");
+            return null;
         }
-        return null;
     }
 
     public static String enCodePass(String pass) {

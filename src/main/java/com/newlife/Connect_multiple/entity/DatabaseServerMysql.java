@@ -37,4 +37,6 @@ public class DatabaseServerMysql {
     private Integer sshPort;
     @Column(name = "pass_sudo")
     private String passSudo;
+    @Column(name = "active")
+    private Integer active;
 }
