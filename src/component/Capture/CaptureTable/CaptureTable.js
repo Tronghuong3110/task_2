@@ -52,7 +52,7 @@ function CaptureTable() {
                 'dbName': item.dbName,
                 'idRestore': null,
                 "isBackuping": 0,
-                "restoreAfterBackup":0
+                "restoreAfterBackup": 0
               })
             }
           })
@@ -151,8 +151,8 @@ function CaptureTable() {
     openCloseRestoreWindow(false)
   }
   //Ham set color for ipdb
-  const setColorForIpDb = (text,status) => {
-    if(status!==null) return "red"
+  const setColorForIpDb = (text, status) => {
+    if (status !== null) return "red"
     if (text != null) {
       let check = text.includes("Deleted")
       if (check === false) return "#00FF1A"
@@ -179,11 +179,42 @@ function CaptureTable() {
       if ((sessionStorage.getItem("restoreInfo") !== null)) {
         let restoreInfo = sessionStorage.getItem("restoreInfo")
         restoreInfo = JSON.parse(restoreInfo)
-        let ob = restoreInfo.find(item => item.capture_id === id && item.restoreAfterBackup===1 )
-        if(ob!== undefined) return ob.restoreAfterBackup;
+        let ob = restoreInfo.find(item => item.capture_id === id && item.restoreAfterBackup === 1)
+        if (ob !== undefined) return ob.restoreAfterBackup;
       }
     }
     return 0;
+  }
+  const renderRestoreStatus = (data) => {
+    if (data.statusRestore.includes("Processing")) {
+      return (<LinearWithValueLabel
+        processId={
+          {
+            "databaseName": data.dbName,
+            "idRestore": setiIdRestore(data.dbName, data.ipDbRunning),
+            "ipDbRunning": data.ipDbRunning
+          }
+        }
+      />)
+    }
+    if (data.statusRestore.includes("Finished") || data.statusRestore.includes("error")) {
+      let restoreInfo = sessionStorage.getItem("restoreInfo")
+      if (restoreInfo !== null) {
+        let tmp = [...JSON.parse(restoreInfo)]
+        tmp = tmp.map(item => {
+          if (processId.processId.databaseName.concat(processId.processId.ipDbRunning) === item.capture_id) {
+            return {
+              ...item,
+              'restoreAfterBackup': 0
+            }
+          }
+          return item;
+        })
+        sessionStorage.setItem("restoreInfo", JSON.stringify(tmp))
+      }
+      return data.statusRestore;
+    }
+    return "Waiting for restore"
   }
   return (
     <div className='CaptureTable'>
@@ -283,12 +314,12 @@ function CaptureTable() {
                       <TableCell>{data.province}</TableCell>
                       <TableCell>
                         <Tooltip title={<div>{data.ipDbLevel1}</div>}>
-                          <div style={{ color: setColorForIpDb(data.ipDbLevel1,data.status_connect) }} >{data.ipDbLevel1}</div>
+                          <div style={{ color: setColorForIpDb(data.ipDbLevel1, data.status_connect) }} >{data.ipDbLevel1}</div>
                         </Tooltip>
                       </TableCell>
                       <TableCell>
                         <Tooltip title={<div>{data.ipDbLevel2}</div>}>
-                          <div style={{ color: setColorForIpDb(data.ipDbLevel2,data.status_connect) }} >{data.ipDbLevel2}</div>
+                          <div style={{ color: setColorForIpDb(data.ipDbLevel2, data.status_connect) }} >{data.ipDbLevel2}</div>
                         </Tooltip>
                       </TableCell>
                       <TableCell>{data.ipDbRunning}</TableCell>
@@ -297,27 +328,19 @@ function CaptureTable() {
                       <TableCell>{data.startTime}</TableCell>
                       <TableCell>{data.stopTime}</TableCell>
                       <TableCell>
-                        {checkBackuping(data.dbName, data.ipDbRunning)!==0?(<BackUpProgress
-                          processId={
-                            {
-                              "databaseName": data.dbName,
-                              "idRestore": setiIdRestore(data.dbName,data.ipDbRunning),
-                              "ipDbRunning": data.ipDbRunning,
-                              'isRestoreAfterBackup':  checkBackuping(data.dbName, data.ipDbRunning)
-                            }
-                          }
-                        />):data.backupStatus}
-                      </TableCell>
-                      <TableCell>
-                        {data.statusRestore.includes("Processing")?(<LinearWithValueLabel
+                        {checkBackuping(data.dbName, data.ipDbRunning) !== 0 ? (<BackUpProgress
                           processId={
                             {
                               "databaseName": data.dbName,
                               "idRestore": setiIdRestore(data.dbName, data.ipDbRunning),
-                              "ipDbRunning": data.ipDbRunning
+                              "ipDbRunning": data.ipDbRunning,
+                              'isRestoreAfterBackup': checkBackuping(data.dbName, data.ipDbRunning)
                             }
                           }
-                        />):checkBackuping(data.dbName,data.ipDbRunning)===1?"Waiting for restore":data.statusRestore}
+                        />) : data.backupStatus}
+                      </TableCell>
+                      <TableCell>
+                        {renderRestoreStatus(data)}
                       </TableCell>
                       <TableCell>
                         <div className='d-flex justify-content-evenly'>

@@ -99,11 +99,9 @@ export default function LinearWithValueLabel(processId) {
                                     })
                                     sessionStorage.setItem("restoreInfo", JSON.stringify(tmp))
                                 }
-                                clearInterval(timer);
                             }
                             if(record === undefined){
                                 setRestoreMessage("Error")
-                                clearInterval(timer);
                             } 
                         }
                     });
