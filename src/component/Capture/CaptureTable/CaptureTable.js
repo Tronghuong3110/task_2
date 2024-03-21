@@ -309,7 +309,7 @@ function CaptureTable() {
                         />):data.backupStatus}
                       </TableCell>
                       <TableCell>
-                        {data.statusRestore==="Processing"?(<LinearWithValueLabel
+                        {data.statusRestore.includes("Processing")?(<LinearWithValueLabel
                           processId={
                             {
                               "databaseName": data.dbName,
@@ -317,7 +317,7 @@ function CaptureTable() {
                               "ipDbRunning": data.ipDbRunning
                             }
                           }
-                        />):data.statusRestore}
+                        />):checkBackuping(data.dbName,data.ipDbRunning)===1?"Waiting for restore":data.statusRestore}
                       </TableCell>
                       <TableCell>
                         <div className='d-flex justify-content-evenly'>
