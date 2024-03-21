@@ -325,13 +325,13 @@ const AddNas = ({ handleCloseWindow, id, rerender }) => {
                 </div>
                 {/* Button */}
                 <div className='btn-container d-flex justify-content-end'>
-                    {(fptPassword ==="" ||fptPassword===null ?false:true) && <button className='btn btn-primary d-flex align-items-center' disabled={testing}  style={{ marginRight: '1rem' }} onClick={testFTPConnection}>
+                    <button className='btn btn-primary d-flex align-items-center' disabled={testing}  style={{ marginRight: '1rem' }} onClick={testFTPConnection}>
                         <div className='btn-icon d-flex align-items-center' >
                             {!testing && <FontAwesomeIcon icon={faPlay} />}
                             {testing && <FontAwesomeIcon icon={faSpinner} spinPulse style={{color: "#ffffff",}} />}
                         </div>
                         <div className='btn-text' >Test FTP connection</div>
-                    </button>}
+                    </button>
                     <button className='btn btn-success d-flex align-items-center' disabled={testing} onClick={() => addOrEditModule(id)} >
                         <div className='btn-icon d-flex align-items-center' >
                             <FontAwesomeIcon icon={faFloppyDisk} />

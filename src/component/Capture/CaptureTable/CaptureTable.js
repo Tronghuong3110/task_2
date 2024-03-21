@@ -309,7 +309,7 @@ function CaptureTable() {
                         />):data.backupStatus}
                       </TableCell>
                       <TableCell>
-                        <LinearWithValueLabel
+                        {data.statusRestore==="Processing"?(<LinearWithValueLabel
                           processId={
                             {
                               "databaseName": data.dbName,
@@ -317,7 +317,7 @@ function CaptureTable() {
                               "ipDbRunning": data.ipDbRunning
                             }
                           }
-                        />
+                        />):data.statusRestore}
                       </TableCell>
                       <TableCell>
                         <div className='d-flex justify-content-evenly'>
