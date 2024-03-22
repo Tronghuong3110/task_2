@@ -18,7 +18,7 @@ function DBTable() {
         fetch(IP+"/api/v1/info/volumes?name=&ip=&type=")
             .then(response => response.json())
             .then(data =>{
-                let displayDB = data.filter(item => item.databaseName!="system")
+                let displayDB = data.filter(item => item.databaseName.toLowerCase()!=="system"&&item.databaseName.toLowerCase()!=="default"&&item.databaseName.toLowerCase()!=="information_schema")
                 setDbList(displayDB)
                 setDbDisplay(displayDB)
             })
