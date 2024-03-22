@@ -38,7 +38,7 @@ function CaptureTable() {
   const [backupData, setBackupData] = useState({});
   const [restoreData, setRestoreData] = useState({});
   const [displayBackupData, setDisplayBackupData] = useState({})
-  const [timer,setTimer] = useState(1000)
+  const [timer, setTimer] = useState(1000)
   var interval
   useEffect(() => {
     const fetchFunction = () => {
@@ -46,10 +46,8 @@ function CaptureTable() {
         .then(response => response.json())
         .then(data => {
           const check = data.find(item => item.backupStatus.includes("Processing") || item.statusRestore.includes("Processing"))
-          console.log(check)
           if (check === undefined) setTimer(5000);
           else setTimer(1000)
-          console.log(timer)
           setCaptrueList(data)
           getCapTureListByCondition(data)
         })
@@ -171,7 +169,11 @@ function CaptureTable() {
         }
       />)
     }
-    return data.backupStatus;
+    return (
+      <Tooltip title={data.backupStatus}>
+        {data.backupStatus}
+      </Tooltip>
+    );
   }
   const renderRestoreStatus = (data) => {
     if (data.statusRestore.includes("Processing")) {
@@ -183,7 +185,11 @@ function CaptureTable() {
         }
       />)
     }
-    return data.statusRestore;
+    return (
+      <Tooltip title={data.statusRestore}>
+        {data.statusRestore}
+      </Tooltip>
+    )
   }
   const setDisable = (data) => {
     return (data.status_connect !== null ||
@@ -317,10 +323,14 @@ function CaptureTable() {
                       <TableCell>{data.startTime}</TableCell>
                       <TableCell>{data.stopTime}</TableCell>
                       <TableCell>
-                        {renderBackupStatus(data)}
+                        <div>
+                          {renderBackupStatus(data)}
+                        </div>
                       </TableCell>
                       <TableCell>
-                        {renderRestoreStatus(data)}
+                        <div>
+                          {renderRestoreStatus(data)}
+                        </div>
                       </TableCell>
                       <TableCell>
                         <div className='d-flex justify-content-evenly'>

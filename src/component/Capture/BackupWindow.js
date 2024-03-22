@@ -28,17 +28,8 @@ const BackupWindow = ({ handleCloseWindow, data, displayBackupData }) => {
             "nasName": ""
         }
     )
-    const [isSetDb, setDb] = useState(
-        {
-            "id": 1,
-            "dbName": "Database 01",
-            "dbIp": "192.168.100.121",
-            "type": "SSD",
-            "volumnTotal": 1280,
-            "volumnUsed": 700,
-            "volumnFree": 580
-        }
-    )
+    const [isSetDb, setDb] = useState({})
+    const [isSetNas,setNas] = useState({})
     const [schedule, setSchedule] = useState("");
 
     const [displaySchedule, setDisplaySchedule] = useState(false)
@@ -46,6 +37,7 @@ const BackupWindow = ({ handleCloseWindow, data, displayBackupData }) => {
     const [dbServerList, setDbServerList] = useState([])
 
     const [serverRestore, setServerRestore] = useState()
+
 
     useEffect(() => {
         fetch(IP + "/api/v1/database/servers?key=")
@@ -63,6 +55,38 @@ const BackupWindow = ({ handleCloseWindow, data, displayBackupData }) => {
             .catch(err => console.log(err))
 
     }, [])
+    useEffect(() => {
+        const id = displayBackupData.idServer
+        if (id !== null) {
+            fetch(IP + "/api/v1/database/server?id=" + id)
+                .then(response => response.json())
+                .then(data => setServer(data))
+                .catch(err => console.log(err))
+        }
+    }, [])
+    useEffect(() => {
+        const id = displayBackupData.nasId
+        if (id !== null) {
+            fetch(IP + "/api/v1/nas?id=" + id)
+                .then(response => response.json())
+                .then(data => {
+                    setNas(data)
+                })
+                .catch(err => console.log(err))
+        }
+    }, [])
+    useEffect(()=>{
+        const name = displayBackupData.dbName
+        console.log(name)
+        if (name !== null) {
+            fetch(IP + `/api/v1/info/volumes?name=${name}&ip=&type=`)
+                .then(response => response.json())
+                .then(data => {
+                    if(data.length!==0) setDb(data[0])
+                })
+                .catch(err => console.log(err))
+        }
+    },[])
 
     //Hàm hiển thị thông báo sau khi thêm
     const notify = (message, status) => {
@@ -134,21 +158,6 @@ const BackupWindow = ({ handleCloseWindow, data, displayBackupData }) => {
             })
         }
         fetch(IP + "/api/v1/capture/backup?idServer=" + data.idServer + "&databaseName=" + data.dbName + "&idInfo=" + data.idInfo + "&restore=" + restore + "&delete=" + dlt, options)
-        // let restoreInfo = sessionStorage.getItem("restoreInfo")
-        // if (restoreInfo !== null) {
-        //     let tmp = JSON.parse(restoreInfo)
-        //     let result = tmp.map(item => {
-        //         if (data.id === item.capture_id) {
-        //             return {
-        //                 ...item,
-        //                 'isBackuping':1,
-        //                 'restoreAfterBackup': restore===false?0:1
-        //             }
-        //         }
-        //         else return item;
-        //     })
-        //     sessionStorage.setItem("restoreInfo", JSON.stringify(result))
-        // }
         handleCloseWindow()
     }
     return (
@@ -171,23 +180,23 @@ const BackupWindow = ({ handleCloseWindow, data, displayBackupData }) => {
                                 <div className='info_container'>
                                     <div className='info d-flex'>
                                         <div className='info-title'>DATABASE NAME : </div>
-                                        <div className='info-data'>{isSetDb.dbName}</div>
+                                        <div className='info-data'>{isSetDb.databaseName}</div>
                                     </div>
                                     <div className='info d-flex'>
                                         <div className='info-title'>DATABASE IP : </div>
-                                        <div className='info-data'>{isSetDb.dbIp}</div>
+                                        <div className='info-data'>{isSetDb.ipDb}</div>
                                     </div>
                                     <div className='info d-flex'>
                                         <div className='info-title'>TOTAL VOLUME : </div>
-                                        <div className='info-data'>{isSetDb.volumnTotal} G</div>
+                                        <div className='info-data'>{isSetDb.volumeTotal}</div>
                                     </div>
                                     <div className='info d-flex'>
                                         <div className='info-title'>USED VOLUME : </div>
-                                        <div className='info-data'>{isSetDb.volumnUsed} G</div>
+                                        <div className='info-data'>{isSetDb.volumeUsed}</div>
                                     </div>
                                     <div className='info d-flex'>
                                         <div className='info-title'>FREE VOLUME : </div>
-                                        <div className='info-data'>{isSetDb.volumnFree} G</div>
+                                        <div className='info-data'>{isSetDb.volumeFree}</div>
                                     </div>
                                 </div>
                             </div>
@@ -226,15 +235,15 @@ const BackupWindow = ({ handleCloseWindow, data, displayBackupData }) => {
                                 <div className='info_container'>
                                     <div className='info d-flex'>
                                         <div className='info-title'>NAS NAME : </div>
-                                        <div className='info-data'>Database 01</div>
+                                        <div className='info-data'>{isSetNas.nasName}</div>
                                     </div>
                                     <div className='info d-flex'>
                                         <div className='info-title'>NAS IP : </div>
-                                        <div className='info-data'>192.168.100.101</div>
+                                        <div className='info-data'>{isSetNas.ip}</div>
                                     </div>
                                     <div className='info d-flex'>
                                         <div className='info-title'>PORT : </div>
-                                        <div className='info-data'>100</div>
+                                        <div className='info-data'>{isSetNas.port}</div>
                                     </div>
                                 </div>
                             </div>

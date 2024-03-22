@@ -39,13 +39,6 @@ const AddNas = ({ handleCloseWindow, id, rerender }) => {
                 .catch(err => console.log(err))
         }
     }, [])
-    // useEffect(() => {
-    //     fetch(IP + "/api/v1/typeModule")
-    //         .then(response => response.json())
-    //         .then(data => setTypeModule(data))
-    //         .catch(err => console.log(err))
-    // }, [])
-
     // Thêm mới một module mẫu
     const addOrEditModule = (id) => {
         let data = getNasInfo();
