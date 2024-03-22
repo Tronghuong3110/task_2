@@ -5,7 +5,7 @@ import { IP } from '../../Layout/constaints';
 function CoreContainer({ probeId }) {
     const [coreList, setCoreList] = useState([]);
     useEffect(() => {
-        const fetchCore =() => {
+        const fetchCore = setInterval(() => {
             fetch(IP+`/api/v1/performance?probeId=${probeId}&number=1`)
                 .then(response => response.json())
                 .then(data => {
@@ -22,9 +22,8 @@ function CoreContainer({ probeId }) {
                     setCoreList(coreArr)
                 })
                 .catch(err => console.log(err))
-        }
-        fetchCore()
-        return () => setInterval(fetchCore, 2000)
+        },2000)
+        return () => clearInterval(fetchCore)
     }, [probeId])
     const [activeCore, setActiveCore] = useState(null);
     return (

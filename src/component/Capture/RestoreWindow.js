@@ -179,7 +179,7 @@ const RestoreWindow = ({ handleCloseWindow, id, data }) => {
                                 }
 
                             }}
-                            renderInput={(params) => <TextField {...params} label="Choose backup server" />}
+                            renderInput={(params) => <TextField {...params} label="Choose restore server" />}
                         />
                         <Autocomplete
                             disablePortal
