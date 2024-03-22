@@ -12,7 +12,7 @@ import { IP } from '../Layout/constaints';
 import CustomDateTimePicker from '../action/CustomDateTimePicker.js';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
-const BackupWindow = ({ handleCloseWindow, data }) => {
+const BackupWindow = ({ handleCloseWindow, data, displayBackupData }) => {
     const [isOpen, openCloseAddWindow] = useState(true)
     const [isSetServer, setServer] = useState(
         {

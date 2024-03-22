@@ -1,6 +1,7 @@
 import React,{memo} from 'react'
 import { Line } from 'react-chartjs-2'
-import styled from 'styled-components'
+import { Chart, registerables } from 'chart.js';
+Chart.register(...registerables);
 function LineChart({ chartData,borderColor }) {
     return (
         <Line

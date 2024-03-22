@@ -17,7 +17,7 @@ function ChartDisPlay(props) {
     })
     useEffect(() => {
         const fetchCore = async () => {
-            fetch(`http://${IP}/api/v1/performance?probeId=${probeId}&number=15`)
+            fetch(`${IP}/api/v1/performance?probeId=${probeId}&number=15`)
                 .then(response => response.json())
                 .then(data => {
                     let corePercentArr = []
