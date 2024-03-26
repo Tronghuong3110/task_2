@@ -6,14 +6,16 @@ import {
     faBell
 } from '@fortawesome/free-regular-svg-icons'
 import {
+    faBars,
     faCircleUser, faMagnifyingGlass
 } from '@fortawesome/free-solid-svg-icons'
-const Header = () => {
+const Header = ({toggleDrawer}) => {
     return (
         <header>
             <div className="row header">
-                <div className="col-lg-2 header-name">
-                    SCREEN NAME
+                <div className="col-lg-2 header-name " onClick={toggleDrawer(true)}>
+                    <FontAwesomeIcon icon={faBars} style={{ color: "#ffffff", fontSize: "1em",cursor:"pointer",marginRight:"1rem" }} />
+                    MAIN MENU
                 </div>
                 <div className="col-lg-10 header-content d-flex justify-content-end">
                     <div className="header-content-input">

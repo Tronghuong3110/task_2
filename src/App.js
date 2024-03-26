@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
-import Sidebar from './component/Layout/Sidebar';
+import Sidebar from './component/Layout/Sidebar/Sidebar';
 import Header from './component/Layout/Header';
 import Probes from './component/Probes/Probes';
 import ProbeDetails from './component/ProbeDetails/ProbeDetails';
@@ -17,19 +17,25 @@ import NASManager from './component/Nas/NASManager';
 import DB from './component/DB/DB';
 import Capture from './component/Capture/Capture';
 import InterfaceManager from './component/InterfaceManage/InterfaceManager';
+import { Drawer } from '@mui/material';
 function App() {
-  const [isHideSideBar, setHideSideBar] = useState(false)
+  const [open, setOpen] = useState(false)
+  const toggleDrawer = (newOpen) => () => {
+    setOpen(newOpen);
+  };
   return (
     <React.Fragment>
       <div className="App" style={{ padding: 0, margin: 0, backgroundColor: "#0b0c24" }}>
         <div className='headerContainer' style={{ height: "80px" }}>
-          <Header></Header>
+          <Header toggleDrawer={toggleDrawer}></Header>
         </div>
-        <main className='mainContainer d-flex' style={{ backgroundColor: "#0b0c24",minHeight:"calc(100vh - 160px)" }} >
-          <div className='sidebarContainer' style={{ width: isHideSideBar === false ? "10%" : "5%", backgroundColor: "transparent", height: "100%", transition: "width 0.5s" }}>
-            <Sidebar isHide={isHideSideBar} setHideSideBar={setHideSideBar} ></Sidebar>
+        <main className='mainContainer d-flex' style={{ backgroundColor: "#0b0c24", minHeight: "calc(100vh - 160px)" }} >
+          <div className='sidebarContainer'>
+            <Drawer open={open} onClose={toggleDrawer(false)}>
+              <Sidebar toggleDrawer={toggleDrawer}  ></Sidebar>
+            </Drawer>
           </div>
-          <div className='dataContainer' style={{ width: isHideSideBar === true ? "95%" : "90%", backgroundColor: "transparent", padding: "0 30px", transition: "width 0.5s" }} >
+          <div className='dataContainer' style={{ width: "100%", backgroundColor: "transparent", padding: "0 30px", transition: "width 0.5s" }} >
 
             <Routes>
               <Route path='/' exact element={<Dashboard></Dashboard>}></Route>

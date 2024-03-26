@@ -46,9 +46,6 @@ const Probes = () => {
             }
         }
     }, [selectedLocation])
-    useEffect(() => {
-        document.querySelector(".header-name").textContent = "PROBES"
-    }, [])
     const handleOptionSelectLocation = (selectedValue) => {
         setSelectedLocation(selectedValue);
         setSelectedArea(null)

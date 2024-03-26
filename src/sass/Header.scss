@@ -16,11 +16,10 @@ $blue-color: #1647F3;
         box-sizing: border-box;
         padding-left: 10px;
         font-size: 1em;
-        width: 10%;
+        cursor: pointer;
     }
     &-content{
         // padding-right: 50px;
-        width: 90%;
         &-icon{
             padding: 5px 20px;
         }

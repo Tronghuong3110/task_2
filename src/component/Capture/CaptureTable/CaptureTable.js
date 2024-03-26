@@ -156,14 +156,10 @@ function CaptureTable() {
   }
 
   const renderBackupStatus = (data) => {
-    if (data.backupStatus.includes("Processing")) {
+    if (data.backupStatus!==null && data.backupStatus.includes("Processing")) {
       return (<BackUpProgress
         processId={
           {
-            // "databaseName": data.dbName,
-            // "idRestore": setiIdRestore(data.dbName, data.ipDbRunning),
-            // "ipDbRunning": data.ipDbRunning,
-            // 'isRestoreAfterBackup': checkBackuping(data.dbName, data.ipDbRunning),
             "backupStatus": data.processBackup
           }
         }
@@ -176,7 +172,7 @@ function CaptureTable() {
     );
   }
   const renderRestoreStatus = (data) => {
-    if (data.statusRestore.includes("Processing")) {
+    if (data.statusRestore!==null && data.statusRestore.includes("Processing")) {
       return (<LinearWithValueLabel
         processId={
           {
