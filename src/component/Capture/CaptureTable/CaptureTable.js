@@ -154,9 +154,15 @@ function CaptureTable() {
 
     return "#FFF61C"
   }
-
+  const setColorForStatus = (text) => {
+    if (text !== null) {
+      if (text.includes("Finished")) return "#00FF1A"
+      else if (text.includes("error")) return "red"
+    }
+    return "white";
+  }
   const renderBackupStatus = (data) => {
-    if (data.backupStatus!==null && data.backupStatus.includes("Processing")) {
+    if (data.backupStatus !== null && data.backupStatus.includes("Processing")) {
       return (<BackUpProgress
         processId={
           {
@@ -167,12 +173,12 @@ function CaptureTable() {
     }
     return (
       <Tooltip title={data.backupStatus}>
-        {data.backupStatus}
+        <div style={{ color: setColorForStatus(data.backupStatus) }}>{data.backupStatus}</div>
       </Tooltip>
     );
   }
   const renderRestoreStatus = (data) => {
-    if (data.statusRestore!==null && data.statusRestore.includes("Processing")) {
+    if (data.statusRestore !== null && data.statusRestore.includes("Processing")) {
       return (<LinearWithValueLabel
         processId={
           {
@@ -183,7 +189,7 @@ function CaptureTable() {
     }
     return (
       <Tooltip title={data.statusRestore}>
-        {data.statusRestore}
+        <div style={{ color: setColorForStatus(data.statusRestore) }}>{data.statusRestore}</div>
       </Tooltip>
     )
   }
