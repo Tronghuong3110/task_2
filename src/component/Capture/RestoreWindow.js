@@ -25,6 +25,7 @@ const RestoreWindow = ({ handleCloseWindow, id, data }) => {
 
 
     useEffect(() => {
+        console.log(data)
         fetch(IP + "/api/v1/info/database/restore?databaseName=" + data.dbName)
             .then(response => response.json())
             .then(data => {
@@ -109,7 +110,7 @@ const RestoreWindow = ({ handleCloseWindow, id, data }) => {
                     "Content-Type": "application/json"
                 }
             }
-            fetch(IP + "/api/v1/capture/restore?idInfoDatabase=" + choosenDb.value + "&idServer=" + choosenServer.value+"&id_info_capture_setting="+data.id_info_capture_setting, options)
+            fetch(IP + "/api/v1/capture/restore?idInfoDatabase=" + choosenDb.value + "&idServer=" + choosenServer.value+"&id_info_capture_setting="+data.idInfo, options)
             // let restoreInfo = sessionStorage.getItem("restoreInfo")
             // if(restoreInfo!==null){
             //     let tmp = [...JSON.parse(restoreInfo)]

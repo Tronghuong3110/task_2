@@ -19,7 +19,7 @@ import Capture from './component/Capture/Capture';
 import InterfaceManager from './component/InterfaceManage/InterfaceManager';
 import { Drawer } from '@mui/material';
 function App() {
-  const [open, setOpen] = useState(false)
+  const [open,setOpen] = useState(false)
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
   };
@@ -29,13 +29,13 @@ function App() {
         <div className='headerContainer' style={{ height: "80px" }}>
           <Header toggleDrawer={toggleDrawer}></Header>
         </div>
-        <main className='mainContainer d-flex' style={{ backgroundColor: "#0b0c24", minHeight: "calc(100vh - 160px)" }} >
+        <main className='mainContainer d-flex' style={{ backgroundColor: "#0b0c24",minHeight:"calc(100vh - 160px)" }} >
           <div className='sidebarContainer'>
             <Drawer open={open} onClose={toggleDrawer(false)}>
               <Sidebar toggleDrawer={toggleDrawer}  ></Sidebar>
             </Drawer>
           </div>
-          <div className='dataContainer' style={{ width: "100%", backgroundColor: "transparent", padding: "0 30px", transition: "width 0.5s" }} >
+          <div className='dataContainer' style={{ width:"100%", backgroundColor: "transparent", padding: "0 30px", transition: "width 0.5s" }} >
 
             <Routes>
               <Route path='/' exact element={<Dashboard></Dashboard>}></Route>
