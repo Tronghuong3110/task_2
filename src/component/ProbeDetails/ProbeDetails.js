@@ -100,7 +100,7 @@ const ProbeDetails = () => {
             ele.removeAttribute('disabled')
             ele.classList.remove('disabled')
         })
-        setAppear(!isAppear)
+        setAppear(false)
     }
     const getInfomationEdited = () => {
         var infomation = getInput();
@@ -125,7 +125,7 @@ const ProbeDetails = () => {
     }
     const handleSaveInformations = (id) => {
         let data = getInfomationEdited()
-        if (findEmptyFields(data) !== 0) {
+        if (findEmptyFields(data).length !== 0) {
             let message = "Field ";
             let arr = findEmptyFields(data);
             if (arr.length === 1) message += arr[0] + " is empty"
@@ -154,18 +154,20 @@ const ProbeDetails = () => {
             fetch(IP + "/api/v1/probe", options)
                 .then(response => response.json())
                 .then(data => {
-                    if (data.code === 1) {
-                        notify(data.message, data.code)
+                    console.log(data)
+                    if (parseInt(data.code) === 1) {
+                        notify(data.message, parseInt(data.code))
                         var infomation = getInput();
                         var element = infomation.elements;
                         element.forEach(ele => {
                             ele.setAttribute('disabled', true);
                             ele.classList.add('disabled')
                         })
-                        setAppear(!isAppear)
+                        setAppear(true)
                     }
                     else {
-                        notify(data.message, data.code)
+                        notify(data.message, parseInt(data.code))
+                        
                     }
                 })
                 .catch(err => console.log(err))

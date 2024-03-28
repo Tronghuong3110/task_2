@@ -49,7 +49,6 @@ const ProbeModules = ({ id, status }) => {
         else getProbeModulesByConditions()
     }, [])
     useEffect(() => {
-        console.log(conditions)
         getProbeModulesByConditions()
     }, [conditions])
     useEffect(() => {
@@ -75,7 +74,6 @@ const ProbeModules = ({ id, status }) => {
                 let result = data.filter(modules => modules.moduleName.includes(name) && (modules.status === (status === "All" ? modules.status : status)))
                 let check = result.filter(item => item.status === "Running" || item.status === "Pending")
                 setExistRunningOrPending(check)
-                console.log(result)
                 setProbeModules(result)
             })
             .catch(err => console.log(err))
@@ -121,11 +119,9 @@ const ProbeModules = ({ id, status }) => {
     }
     function descendingComparator(a, b, orderBy) {
         if (parseInt(b[orderBy]) < parseInt(a[orderBy])) {
-            console.log(b[orderBy] + " < " + a[orderBy])
             return -1;
         }
         if (parseInt(b[orderBy]) > parseInt(a[orderBy])) {
-            console.log(b[orderBy] + " > " + a[orderBy])
             return 1;
         }
         return 0;
@@ -159,7 +155,6 @@ const ProbeModules = ({ id, status }) => {
         const interval = setInterval(() => {
             const checkValue = sessionStorage.getItem("check");
             if (checkValue === 1 || checkValue === null) {
-                console.log("Check value :", checkValue)
                 setTimeout(getProbeModulesByConditions(), 5000);
                 sessionStorage.removeItem("check");
                 setSelectedProbeModules([]);
@@ -211,7 +206,6 @@ const ProbeModules = ({ id, status }) => {
             notify("Please connect this probe before do any action", 0)
             return;
         }
-        console.log(arr, action)
         const options = {
             method: "POST",
             headers: {

@@ -11,7 +11,8 @@ import { IP } from '../../Layout/constaints';
 import SimpleDialogDemo from '../../action/SimpleDialog';
 import LinearWithValueLabel from '../../action/LinearProgressWithLabel';
 import BackUpProgress from '../../action/BackUpProgress';
-function CaptureTable() {
+function CaptureTable({ipServer}) {
+  
   const [captureList, setCaptrueList] = useState([])
   const [displayCaptureList, setDisplayCaptrueList] = useState([])
   const [isOpenBackupWindow, openCloseBackupWindow] = useState(false);
@@ -42,7 +43,7 @@ function CaptureTable() {
   var interval
   useEffect(() => {
     const fetchFunction = () => {
-      fetch(IP + "/api/v1/captures")
+      fetch(IP + "/api/v1/captures?ip="+ipServer)
         .then(response => response.json())
         .then(data => {
           const check = data.find(item => item.backupStatus.includes("Processing") || item.statusRestore.includes("Processing"))
@@ -53,7 +54,7 @@ function CaptureTable() {
         })
         .catch(err => console.log(err))
     }
-    fetch(IP + "/api/v1/captures")
+    fetch(IP + "/api/v1/captures?ip="+ipServer)
       .then(response => response.json())
       .then(data => {
         setCaptrueList(data)
@@ -134,6 +135,13 @@ function CaptureTable() {
   }
   const handleCloseBackupWindow = () => {
     openCloseBackupWindow(false)
+    fetch(IP + "/api/v1/captures?ip="+ipServer)
+      .then(response => response.json())
+      .then(data => {
+        setCaptrueList(data)
+        setDisplayCaptrueList(data)
+      })
+      .catch(err => console.log(err))
   }
   // Ham dong mo cua so restore
   const handleOpenRestoreWindow = (data) => {

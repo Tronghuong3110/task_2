@@ -8,14 +8,15 @@ import '../../action/Confirm'
 import { IP } from '../../Layout/constaints';
 import '../../../sass/DB/DBTable/DBTable.scss'
 
-function DBTable() {
+function DBTable({ipServer}) {
     const [dbList,setDbList] = useState([])
     const [dbDisplay,setDbDisplay] = useState(dbList)
     const [findingKeyWord, setFindingKeyWord] = useState("")
     const [dbType, setDbType] = useState("All")
 
     useEffect(()=>{
-        fetch(IP+"/api/v1/info/volumes?name=&ip=&type=")
+        const paramsIpServer = ipServer===0?"":ipServer
+        fetch(IP+"/api/v1/info/volumes?name=&ip="+paramsIpServer+"&type=")
             .then(response => response.json())
             .then(data =>{
                 let displayDB = data.filter(item => item.databaseName.toLowerCase()!=="system"&&item.databaseName.toLowerCase()!=="default"&&item.databaseName.toLowerCase()!=="information_schema")

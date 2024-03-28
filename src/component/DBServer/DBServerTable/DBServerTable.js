@@ -1,7 +1,7 @@
 import { TableContainer, TableHead, TableRow, TableCell, TableBody, Table, Box, Typography } from '@mui/material'
 import React, { useState, useEffect } from 'react'
 import '../../../sass/DBServer/DBServerTable/DBServerTable.scss'
-import {  faSquarePlus, faPenToSquare, faTrashCan } from '@fortawesome/free-regular-svg-icons';
+import { faSquarePlus, faPenToSquare, faTrashCan } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import 'bootstrap/dist/css/bootstrap.css';
 import Button from "@mui/material/Button"
@@ -11,6 +11,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import '../../action/Confirm'
 import Confirm from '../../action/Confirm';
 import { IP } from '../../Layout/constaints';
+import { TabOutlined } from '@mui/icons-material';
+import { Link } from 'react-router-dom';
 function DBServerTable() {
 
     const [isOpenAddWindow, openCloseAddWindow] = useState(false);
@@ -185,6 +187,7 @@ function DBServerTable() {
                             <TableCell>Server IP</TableCell>
                             <TableCell>Server Name</TableCell>
                             <TableCell>Type</TableCell>
+                            <TableCell>Hardware Volume (Free/Total)</TableCell>
                             <TableCell>Backup NAS</TableCell>
                             <TableCell>Description</TableCell>
                             <TableCell>DB Account</TableCell>
@@ -197,9 +200,18 @@ function DBServerTable() {
                             return (
                                 <TableRow key={data.id}>
                                     <TableCell>{data.id}</TableCell>
-                                    <TableCell>{data.ipServer}</TableCell>
+                                    <TableCell>
+                                        <Link to={`/capture/${data.ipServer}`}>
+                                            {data.ipServer}
+                                        </Link>
+                                    </TableCell>
                                     <TableCell>{data.serverName}</TableCell>
                                     <TableCell>{data.type}</TableCell>
+                                    <TableCell>
+                                        <Link to={`/db/${data.ipServer}`}>
+                                            50G/150G
+                                        </Link>
+                                    </TableCell>
                                     <TableCell>{data.nasName}</TableCell>
                                     <TableCell>{data.description}</TableCell>
                                     <TableCell>{data.dbAccount}</TableCell>

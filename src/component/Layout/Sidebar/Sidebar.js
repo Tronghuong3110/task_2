@@ -54,12 +54,12 @@ const Sidebar = (props) => {
                 },
                 {
                     displayItemText: "Database",
-                    linkTo: '/db',
+                    linkTo: '/db/0',
                     icon: <FontAwesomeIcon icon={faDatabase} style={{ color: "#ffffff", fontSize: "1em" }} />
                 },
                 {
                     displayItemText: "Capture",
-                    linkTo: '/capture',
+                    linkTo: '/capture/ip=',
                     icon: <FontAwesomeIcon icon={faWarehouse} style={{ color: "#ffffff", fontSize: "1em" }} />
                 }
             ]

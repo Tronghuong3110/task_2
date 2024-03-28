@@ -18,6 +18,7 @@ import DB from './component/DB/DB';
 import Capture from './component/Capture/Capture';
 import InterfaceManager from './component/InterfaceManage/InterfaceManager';
 import { Drawer } from '@mui/material';
+import BackupRestoreHistory from './component/BackupRestoreHistory/BackupRestoreHistory';
 function App() {
   const [open,setOpen] = useState(false)
   const toggleDrawer = (newOpen) => () => {
@@ -47,9 +48,10 @@ function App() {
               <Route path='/bin' exact={true} element={<RecycleBin></RecycleBin>}></Route>
               <Route path='/dbserver' exact={true} element={<DBServer></DBServer>}></Route>
               <Route path='/nas' exact element={<NASManager />} ></Route>
-              <Route path='/db' exact element={<DB />}></Route>
-              <Route path='/capture' exact element={<Capture />}></Route>
+              <Route path='/db/:ipServer' exact element={<DB />}></Route>
+              <Route path='/capture/:ipServer' exact element={<Capture />}></Route>
               <Route path='/interface/:id' exact element={<InterfaceManager />}></Route>
+              <Route path='/backup_restore_history' exact element= {<BackupRestoreHistory />} />
             </Routes>
           </div>
         </main>
