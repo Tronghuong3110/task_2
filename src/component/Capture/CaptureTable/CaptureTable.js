@@ -42,6 +42,7 @@ function CaptureTable({ipServer}) {
   const [timer, setTimer] = useState(1000)
   var interval
   useEffect(() => {
+    console.log(ipServer)
     const fetchFunction = () => {
       fetch(IP + "/api/v1/captures?ip="+ipServer)
         .then(response => response.json())

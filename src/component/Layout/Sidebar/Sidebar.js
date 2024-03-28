@@ -59,7 +59,7 @@ const Sidebar = (props) => {
                 },
                 {
                     displayItemText: "Capture",
-                    linkTo: '/capture/ip=',
+                    linkTo: '/capture/all',
                     icon: <FontAwesomeIcon icon={faWarehouse} style={{ color: "#ffffff", fontSize: "1em" }} />
                 }
             ]

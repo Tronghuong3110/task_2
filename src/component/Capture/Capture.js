@@ -5,10 +5,10 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useParams } from 'react-router-dom';
 function Capture() {
-  const {ipServer} = useParams()
+  let {ipServer} = useParams()
   return (
     <div className='Capture'>
-      <CaptureTable ipServer={ipServer} />
+      <CaptureTable ipServer={ipServer==="all"?"":ipServer} />
       <ToastContainer></ToastContainer>
     </div>
   )
